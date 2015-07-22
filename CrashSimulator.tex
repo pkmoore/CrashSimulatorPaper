@@ -386,14 +386,14 @@ Homer Simpson\IEEEauthorrefmark{2},
 James Kirk\IEEEauthorrefmark{3},
 Montgomery Scott\IEEEauthorrefmark{3} and
 Eldon Tyrell\IEEEauthorrefmark{4}}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
-Georgia Institute of Technology,
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Fake School\\
+Fake University,
 Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
 \IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
 Email: homer@thesimpsons.com}
 \IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678--2391\\
 Telephone: (800) 555--1212, Fax: (888) 555--1212}
-\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
+}
 
 
 
@@ -410,14 +410,21 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
 
 \begin{abstract}
 %\boldmath
-The abstract goes here.
+
+    This paper introduces CrashSimulator, a tool designed to induce crashes in applications that do not properly handle
+    anomalous return conditions in common network API calls. CrashSimulator accomplishes this in three steps. First, it
+    analyzes a system call trace of an application collected using a utility like \emph{strace} in order to identify a
+    set of system calls that are commonly mishandled by developers. Next, it injects faults into the running application
+    at the previously identified points by using \emph{ptrace} to modify their return values. Finally, it observes
+    % What does "correctly" mean in general? %
+    whether or not the application responded to the erroneous return values correctly. Because CrashSimulator operates
+    using black box analysis utilities it does not require access to an application's source code.
+
 \end{abstract}
-% IEEEtran.cls defaults to using nonbold math in the Abstract.
-% This preserves the distinction between vectors and scalars. However,
-% if the conference you are submitting to favors bold math in the abstract,
-% then you can use LaTeX's standard command \boldmath at the very start
-% of the abstract to achieve this. Many IEEE journals/conferences frown on
-% math in the abstract anyway.
+% IEEEtran.cls defaults to using nonbold math in the Abstract.  This preserves the distinction between vectors and
+    % scalars. However, if the conference you are submitting to favors bold math in the abstract, then you can use
+    % LaTeX's standard command \boldmath at the very start of the abstract to achieve this. Many IEEE
+    % journals/conferences frown on math in the abstract anyway.
 
 % no keywords
 
