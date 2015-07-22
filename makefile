@@ -8,5 +8,5 @@ CrashSimulator.pdf: CrashSimulator.tex
 clean:
 	latexmk -CA
 
-view:
+view: CrashSimulator.pdf
 	open CrashSimulator.pdf
