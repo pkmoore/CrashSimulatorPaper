@@ -417,8 +417,12 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
     set of system calls that are commonly mishandled by developers. Next, it injects faults into the running application
     at the previously identified points by using \emph{ptrace} to modify their return values. Finally, it observes
     % What does "correctly" mean in general? %
-    whether or not the application responded to the erroneous return values correctly. Because CrashSimulator operates
-    using black box analysis utilities it does not require access to an application's source code.
+    whether or not the application responded to the erroneous return values correctly and reports its findings to the
+    developer. Because CrashSimulator operates using black box analysis utilities it does not require access to an
+    application's source code. CrashSimulator was used to analyze \emph{<<somenumber>>} commonly used open and closed
+    source applications. Its findings were compared to tickets listed in the bug tracking suites of these applications.
+    It was able to successfully identify \emph{<<somenumber>>} of bugs listed in these suites and
+    \emph{<<someothernumber>>} of bugs that had not yet been discovered.
 
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.  This preserves the distinction between vectors and
