@@ -460,14 +460,59 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
 
 \section{Introduction}
 % no \IEEEPARstart
-This demo file is intended to serve as a ``starter file''
-for IEEE conference papers produced under \LaTeX\ using
-IEEEtran.cls version 1.7 and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
 
-\hfill mds
+    One major hurdle in developing robust applications is anticipating and dealing with edge conditions and faults that
+    compromise and applications ability to run as intended. A common source of faults is the environment in which an
+    application runs. The typical approach to eliminating faults in an application is the creation of a suite of tests that
+    exercise the applications functionality and ensure that it always acts appropriately. In the case of issues that arise
+    from an application's environment it is not possible to enumerate and test for an acceptable amount of faults due to the
+    variety of hardware and software systems that make up the environment.
+
+    This problem is of particular concern in the context of today's highly network dependent applications. With the
+    explosion of mobile computing and software as a service products applications that are completely reliant on
+    well-behaved network communication are increasingly common. As a result a great deal of emphasis must be placed on
+    properly dealing with faults in these network communications. Unfortunately, identifying these faults is difficult due
+    to the inability of the developer to replicate all possible application environments.
+
+    The standard approach for identifying environment-induced faults at this time is to perform a beta test by deploying the
+    application to a subset of users and gathering feedback related to faults via automated crash reporting or manual bug
+    reports. This this group of users starts small and gradually increases over many deployments as the developer eliminates
+    the most common faults and feels comfortable expanding the user base. Eventually, the application is deemed sufficiently
+    free of faults and a initial production version can be published to the full user base.
+
+    This approach proves problematic. Deployment for testing is expensive in terms of time and cost. A
+    deployment may include the following steps:
+    \begin{enumerate}
+        \item{} A subset of users must be selected
+        \item{} The users must receive training or documentation on the application
+        \item{} The users must utilize the application for some period of time
+        \item{} Feedback regarding faults must be elicited through either automated or manual means
+        \item{} A set of faults must be derived and prioritized from the resultant feedback
+        \item{} The faults must be corrected
+    \end{enumerate}
+    These steps are repeated with successively larger groups of users until the developer decides that the application
+    is in an production ready state. Each iteration incurs the high costs associated with deployment to the users
+    elimination of the faults identified. Furthermore, there is no guarantee that the developer will receive a sufficient
+    quantity and quality of feedback required in order to render the application acceptably free of faults. This occurs
+    for a variety of reasons. First, users may not exercise uncommon code paths sufficiently to identify faults present
+    within them. This is particularly true with complex applications like web browsers or document editors. Second,
+    users may opt not to submit bug reports or may submit bug reports that are of such poor quality that they are
+    useless to the developer. Finally, and most importantly, there is no guarantee that these successive tests will
+    exhaustively cover the possible environment configurations in which the application may be required to run.
+
+    In light of these challenges, some other approach is needed to provide developers with confidence that their
+    applications are sufficiently free of faults without requiring the often onerous testing deployment cycle.
+    CrashSimulator is a tool designed to meet this need by providing automated identification of environment-induced
+    faults through simulated deviations from the normal flow of system calls an application makes to interact with its
+    environment.
+
+    CrashSimulator is able to test applications in a completely black box manner. It utilizes system call traces
+    collected during execution of the program to identify points for fault injection and injects the faults on
+    subsequent runs using ptrace to hook the applications execution and access its memory and registers. It then
+    evaluates whether the program successfully handled the injected fault or not and reports these results to the
+    developer.
+
+    \hfill mds
 
 \hfill January 11, 2007
 
