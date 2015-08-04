@@ -493,6 +493,10 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
     running through system calls.
 
     %%% Need examples of black-box testing tools
+    The alternative, black-box tools, have their own set of issues. Black-box tools work only by manipulating inputs
+    into the application and observing outputs. Because they do not attempt to understand the internal workings of an
+    application, these tools are typically less complex from an implementation and runtime standpoint. The price of this
+    lack of complexity is reduced the inability to target specific code paths or identify where faults come from.
 
     In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
     applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
