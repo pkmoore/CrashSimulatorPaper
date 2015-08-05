@@ -541,12 +541,30 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
 
 \section{CrashSimulator Approach Details}
 
-    Implementation Details Go Here
-    How do we determine what faults to inject specifically. E.g.\ do we make a syscall return -5 or -4 or whatever?
+    The trace gathering process
+        Linux -> Ktrace, Strace
+        OS X -> Dtrace
+
+    Trace analysis -> read netcheck and checkapi papers
+        NetCheck -> Has model of correct network system call order
+                    Looks at order of system calls and uses heuristic algorithm and network model to determine whether
+                    a particular ordering is feasible or not
+                        Model encodes falsehoods commonly believed by developers
+                        Prioritizes system call according to correct ordering
+                        Accept, Reject, or Permanently Reject the system call
+
+    Fault Injection
+        Using ptrace to change values of system calls
+        Using ptrace to buffer and change the ordering of UDP packets
+        How do we determine what faults to inject specifically. E.g.\ do we make a syscall return -5 or -4 or whatever?
+
+    Reporting
+        Netcheck diagnosis engine -> How does this tie into CrashSimulator
 
 \section{Evaluation}
 
-    Evaluation Goes Here
+    Limitations
+        Multi-threaded stuff is an issue for both NetCheck and CheckAPI
 
 \section{Related Work}
 
