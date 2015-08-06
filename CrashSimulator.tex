@@ -554,9 +554,11 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
     the frequency with which developers have an incorrect understanding of how these system calls can behave in an
     imperfect environment.
 
-    \textbf{Return Value Modification:} One way CrashSimulator can inject faults into running application is to modify
-    the return values of interesting system calls identified in the previous trace analysis step. First, the
-    CrashSimulator parent application is launched and configure
+    %% I can go into much more detail with the ptrace implementation stuff if I need to
+    \textbf{Return Value Modification:} One way CrashSimulator can inject faults into the running application is to
+    modify the return values of interesting system calls identified in the previous trace analysis step. First, the
+    CrashSimulator parent application is launched and configured.
+
         launching of parent application
         setup of child application under test
         run child application
@@ -566,18 +568,45 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
             New return value random? Smaller than present return value? Some constant -1?
             What do we do about 32-bit vs 64-bit
 
-    Reporting
-        NetCheck diagnosis engine -> How does this tie into CrashSimulator
-            Based on a set of rules. If simulation state matches a rule, the associated diagnosis is emitted.
+    % Probably just all this general packet reordering Is there some way to determine from the system call trace
+    % whether TCP or UDP was used
+    \textbf{Reordering of UDP packets:} A second way CrashSimulator can inject faults into the running application
+    is to buffer incoming UDP packets and reorder them
+
+        aunch parent application
+        run child application
+        wait for recv
+        buffer packet
+        wait for subsequent recvs
+        buffer further packet
+        replay buffered packet
+
+
+    %% Other than return codes, what else can we report on? NetCheck diagnosis engine -> How does this tie into
+    %% CrashSimulator
+    \textbf{Reporting:} CrashSimulator monitors the application under test during execution and reports on its
+    behavior. Any executions of the application that result in the application exiting with an error code or crashing
+    after injection of a fault are recorded. After all potential faults have been tested these failure-causing faults
+    are reported to the user.
 
 \section{Evaluation}
 
-    Limitations
+    \textbf{Bugs Identified}
+    %% Intro paragraph
+    First, CrashSimulator was evaluated against NUMBER of popular tools with public bug trackers available. The goal was
+    to identify bugs from each tool's bug tracker (both fixed and unfixed) that are related to the faults that
+    CrashSimulator can inject. Next, CrashSimulator was run against these tools fault counts were collected. A
+    comparison of the number of faults identified by the tool's users in the tool's bug tracker to the number of faults
+    identified by CrashSimulator is presented in the table below.
+
+    \emph{\textbf{INSERT TABLE HERE}}
+
+    \textbf{Limitations}
         Multi-threaded stuff is an issue for both NetCheck and CheckAPI
 
 \section{Related Work}
 
-    Related Work Goes Here
+    What goes here?
 
 \section{Conclusion}
 
