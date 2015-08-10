@@ -568,26 +568,50 @@ Telephone: (800) 555--1212, Fax: (888) 555--1212}
             New return value random? Smaller than present return value? Some constant -1?
             What do we do about 32-bit vs 64-bit
 
-    % Probably just all this general packet reordering Is there some way to determine from the system call trace
-    % whether TCP or UDP was used
-    \textbf{Reordering of UDP packets:} A second way CrashSimulator can inject faults into the running application
-    is to buffer incoming UDP packets and reorder them
+    %% What is the process for culling our set of unit tests for instances where there are a huge number of permutations
+    %% of packet orderings
+    \textbf{Catalog-Based Anomalies:} A second category of faults CrashSimulator can produce are known as catalog-based
+    faults. These faults are injected in two steps. First, the normal run trace is parsed in its entirety for system
+    calls in a specific set associated with the fault being injected and the data items passed into these system calls
+    are recorded in a data item catalog. Next, the application under test is run repeatedly with each run receiving a
+    different ordering of data items from the catalog for the corresponding system calls. One example of a fault
+    CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
+    pseudo-code listing:
 
-        aunch parent application
-        run child application
-        wait for recv
-        buffer packet
-        wait for subsequent recvs
-        buffer further packet
-        replay buffered packet
+    \begin{verbatim}
+        int main() {
+            socket = setupUdpSocket()
+            data1 = recvfrom(socket)
+            processData1(data1)
+            data2 = recvfrom(socket)
+            processData2(data2)
+        }
+    \end{verbatim}
 
+    This listing sets up a UDP socket and receives two datagrams from the socket processing each with the appropriate
+    function. A C program that implements this pseudo-code will produce a normal flow system call trace as follows:
 
-    %% Other than return codes, what else can we report on? NetCheck diagnosis engine -> How does this tie into
-    %% CrashSimulator
-    \textbf{Reporting:} CrashSimulator monitors the application under test during execution and reports on its
-    behavior. Any executions of the application that result in the application exiting with an error code or crashing
-    after injection of a fault are recorded. After all potential faults have been tested these failure-causing faults
-    are reported to the user.
+    \begin{verbatim}
+        ...
+        socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
+        bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+        recvfrom(3, "test\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 5
+        ...
+        write(1, "Process 1: test\n", 16)       = 16
+        recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
+        write(1, "Process 2: testagain\n", 21)  = 21
+        ...
+    \end{verbatim}
+
+    The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
+    makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as datagram
+    1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system call trace
+    and identify all calls to recvfrom, storing the data that was received in a data catalog and the identifying
+    information pertaining to the socket it was received from. Second, it would re-run the application under test and
+    send a different ordering of data from the data catalog to the socket in question. From the above example,
+    ``testagain'' would be sent to the first receive from and ``test'' would be sent to the second recvfrom resulting in
+    each data item being parsed by the incorrect function. CrashSimulator would then report abnormalities in the
+    application's behavior. \textbf{How are we going to handle situations where this is a silent failure}
 
 \section{Evaluation}
 
