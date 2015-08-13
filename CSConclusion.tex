@@ -1,0 +1,21 @@
+\section{Conclusion}
+
+    Minimizing the number of faults present in the applications they write is a key concern for software developers. A
+    number of automated testing techniques have been created in order to meet this goal. The most sophisticated of these
+    existing techniques focus on either analyzing an applications source code or machine code in order to gain an
+    understanding of the inputs required to exercise an applications code paths and then exercising them with the goal
+    of exposing faults. These techniques focus on the application itself to the neglect of the application's environment
+    which can be a source of numerous faults that cannot be identified by testing the application in isolation. To
+    combat this problem this work presents CrashSimulator, a tool that analyzes system call traces of application in
+    order to facilitate the injection of environment-based faults into the application for testing purposes.
+
+    The goal of CrashSimulator is to allow developers to identify unhandled edge cases at the intersection of their
+    application and the environment it is running in an automated fashion. CrashSimulator's ability to test an
+    application in a completely black-box manner, as well as its language-agnostic approach to application analysis,
+    gives considerable advantage over similar tools in the space. \textbf{NUMBER} major applications with public facing
+    bug trackers were tested using CrashSimulator and CrashSimulator was able to identify \textbf{PERCENT} of bugs
+    related to anomalies it tests for that had previously been located manually and reported. Additionally,
+    \textbf{NUMBER} of open source projects with existing unit test suites were examined and CrashSimulator was able to
+    improve test coverage in each of them by providing additional meaningful unit tests.
+
+

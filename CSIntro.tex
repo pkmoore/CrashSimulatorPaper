@@ -1,0 +1,51 @@
+\section{Introduction}
+% no \IEEEPARstart
+
+    One major hurdle in developing robust applications is anticipating and dealing with edge conditions and faults that
+    compromise and applications ability to run as intended. A common source of faults is the environment in which an
+    application runs. The typical approach to eliminating faults in an application is the creation of a suite of tests that
+    exercise the applications functionality and ensure that it always acts appropriately. In the case of issues that arise
+    from an application's environment it is not possible to enumerate and test for an acceptable amount of faults due to the
+    variety of hardware and software systems that make up the environment.
+
+    This problem is of particular concern in the context of today's highly network dependent applications. With the
+    explosion of mobile computing and software as a service products applications that are completely reliant on
+    well-behaved network communication are increasingly common. As a result a great deal of emphasis must be placed on
+    properly dealing with faults in these network communications. Unfortunately, identifying these faults is difficult due
+    to the inability of the developer to replicate all possible application environments and exhaust all possible code
+    paths.
+
+    Existing white-box testing tools like DART and SAGE testing tools rely on static analysis and symbolic execution of
+    code in order to determine sets of inputs that exercise particular code paths. DART symbolically executes an
+    applications source code in order to facilitate its testing. This limits DART to operating only on programs written
+    in C. SAGE improves on this strategy symbolically executing an application's x86 machine code instructions but this
+    results in an architecture based rather than programming language based limitation. CrashSimulator avoids these
+    issues by relying on transparent observation of native execution of an application.
+
+    %% Does this need to be here? Am I just arguing against static analysis???
+    Symbolic execution is computationally expensive and can result in deviations where the symbolic execution of code
+    Doesn't accurately represent the actual execution of code.
+    %% Is this a true sentence??
+    Both tools focus on how the application under test behaves when given a particular set of inputs without taking the
+    program's environment into account. DART assumes that external functions are side effect free (I.e.\ their execution
+    does not modify program memory). Alternatively, CrashSimulator executes standard, non-instrumented versions of an
+    application and transparently injects faults via the programs interaction with the environment in which it is
+    running through system calls.
+
+    %%% Need examples of black-box testing tools
+    The alternative, black-box tools, have their own set of issues. They do not have an understanding of what an
+    application is actually doing during execution which means they are only able to submit inputs and observe outputs.
+    They cannot identify specifically the source of faults in an application.
+
+    In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
+    applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
+    need by providing automated identification of environment-induced faults through simulated deviations from the
+    normal flow of system calls an application makes to interact with its environment.
+
+    CrashSimulator is able to test applications in a completely black-box manner. It utilizes system call traces
+    collected during execution of the program to identify points for fault injection and injects the faults on
+    subsequent runs using ptrace to hook the applications execution and access its memory and registers. It then
+    evaluates whether the program successfully handled the injected fault or not and reports these results to the
+    developer.
+
+
