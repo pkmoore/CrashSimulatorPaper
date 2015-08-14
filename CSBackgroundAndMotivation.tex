@@ -3,29 +3,35 @@
     %%This sentence is very similar to the one from the Sniper paper
     This section describes the techniques and terminologies used in other automatic testing frameworks.
 
-    \textbf{Black-box vs White-box Testing:} There are two primary approaches to automated software testing: black-box
-    testing and white-box testing. White-box testing tools require access to an applications source code in order to test
-    it. Typically this means that the testing tool is able to better ``understand'' the application. This can result in more
-    efficient and targeted testing. In the case of DART, the applications source code is used to generate a ``test
-    interface'' for each of the functions that make up the application. SAGE takes a slightly different approach in that it
-    works with compiled application code rather than source code. Its testing still falls into the white-box category
-    because of the way it attempts interpret and reason about the application's machine code.
+    \subsection{Black-box vs White-box Testing}
 
-    Black-box tools work only by manipulating inputs into the application and observing outputs. Because they do not
-    attempt to understand the internal workings of an application, these tools are typically less complex from an
-    implementation and runtime standpoint. The price of this lack of complexity is reduced the inability to target
-    specific code paths or identify where faults come from.
+        There are two primary approaches to automated software testing: black-box testing and white-box testing.
+        White-box testing tools require access to an applications source code in order to test it. Typically this means
+        that the testing tool is able to better ``understand'' the application. This can result in more efficient and
+        targeted testing. In the case of DART, the applications source code is used to generate a ``test interface'' for
+        each of the functions that make up the application. SAGE takes a slightly different approach in that it works
+        with compiled application code rather than source code. Its testing still falls into the white-box category
+        because of the way it attempts interpret and reason about the application's machine code.
 
-    \textbf{System Call Trace Analysis:} CrashSimulator is based on prior work from two projects: NetCheck and
-    CheckAPI.\@  It, like these tools, analyzes system call traces captured from an execution of the application under
-    test in order to determine locations that are likely to to be sources of faults. These traces are captured using
-    strace and dtrace, the standard tools made available for this purpose in Linux and OS X respectively. Each system
-    call is evaluated within the context of prior system calls, their parameters, and return values. This system call
-    context is compared an ideal model and deviations from this model are logged.
+        Black-box tools work only by manipulating inputs into the application and observing outputs. Because they do not
+        attempt to understand the internal workings of an application, these tools are typically less complex from an
+        implementation and runtime standpoint. The price of this lack of complexity is reduced the inability to target
+        specific code paths or identify where faults come from.
 
-    \textbf{Crash Simulation:} Once CrashSimulator has generated a series of potential faults from its analysis of an
-    application's system call trace the process of verifying the presence of faults can begin. Verification handled by
-    running an instance of the application and injecting one of the potential faults identified during the analysis
-    step.  The results of this faulty execution are monitored and any deviations in output from the ``correct'' output
-    are recorded. Faults that result in an application crashing are also recorded.
+    \subsection{System Call Trace Analysis}
+
+        CrashSimulator is based on prior work from two projects: NetCheck and CheckAPI. It, like these tools, analyzes
+        system call traces captured from an execution of the application under test in order to determine locations that
+        are likely to to be sources of faults. These traces are captured using strace and dtrace, the standard tools
+        made available for this purpose in Linux and OS X respectively. Each system call is evaluated within the context
+        of prior system calls, their parameters, and return values. This system call context is compared an ideal model
+        and deviations from this model are logged.
+
+    \subsection{Crash Simulation}
+
+        Once CrashSimulator has generated a series of potential faults from its analysis of an application's system call
+        trace the process of verifying the presence of faults can begin. Verification handled by running an instance of
+        the application and injecting one of the potential faults identified during the analysis step.  The results of
+        this faulty execution are monitored and any deviations in output from the ``correct'' output are recorded.
+        Faults that result in an application crashing are also recorded.
 
