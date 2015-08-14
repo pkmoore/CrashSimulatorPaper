@@ -23,9 +23,22 @@
     Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace gathering
     tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
 
-    %%% How much information should be included about NetCheck's inner workings here? Should they just be referred to
-    %%% the NetCheck paper?
-    %%% Talk about multiple traces?
+
+    \subsection{Supported Anomaly Types}
+
+    \textbf{I would really like to find another term besides anomaly}
+
+    CrashSimulator's goal when analyzing a normal run system call trace is to identify individual system calls or
+    patterns of system calls that it recognizes as an opportunity to inject a fault during subsequent runs. These
+    signatures are referred to as ``potential anomalies.'' CrashSimulator has the ability to identify and make use of
+    several classifications of potential anomalies.
+
+    \subsubsection{Return Value Modification}
+
+    \subsubsection{Data Reordering}
+
+    \subsubsection{Data Truncation}
+
     \subsection{Trace Analysis}
 
 
