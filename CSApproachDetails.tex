@@ -3,41 +3,41 @@
     %%% Verify information on supported trace formats %%%
     \subsection{System Call Traces}
 
-    The first step in CrashSimulator's operation is to gather a trace of the system
-    calls made by the application during a normal run. Where other tools base their operation of direct analysis of the
-    application under test CrashSimulator operates based on information gleaned from system call traces. This gives
-    CrashSimulator several advantages over similar tools. First, CrashSimulator operates in a language independent
-    manner. It can test any program given two conditions hold true:
+        The first step in CrashSimulator's operation is to gather a trace of the system calls made by the application
+        during a normal run. Where other tools base their operation of direct analysis of the application under test
+        CrashSimulator operates based on information gleaned from system call traces. This gives CrashSimulator several
+        advantages over similar tools. First, CrashSimulator operates in a language independent manner. It can test any
+        program given two conditions hold true:
 
-    \begin{enumerate}
-        \item{The application can run in the testing environment}
-        \item{The testing environment has the tooling required to take a system call trace of the application during a
-        normal run}
-    \end{enumerate}
+        \begin{enumerate}
+            \item{The application can run in the testing environment}
+            \item{The testing environment has the tooling required to take a system call trace of the application during
+            a normal run}
+        \end{enumerate}
 
-    This removes the need for the complex language parsing that other similar tools rely on. Second, the faults injected
-    by CrashSimulator test the interface between the application under test and its environment. Other similar testing
-    tools focus on testing the logic within the application under test which missing faults that only appear when the
-    application is run in an imperfect, real world environment.
+        This removes the need for the complex language parsing that other similar tools rely on. Second, the faults
+        injected by CrashSimulator test the interface between the application under test and its environment. Other
+        similar testing tools focus on testing the logic within the application under test which missing faults that
+        only appear when the application is run in an imperfect, real world environment.
 
-    Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace gathering
-    tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
+        Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace
+        gathering tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
 
 
     \subsection{Supported Anomaly Types}
 
-    \textbf{I would really like to find another term besides anomaly}
+        \textbf{I would really like to find another term besides anomaly}
 
-    CrashSimulator's goal when analyzing a normal run system call trace is to identify individual system calls or
-    patterns of system calls that it recognizes as an opportunity to inject a fault during subsequent runs. These
-    signatures are referred to as ``potential anomalies.'' CrashSimulator has the ability to identify and make use of
-    several classifications of potential anomalies.
+        CrashSimulator's goal when analyzing a normal run system call trace is to identify individual system calls or
+        patterns of system calls that it recognizes as an opportunity to inject a fault during subsequent runs. These
+        signatures are referred to as ``potential anomalies.'' CrashSimulator has the ability to identify and make use
+        of several classifications of potential anomalies.
 
-    \subsubsection{Return Value Modification}
+        \subsubsection{Return Value Modification}
 
-    \subsubsection{Data Reordering}
+        \subsubsection{Data Reordering}
 
-    \subsubsection{Data Truncation}
+        \subsubsection{Data Truncation}
 
     \subsection{Trace Analysis}
 
@@ -45,83 +45,85 @@
 
     \subsection{Fault Injection}
 
-     Once a set of potential fault injection points has been identified CrashSimulator uses
-    \emph{ptrace} inject faults on a live execution of the program. At this point, two faults types identifiable by
-    NetCheck are supported: modification of return values from network system calls and reordering of UDP packets.
-    These faults were chosen because of high impact they can have on applications that don't handle them properly and
-    the frequency with which developers have an incorrect understanding of how these system calls can behave in an
-    imperfect environment.
+         Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
+         faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
+         supported: modification of return values from network system calls and reordering of UDP packets.  These faults
+         were chosen because of high impact they can have on applications that don't handle them properly and the
+         frequency with which developers have an incorrect understanding of how these system calls can behave in an
+         imperfect environment.
 
-    %% I can go into much more detail with the ptrace implementation stuff if I need to
-    \subsection{Return Value Modification}
+        %% I can go into much more detail with the ptrace implementation stuff if I need to
+        \subsection{Return Value Modification}
 
-    One way CrashSimulator can inject faults into the running application is to
-    modify the return values of interesting system calls identified in the previous trace analysis step. First, the
-    CrashSimulator parent application is launched and configured.
+        One way CrashSimulator can inject faults into the running application is to
+        modify the return values of interesting system calls identified in the previous trace analysis step. First, the
+        CrashSimulator parent application is launched and configured.
 
-    \begin{verbatim}
-    launching of parent application
-        setup of child application under test
-        run child application
-        For for each system call determine if it is one we are interested in as determined by analysis
-            e.g.\ is this the 4th call to recv?
-        Modify EAX/RAX register after system call completion to contain new return value
-            New return value random? Smaller than present return value? Some constant -1?
-            What do we do about 32-bit vs 64-bit
-    \end{verbatim}
+        \begin{verbatim}
+        launching of parent application
+            setup of child application under test
+            run child application
+            For for each system call determine if it is one we are interested in as determined by analysis
+                e.g.\ is this the 4th call to recv?
+            Modify EAX/RAX register after system call completion to contain new return value
+                New return value random? Smaller than present return value? Some constant -1?
+                What do we do about 32-bit vs 64-bit
+        \end{verbatim}
 
-    %% What is the process for culling our set of unit tests for instances where there are a huge number of permutations
-    %% of packet orderings
-    \subsection{Catalog-Based Anomalies}
+        %% What is the process for culling our set of unit tests for instances where there are a huge number of
+        %% permutations of packet orderings
+        \subsection{Catalog-Based Anomalies}
 
-    A second category of faults CrashSimulator can produce are known as catalog-based
-    faults. These faults are injected in two steps. First, the normal run trace is parsed in its entirety for system
-    calls in a specific set associated with the fault being injected and the data items passed into these system calls
-    are recorded in a data item catalog. Next, the application under test is run repeatedly with each run receiving a
-    different ordering of data items from the catalog for the corresponding system calls. One example of a fault
-    CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
-    pseudo-code listing:
+        A second category of faults CrashSimulator can produce are known as catalog-based faults. These faults are
+        injected in two steps. First, the normal run trace is parsed in its entirety for system calls in a specific set
+        associated with the fault being injected and the data items passed into these system calls are recorded in a
+        data item catalog. Next, the application under test is run repeatedly with each run receiving a different
+        ordering of data items from the catalog for the corresponding system calls. One example of a fault
+        CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
+        pseudo-code listing:
 
-    %% Use the real C Code here
-    \begin{verbatim}
-        int main() {
-            socket = setupUdpSocket()
-            data1 = recvfrom(socket)
-            processData1(data1)
-            data2 = recvfrom(socket)
-            processData2(data2)
-        }
-    \end{verbatim}
+        %% Use the real C Code here
+        \begin{verbatim}
+int main() {
+    socket = setupUdpSocket()
+    data1 = recvfrom(socket)
+    processData1(data1)
+    data2 = recvfrom(socket)
+    processData2(data2)
+}
+        \end{verbatim}
 
-    This listing sets up a UDP socket and receives two datagrams from the socket processing each with the appropriate
-    function. A C program that implements this pseudo-code will produce a normal flow system call trace as follows:
+        This listing sets up a UDP socket and receives two datagrams from the socket processing each with the
+        appropriate function. A C program that implements this pseudo-code will produce a normal flow system call trace
+        as follows:
 
-    \begin{verbatim}
-        ...
-        socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
-        bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
-        recvfrom(3, "test\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 5
-        ...
-        write(1, "Process 1: test\n", 16)       = 16
-        recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
-        write(1, "Process 2: testagain\n", 21)  = 21
-        ...
-    \end{verbatim}
+        \begin{verbatim}
+...
+socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
+bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+recvfrom(3, "test\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 5
+...
+write(1, "Process 1: test\n", 16)       = 16
+recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
+write(1, "Process 2: testagain\n", 21)  = 21
+...
+        \end{verbatim}
 
-    The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
-    makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as datagram
-    1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system call trace
-    and identify all calls to recvfrom, storing the data that was received in a data catalog and the identifying
-    information pertaining to the socket it was received from. Second, it would re-run the application under test and
-    send a different ordering of data from the data catalog to the socket in question. From the above example,
-    ``testagain'' would be sent to the first receive from and ``test'' would be sent to the second recvfrom resulting in
-    each data item being parsed by the incorrect function. CrashSimulator would then report abnormalities in the
-    application's behavior. \textbf{How are we going to handle situations where this is a silent failure}
+        The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
+        makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as
+        datagram 1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system
+        call trace and identify all calls to recvfrom, storing the data that was received in a data catalog and the
+        identifying information pertaining to the socket it was received from. Second, it would re-run the application
+        under test and send a different ordering of data from the data catalog to the socket in question. From the above
+        example, ``testagain'' would be sent to the first receive from and ``test'' would be sent to the second recvfrom
+        resulting in each data item being parsed by the incorrect function. CrashSimulator would then report
+        abnormalities in the application's behavior. \textbf{How are we going to handle situations where this is a
+        silent failure}
 
     \subsection{Limitations}
 
-    %% This text will need to be updated based on discussion about handling testing of interpreted languages
-    In situations where CrashSimulator is testing an application written in an interpreted language the possibility
-    exists that faults will be found in the interpreter rather than the application itself. For example, CrashSimulator
-    may modify system calls made by the interpreter for purposes that are independent from the application under test
-    This could result in the interpreter itself behaving improperly...........
+        %% This text will need to be updated based on discussion about handling testing of interpreted languages
+        In situations where CrashSimulator is testing an application written in an interpreted language the possibility
+        exists that faults will be found in the interpreter rather than the application itself. For example,
+        CrashSimulator may modify system calls made by the interpreter for purposes that are independent from the
+        application under test This could result in the interpreter itself behaving improperly\ldots{}
