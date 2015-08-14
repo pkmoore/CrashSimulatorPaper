@@ -1,15 +1,21 @@
 \section{CrashSimulator Approach Details}
 
     %%% Verify information on supported trace formats %%%
-    \textbf{The Trace Gathering Process:} The first step in CrashSimulator's operation is to gather a trace of the
-    system calls made by the application during a normal run. Because CrashSimulator's trace analysis engine is based on
-    prior work from the NetCheck supported trace gathering tools include \emph{strace} on Linux and \emph{dtrace} on OS
-    X.
+    \subsection{System Call Traces}
+
+    The first step in CrashSimulator's operation is to gather a trace of the system
+    calls made by the application during a normal run. Where other tools base their operation of direct analysis of the
+    application under test CrashSimulator operates based on information gleaned from system call traces. This gives
+    CrashSimulator several advantages over similar tools. First, CrashSimulator is language and platform independent.
+    Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace gathering
+    tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
 
     %%% How much information should be included about NetCheck's inner workings here? Should they just be referred to
     %%% the NetCheck paper?
     %%% Talk about multiple traces?
-    \textbf{Trace Analysis:} CrashSimulator's trace analysis engine is based on NetCheck. NetCheck uses two strategies
+    \subsection{Trace Analysis}
+
+    CrashSimulator's trace analysis engine is based on NetCheck. NetCheck uses two strategies
     to identify potential fault areas from system call trace. The first is a model based simulation of the system calls
     relevant to network communication from the input trace. System calls are organized according to a POSIX socket API
     dependency graph and prioritized based on the order in which the system calls should be made in an ideal scenario.
@@ -23,7 +29,9 @@
     logged. These rejected system calls are treated as opportunities to inject faults during the next step of the
     process.
 
-    \textbf{Fault Injection:} Once a set of potential fault injection points has been identified CrashSimulator uses
+    \subsection{Fault Injection}
+
+     Once a set of potential fault injection points has been identified CrashSimulator uses
     \emph{ptrace} inject faults on a live execution of the program. At this point, two faults types identifiable by
     NetCheck are supported: modification of return values from network system calls and reordering of UDP packets.
     These faults were chosen because of high impact they can have on applications that don't handle them properly and
@@ -31,7 +39,9 @@
     imperfect environment.
 
     %% I can go into much more detail with the ptrace implementation stuff if I need to
-    \textbf{Return Value Modification:} One way CrashSimulator can inject faults into the running application is to
+    \subsection{Return Value Modification}
+
+     One way CrashSimulator can inject faults into the running application is to
     modify the return values of interesting system calls identified in the previous trace analysis step. First, the
     CrashSimulator parent application is launched and configured.
 
@@ -46,7 +56,9 @@
 
     %% What is the process for culling our set of unit tests for instances where there are a huge number of permutations
     %% of packet orderings
-    \textbf{Catalog-Based Anomalies:} A second category of faults CrashSimulator can produce are known as catalog-based
+    \subsection{Catalog-Based Anomalies}
+
+    A second category of faults CrashSimulator can produce are known as catalog-based
     faults. These faults are injected in two steps. First, the normal run trace is parsed in its entirety for system
     calls in a specific set associated with the fault being injected and the data items passed into these system calls
     are recorded in a data item catalog. Next, the application under test is run repeatedly with each run receiving a
