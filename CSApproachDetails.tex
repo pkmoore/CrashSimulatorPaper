@@ -15,19 +15,7 @@
     %%% Talk about multiple traces?
     \subsection{Trace Analysis}
 
-    CrashSimulator's trace analysis engine is based on NetCheck. NetCheck uses two strategies
-    to identify potential fault areas from system call trace. The first is a model based simulation of the system calls
-    relevant to network communication from the input trace. System calls are organized according to a POSIX socket API
-    dependency graph and prioritized based on the order in which the system calls should be made in an ideal scenario.
-    For example, a client application should not be making a \emph{connect} system call before it has set up its
-    socket with the appropriate \emph{socket} system call. The model assumes that all system calls are atomic and that
-    they cannot happen simultaneously. This allows a definite global order to be created.
 
-    Once a global ordering is in place each system call is evaluated based on the previous system calls. Return values
-    and parameters passed in are taken into account. If the system call is feasible it is accepted and the next system
-    call is evaluated. If the system call is not feasible given the current system call context it is rejected and
-    logged. These rejected system calls are treated as opportunities to inject faults during the next step of the
-    process.
 
     \subsection{Fault Injection}
 
