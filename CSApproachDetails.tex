@@ -6,7 +6,20 @@
     The first step in CrashSimulator's operation is to gather a trace of the system
     calls made by the application during a normal run. Where other tools base their operation of direct analysis of the
     application under test CrashSimulator operates based on information gleaned from system call traces. This gives
-    CrashSimulator several advantages over similar tools. First, CrashSimulator is language and platform independent.
+    CrashSimulator several advantages over similar tools. First, CrashSimulator operates in a language independent
+    manner. It can test any program given two conditions hold true:
+
+    \begin{enumerate}
+        \item{The application can run in the testing environment}
+        \item{The testing environment has the tooling required to take a system call trace of the application during a
+        normal run}
+    \end{enumerate}
+
+    This removes the need for the complex language parsing that other similar tools rely on. Second, the faults injected
+    by CrashSimulator test the interface between the application under test and its environment. Other similar testing
+    tools focus on testing the logic within the application under test which missing faults that only appear when the
+    application is run in an imperfect, real world environment.
+
     Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace gathering
     tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
 
