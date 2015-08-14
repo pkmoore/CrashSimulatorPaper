@@ -42,11 +42,12 @@
     %% I can go into much more detail with the ptrace implementation stuff if I need to
     \subsection{Return Value Modification}
 
-     One way CrashSimulator can inject faults into the running application is to
+    One way CrashSimulator can inject faults into the running application is to
     modify the return values of interesting system calls identified in the previous trace analysis step. First, the
     CrashSimulator parent application is launched and configured.
 
-        launching of parent application
+    \begin{verbatim}
+    launching of parent application
         setup of child application under test
         run child application
         For for each system call determine if it is one we are interested in as determined by analysis
@@ -54,6 +55,7 @@
         Modify EAX/RAX register after system call completion to contain new return value
             New return value random? Smaller than present return value? Some constant -1?
             What do we do about 32-bit vs 64-bit
+    \end{verbatim}
 
     %% What is the process for culling our set of unit tests for instances where there are a huge number of permutations
     %% of packet orderings
