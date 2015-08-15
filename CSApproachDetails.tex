@@ -120,14 +120,3 @@ write(1, "Process 2: testagain\n", 21)  = 21
         abnormalities in the application's behavior. \textbf{How are we going to handle situations where this is a
         silent failure}
 
-    \subsection{Limitations}
-
-        %% This text will need to be updated based on discussion about handling testing of interpreted languages
-        CrashSimulator operates at the level of an applications interactions with the operating system and environment
-        on which it is run. It does not make any attempt to determine what the cause of a fault may have been at a
-        higher level. For example, in situations where CrashSimulator is testing an application written in an
-        interpreted language the possibility exists that faults will be found in the interpreter rather than the
-        application itself. For example, CrashSimulator may modify system calls made by the interpreter for purposes
-        that are independent from the application under test. If this results results in improper output CrashSimulator
-        will simply report it as a fault in the application despite the fact that the user's code was not responsible
-        for the error.

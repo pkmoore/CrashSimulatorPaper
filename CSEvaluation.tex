@@ -15,3 +15,11 @@
 
         Multi-threaded stuff is an issue for both NetCheck and CheckAPI
 
+        %% This text will need to be updated based on discussion about handling testing of interpreted languages
+        Because CrashSimulator operates on the system calls made by an application it does not make any attempt to
+        determine what the cause of a fault may have been at a higher level. For example, in situations where
+        CrashSimulator is testing an application written in an interpreted language the possibility exists that faults
+        will be found in the interpreter rather than the application itself. For example, CrashSimulator may modify
+        system calls made by the interpreter for purposes that are independent from the application under test.  If this
+        results results in improper output CrashSimulator will simply report it as a fault in the application despite
+        the fact that the user's code was not responsible for the error.
