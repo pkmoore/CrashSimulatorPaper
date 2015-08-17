@@ -120,11 +120,7 @@
                 greater than the increase observed during the sample program evaluations. This is likely due to the high
                 count of opportunities for fault injection present in a complex piece of software like Firefox as
                 opposed to the sample programs. From this, it can be inferred that CrashSimulator would cause a similar
-                increase in the amount of time required to complete a test of a standard version of Firefox. That said,
-                the total time is still well within what the authors define as a reasonable time frame for test suite
-                completion. Given the high degree of success CrashSimulator sees in identifying faults in the
-                applications under test, the authors do not see this increase in execution time as a significant
-                impediment to the adoption of CrashSimulator as part of a rigorous testing process.
+                increase in the amount of time required to complete a test of a standard version of Firefox.
 
             \paragraph{Apache}
 
@@ -159,7 +155,40 @@
                 Because the control script needed to be able to directly manage both client and server activates, in
                 this setup, both the ``client'' script and the Apache instance were run on the same machine.
 
+                Once again, CrashSimulator's performance was evaluated in terms of the run time of CrashSimulator's
+                executions versus the run time of the same number of executions performed without CrashSimulator's
+                involvement. The actual run times measured are for the complete execution for the Apache control script
+                described above. As such, some run time accumulated is the result of non-Apache client code and control
+                script overhead. The following table contains the results collected.
 
+                \begin{tabular}{l l l}
+                    \toprule{}
+                    Title & Number Of Executions & Execution Time \\
+                    \multirow{3}{*}{Apache Control Script} \\
+                    & 1 & 300ms \\
+                    & 10 & 3000ms \\
+                    & 100 & 30000ms \\
+                    \multirow{3}{*}{Apache Control Script (CrashSimulator)} \\
+                    & 1 & 450ms \\
+                    & 10 & 4500ms \\
+                    & 100 & 45000ms \\
+                    \bottomrule{}
+                \end{tabular}
+
+                As expected, the run times of the CrashSimulator-involved executions shows an increase over the
+                non-CrashSimulator executions. The results above show an approximately 50 percent increase in run time
+                between the CrashSimulator controlled executions and the non-CrashSimulator executions. This increase is
+                in line with what was expected based on the previously discussed Firefox evaluation for similar reasons
+                related to complexity. One difference with this evaluation is there is a higher likely-hood of the
+                accumulated run time being affected by overhead introduced by the control script. That said, this
+                overhead would be similar across all executions.
+
+                This evaluation has shown that CrashSimulator causes an increase in run time for executions of both the
+                sample programs and common major applications. That said, the total time is still well within what the
+                authors define as a reasonable time frame for test suite completion. Given the high degree of success
+                CrashSimulator sees in identifying faults in the applications under test, the authors do not see this
+                increase in execution time as a significant impediment to the adoption of CrashSimulator as part of a
+                rigorous testing process.
 
     \subsection{Bugs Identified}
 
