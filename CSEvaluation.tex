@@ -5,48 +5,109 @@
     the basis of execution performance and number of bugs detected across a set of small test programs and larger, more
     mainstream applications.
 
+
+    %%%% Talk about the test platform, OS, Hardware, etc.
+
     \subsection{Execution Performance}
 
-        The Python implementation of CrashSimulator was performance tested against two sample programs that were seeded
-        with specific counts of potential anomalies. The two sample programs were seeded as follows:
+        \subsubsection{Evaluation Against Sample Programs} The Python implementation of CrashSimulator was performance
+        tested against two sample programs that were seeded with specific counts of potential anomalies. The two sample
+        programs were seeded as follows:
 
-        \begin{tabular}{l | l | l | l}
-            \hline{}
-                Title & Return Value Modification & Catalog Based & Data Fragmentation \\
-                Sample A & 20 & 2 & 2 \\
-                Sample B & 100 & 20 & 20 \\
-            \hline{}
-        \end{tabular}
+            \begin{tabular}{l  l  l  l}
+                \toprule{}
+                    Title & Return Value Modification & Catalog Based & Data Fragmentation \\
+                    Sample A & 20 & 2 & 2 \\
+                    Sample B & 100 & 20 & 20 \\
+                \bottomrule{}
+            \end{tabular}
 
-        These sample applications were written with two goals in mind. First, their system call related behavior should
-        be deterministic and repeatable in nature. Second, they should be able to run to completion without user
-        interaction and with a completion time that would allow for hundreds of executions in a reasonable amount of
-        time. In short, the sample programs allow an accurate evaluation of CrashSimulator's performance by acting as
-        ideal testing candidates.
+            These sample applications were written with two goals in mind. First, their system call related behavior
+            should be deterministic and repeatable in nature. Second, they should be able to run to completion without
+            user interaction and with a completion time that would allow for hundreds of executions in a reasonable
+            amount of time. In short, the sample programs allow an accurate evaluation of CrashSimulator's performance
+            by acting as ideal testing candidates.
 
-        Performance tests using the sample programs were performed five times in order to account for differences in
-        execution times related varying resource loads on the test hardware at the time the tests were run. The results
-        are recorded below. Repeated executions of the sample programs outside of crash simulator provide a control run
-        time for comparison to times recorded from the CrashSimulator test sessions. Because CrashSimulator will
-        potentially execute the application under test \emph{thousands} of times, it is not appropriate to compare test
-        run times to the run time of a single run of the application.
+            Performance tests using the sample programs were performed five times in order to account for differences in
+            execution times related varying resource loads on the test hardware at the time the tests were run. The
+            results are recorded below. Repeated executions of the sample programs outside of crash simulator provide a
+            control run time for comparison to times recorded from the CrashSimulator test sessions. Because
+            CrashSimulator will potentially execute the application under test \emph{thousands} of times, it is not
+            appropriate to compare test run times to the run time of a single run of the application.
 
-        \begin{tabular} {l | l | l}
-            This Table Consists Entirely of \textbf{FAKE DATA} \\
-            Title & Number of Executions & Run Time \\
-            Sample A (No CrashSimulator Tests) & 10000 & 1m 50s \\
-            Sample B (No CrashSimulator Tests) & 10000 & 2m 30s \\
-            Sample A (CrashSimulator) & 10000 & 2m 13s \\
-            Sample B (CrashSimulator & 10000 & 3m 15s \\
-        \end{tabular}
+            \begin{tabular} {l  l  l}
+                \toprule{}
+                This Table Consists Entirely of \textbf{FAKE DATA} \\
+                Title & Number of Executions & Run Time \\
+                Sample A (No CrashSimulator Tests) & 10000 & 1m 50s \\
+                Sample B (No CrashSimulator Tests) & 10000 & 2m 30s \\
+                Sample A (CrashSimulator) & 10000 & 2m 13s \\
+                Sample B (CrashSimulator) & 10000 & 3m 15s \\
+                \bottomrule{}
+            \end{tabular}
 
-        As expected, CrashSimulator is responsible for adding some overhead as compared to the non-CrashSimulator
-        executions of the sample applications.
+            As expected, CrashSimulator is responsible for adding some overhead as compared to the non-CrashSimulator
+            executions of the sample applications. For each sample program, a group of executions through CrashSimulator
+            took approximately 30 percent longer to complete than an identically sized group of executions performed by
+            repeatedly executing the sample program.
+
+        \subsubsection{Evaluation Against Major Programs}
+
+            Next, CrashSimulator's performance was evaluated against two major open source applications: Firefox and
+            Apache 2. In these cases, the evaluation methodology required modification because these applications are
+            not specifically engineered to meet the same criteria the sample programs were. Firefox, on one hand,
+            typically requires user input in order carry out its purpose of retrieving content hosted on a remote
+            server. On the other hand, Apache 2 runs as a background service and is intended under ideal conditions to
+            continually serve content indefinitely. In both cases, the complexity of these pieces of software result in
+            system call traces that are likely not deterministic or repeatable.
+
+            \paragraph{Firefox}
+
+                Because Firefox is a large application with a great deal of complex functionality and behavior it was
+                determined that a specific use case should be identified for the purposes of evaluating CrashSimulator's
+                performance. The primary use of Firefox for most of its users is the retrieval, rendering and display of
+                content from a remote server. In the vast majority of cases this is web content retrieved over HTTP As
+                such, it was decided that this use case would be appropriate for CrashSimulator's performance
+                evaluation.
+
+                In order to achieve consistent test runs the following setup was constructed. The Firefox scripting API
+                was used in order to modify the behavior of the browser in two key aspects. First, the browser was
+                modified to automatically request a static web page with no dynamic content from a server hosted and
+                operated by the authors. A static web page was chosen to reduce the chances of any script parsing and
+                execution code present in Firefox confounding the run time measurements. Second, Firefox's scripting API
+                was used to end execution of the browser immediately upon the completion of the page's rendering. This
+                allows for the measurement of one complete ``execution'' of Firefox from start to finish. Additionally,
+                Firefox was configured to cache no content so each run was required to perform the complete set of
+                communications with the server necessary to retrieve the static web page prior to displaying it. In
+                order to reduce the effect of network latency on execution times both the client machine running Firefox
+                and the server machine serving the static web page were located on the same network. Also, the server
+                software was configured to cache no content in order to reduce the chances of server side resource
+                caching affecting execution times.
+
+                Actual evaluation of CrashSimulator's performance was conducted in a similar manner to the methodology
+                described for the sample programs. The scripted version of Firefox was executed a number of times by
+                CrashSimulator for testing purposes and the total time required to complete these test executions was
+                recorded. For comparison purposes, the scripted version of Firefox was executed the same number of times
+                \emph{without} CrashSimulator.  The following table contains the total execution times required to
+                complete the listed number of executions.
+
+                \begin{tabular}{l l l}
+                    \toprule{}
+                    Title & Number Of Executions & Execution Time \\
+                    \multirow{3}{*}{Firefox} \\
+                    & 1 & 300ms \\
+                    & 10 & 3000ms \\
+                    & 100 & 30000ms \\
+                    \multirow{3}{*}{Firefox (CrashSimulator)} \\
+                    & 1 & 600ms \\
+                    & 10 & 6000ms \\
+                    & 100 & 60000ms \\
+                    \bottomrule{}
+                \end{tabular}
 
 
-        Next, CrashSimulator's performance was evaluated against two major open source applications: Firefox and Apache
-        2. Comparison methodology changes a little bit because these two applications require use input and do not
-        typically run to completion.
+
+        Apache start up, serve page, kill process. Use WGET
 
     \subsection{Bugs Identified}
 
