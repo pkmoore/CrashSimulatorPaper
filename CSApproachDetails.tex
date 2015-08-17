@@ -45,6 +45,9 @@
 
     \subsection{Fault Injection}
 
+
+        %%Talk about why we choose to to serial tests rather than parallel
+
          Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
          faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
          supported: modification of return values from network system calls and reordering of UDP packets.  These faults
