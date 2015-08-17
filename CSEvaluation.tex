@@ -1,8 +1,55 @@
 \section{Evaluation}
 
+    In order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
+    code reuse from the previous work on CheckAPI and NetCheck. This implementation of CrashSimulator was evaluated on
+    the basis of execution performance and number of bugs detected across a set of small test programs and larger, more
+    mainstream applications.
+
+    \subsection{Execution Performance}
+
+        The Python implementation of CrashSimulator was performance tested against two sample programs that were seeded
+        with specific counts of potential anomalies. The two sample programs were seeded as follows:
+
+        \begin{tabular}{l | l | l | l}
+            \hline{}
+                Title & Return Value Modification & Catalog Based & Data Fragmentation \\
+                Sample A & 20 & 2 & 2 \\
+                Sample B & 100 & 20 & 20 \\
+            \hline{}
+        \end{tabular}
+
+        These sample applications were written with two goals in mind. First, their system call related behavior should
+        be deterministic and repeatable in nature. Second, they should be able to run to completion without user
+        interaction and with a completion time that would allow for hundreds of executions in a reasonable amount of
+        time. In short, the sample programs allow an accurate evaluation of CrashSimulator's performance by acting as
+        ideal testing candidates.
+
+        Performance tests using the sample programs were performed five times in order to account for differences in
+        execution times related varying resource loads on the test hardware at the time the tests were run. The results
+        are recorded below. Repeated executions of the sample programs outside of crash simulator provide a control run
+        time for comparison to times recorded from the CrashSimulator test sessions. Because CrashSimulator will
+        potentially execute the application under test \emph{thousands} of times, it is not appropriate to compare test
+        run times to the run time of a single run of the application.
+
+        \begin{tabular} {l | l | l}
+            This Table Consists Entirely of \textbf{FAKE DATA} \\
+            Title & Number of Executions & Run Time \\
+            Sample A (No CrashSimulator Tests) & 10000 & 1m 50s \\
+            Sample B (No CrashSimulator Tests) & 10000 & 2m 30s \\
+            Sample A (CrashSimulator) & 10000 & 2m 13s \\
+            Sample B (CrashSimulator & 10000 & 3m 15s \\
+        \end{tabular}
+
+        As expected, CrashSimulator is responsible for adding some overhead as compared to the non-CrashSimulator
+        executions of the sample applications.
+
+
+        Next, CrashSimulator's performance was evaluated against two major open source applications: Firefox and Apache
+        2. Comparison methodology changes a little bit because these two applications require use input and do not
+        typically run to completion.
+
     \subsection{Bugs Identified}
 
-    %% Intro paragraph
     First, CrashSimulator was evaluated against NUMBER of popular tools with public bug trackers available. The goal was
     to identify bugs from each tool's bug tracker (both fixed and unfixed) that are related to the faults that
     CrashSimulator can inject. Next, CrashSimulator was run against these tools fault counts were collected. A
