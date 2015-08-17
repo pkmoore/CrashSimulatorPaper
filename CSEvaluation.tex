@@ -108,13 +108,23 @@
                     & 10 & 3000ms \\
                     & 100 & 30000ms \\
                     \multirow{3}{*}{Firefox (CrashSimulator)} \\
-                    & 1 & 600ms \\
-                    & 10 & 6000ms \\
-                    & 100 & 60000ms \\
+                    & 1 & 450ms \\
+                    & 10 & 4500ms \\
+                    & 100 & 45000ms \\
                     \bottomrule{}
                 \end{tabular}
 
-
+                From these results it is apparent that CrashSimulator  increased the time required to complete a given
+                number of executions of the modified version of Firefox. The results above show an approximately 50
+                percent increase in run time between the non-CrashSimulator and CrashSimulator runs. This increase is
+                greater than the increase observed during the sample program evaluations. This is likely due to the high
+                count of opportunities for fault injection present in a complex piece of software like Firefox as
+                opposed to the sample programs. From this, it can be inferred that CrashSimulator would cause a similar
+                increase in the amount of time required to complete a test of a standard version of Firefox. That said,
+                the total time is still well within what the authors define as a reasonable time frame for test suite
+                completion. Given the high degree of success CrashSimulator sees in identifying faults in the
+                applications under test, the authors do not see this increase in execution time as a significant
+                impediment to the adoption of CrashSimulator as part of a rigorous testing process.
 
         Apache start up, serve page, kill process. Use WGET
 
