@@ -126,7 +126,40 @@
                 applications under test, the authors do not see this increase in execution time as a significant
                 impediment to the adoption of CrashSimulator as part of a rigorous testing process.
 
-        Apache start up, serve page, kill process. Use WGET
+            \paragraph{Apache}
+
+                Evaluating CrashSimulator's performance against Apache saw similar challenges to its evaluation against
+                Firefox. Apache is a complex piece of software and, while its normal use cases don't require user
+                interaction, it presents challenges due to its typically long-lived nature. Apache's primary use case is
+                evaluation methodology should primarily exercise this functionality to serve content to a client program
+                upon the client's request. As such, it was determined that the evaluation methodology should primarily
+                exercise this functionality evaluation methodology should primarily exercise this functionality. To this
+                end, the following evaluation setup was constructed.
+
+                For this evaluation one execution of Apache consists of the following steps:
+
+                \begin{enumerate}
+                    \item{} Launch an instance of Apache
+                    \item{} Request the static web page from Apache
+                    \item{} Wait for transmission of the static web page to complete
+                    \item{} Terminate the execution of Apache
+                \end{enumerate}
+
+                A Python script was written in order to execute these steps in a consistent manner. First, an instance
+                of Apache was launched. This instance of Apache was configured to serve a single directory on the host
+                machine using a single static host entry. This directory contained a single static web page with 100
+                bytes of HTML content. Apache was also configured to perform \emph{no} caching of local resources. This
+                setup was chosen in order to reduce the amount of extraneous functionality executed by Apache. A single
+                static host entry eliminates Apache's virtual host parsing and a single static HTML document eliminates
+                the need for apache to execute any external parsing engine such as mod\_php. Once Apache has completed
+                its startup, the script requests the static web page using the \emph{wget} utility. The page is not
+                rendered or displayed in any way upon receipt as these processes are not relevant to this evaluation.
+                Once the web page has been retrieved the script instructs the Apache instance to terminate and waits for
+                it to do so. Termination of the Apache instance concludes the measured run time for the execution.
+                Because the control script needed to be able to directly manage both client and server activates, in
+                this setup, both the ``client'' script and the Apache instance were run on the same machine.
+
+
 
     \subsection{Bugs Identified}
 
