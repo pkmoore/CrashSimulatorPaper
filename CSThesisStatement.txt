@@ -1,0 +1,2 @@
+The purpose of CrashSimulator is to expose faults in applications that result from an incomplete understanding of common
+APIs used by the application.
