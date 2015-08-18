@@ -1,8 +1,7 @@
 \section{CrashSimulator Approach Details}
 
-    %%% Verify information on supported trace formats %%%
-    %%% TODO: Assume all program are deterministic and will end. Unit test individual functions by putting in script
-    %%% TODO: Architecture section
+    % TODO: Verify information on supported trace formats %%%
+    % TODO: Assume all program are deterministic and will end. Unit test individual functions by putting in script
     \subsection{Architecture}
 
         At a high level CrashSimulator is organized into three primary modules. First, there is the system call trace
@@ -86,7 +85,7 @@
     \subsection{Fault Injection}
 
 
-        %%Talk about why we choose to to serial tests rather than parallel
+        % TODO: Talk about why we choose to to serial tests rather than parallel
 
          Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
          faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
@@ -113,8 +112,8 @@
                 What do we do about 32-bit vs 64-bit
         \end{verbatim}
 
-        %% What is the process for culling our set of unit tests for instances where there are a huge number of
-        %% permutations of packet orderings
+        % What is the process for culling our set of unit tests for instances where there are a huge number of
+        % permutations of packet orderings
         \subsection{Catalog-Based Anomalies}
 
         A second category of faults CrashSimulator can produce are known as catalog-based faults. These faults are
@@ -125,7 +124,7 @@
         CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
         pseudo-code listing:
 
-        %% Use the real C Code here
+        % TODO: Use the real C Code here
         \begin{verbatim}
 int main() {
     socket = setupUdpSocket()
