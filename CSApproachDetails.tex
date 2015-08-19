@@ -2,6 +2,7 @@
 
     % TODO: Verify information on supported trace formats %%%
     % TODO: Assume all program are deterministic and will end. Unit test individual functions by putting in script
+
     \subsection{Architecture}
 
         At a high level CrashSimulator is organized into three primary modules. First, there is the system call trace
@@ -17,6 +18,12 @@
         and \emph{dtrace} both produce output that was primarily intended for human rather than programmatic
         consumption. As such, reuse of their parsing code resulted in a large time savings and increased confidence in
         parsing accuracy.
+
+        % TODO: More Detail!!!
+        During parsing CrashSimulator makes use of a group of supported strategies. These strategies along with
+        configurable rule sets are used to identify ``interesting'' system calls into which faults will be injected
+        during the testing phase. The output from this module is a ``test plan'' that contains a list of tests to be run
+        by the test controller. A test consists of the system calls to be modified and the modification to make.
 
         The test launcher was separated from the test controller for the sake of portability. A great deal of the test
         launcher's code deals with the low level details of process manipulation and monitoring and, as such, will
@@ -42,8 +49,6 @@
 
     \subsection{System Call Traces}
 
-        % TODO: What denotes an interesting system call??
-
         The first step in CrashSimulator's operation is to gather a trace of the system calls made by the application
         during a normal run. Where other tools base their operation of direct analysis of the application under test
         CrashSimulator operates based on information gleaned from system call traces. This gives CrashSimulator several
@@ -64,6 +69,48 @@
         Because CrashSimulator's trace analysis engine is based on prior work from the NetCheck supported trace
         gathering tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
 
+    \subsection{Identifying Injection Points}
+
+        CrashSimulator has three strategies for identifying a section of a system call trace as an interesting point for
+        fault injection. There is a many-to-many relationship between the strategies described here and the fault types
+        that can be injected that are discussed later in this section.
+
+        % TODO: More Detail!!!
+        \subsubsection{Pattern Matching}
+
+            This injection point identification strategy is the most straightforward in description and implementation.
+            CrashSimulator simply searches through the system call trace line-by-line identifying all system calls that
+            match a rule in CrashSimulator's pattern matching rule set. For example of rule that results in a ``return
+            value modification'' injection could be as follows: Find all calls to the \emph{connect} system call that
+            are successful (i.e.\ the system call returns 0) and modify the return value to be -1 (i.e.\ failure) during
+            a subsequent test run. This strategy generates a single test for each line in the system call trace that
+            matches a rule.
+
+            This strategy has two main advantages. First, it is relatively simple to implement and processing the system
+            call traces in this manner is fairly inexpensive computationally. At the same time, this strategy produces a
+            very large number of tests and an extensive rule set can provide a high degree of system call coverage.
+
+        % TODO: More Detail!!!
+        \subsubsection{Catalog Based}
+
+            This injection point identification strategy is a step up in complexity from the Pattern Matching strategy
+            and as a result it is able to generate tests that catch faults at a slightly higher level of abstraction.
+            With this strategy, a set of system calls is identified in a rule set and they are analyzed collectively.
+            This allows for modifications across a whole group of system calls at the same time. For example, a
+            simplistic case might be modifying the return values of all of a set of system calls at the same time. A
+            more complex case would be reordering the data returned by all recvfrom system calls to replicate out of
+            order receipt of UDP datagrams.  In this strategy, each rule generates a single test that modifies a group
+            of system calls.
+
+        % TODO: More Detail!!!
+        \subsubsection{Conditional Based}
+
+            This injection point identification strategy is the most complex offered by CrashSimulator. Rules for this
+            strategy allow for the identification of system calls based on the success or failure of previous system calls.
+            Rules are specified in the form of an ordered list of system calls and their expected return values. A match
+            occurs when the final system call in the list is reached and the prior system calls occurred in order with the
+            appropriate return values. An example would be modifying a subsequent call to recv to fail only if the prior
+            call to recv was successful.
 
     \subsection{Supported Anomaly Types}
 
@@ -97,37 +144,26 @@
             run. Other modifications would include changing the positive return value to 0 and to some other positive
             number that is less than the original return value.
 
+            Should modification of return value depend on the value from the initial run or the value returned during
+            the test???
+
         \subsubsection{Data Reordering}
 
-        \subsubsection{Data Truncation}
+            supported by catalog based
+            identify group of system calls in question
+            hand in re-ordered data from ideal run
+            dependent on data collected in the ideal run
 
-    \subsection{Trace Analysis}
 
+            First, the normal run trace is parsed in its entirety for system calls in a specific set
+            associated with the fault being injected and the data items passed into these system calls are recorded in a
+            data item catalog. Next, the application under test is run repeatedly with each run receiving a different
+            ordering of data items from the catalog for the corresponding system calls. One example of a fault
+            CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
+            pseudo-code listing:
 
-
-    \subsection{Fault Injection}
-
-        Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
-        faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
-        supported: modification of return values from network system calls and reordering of UDP packets.  These faults
-        were chosen because of high impact they can have on applications that don't handle them properly and the
-        frequency with which developers have an incorrect understanding of how these system calls can behave in an
-        imperfect environment.
-
-        % What is the process for culling our set of unit tests for instances where there are a huge number of
-        % permutations of packet orderings
-        \subsection{Catalog-Based Anomalies}
-
-        A second category of faults CrashSimulator can produce are known as catalog-based faults. These faults are
-        injected in two steps. First, the normal run trace is parsed in its entirety for system calls in a specific set
-        associated with the fault being injected and the data items passed into these system calls are recorded in a
-        data item catalog. Next, the application under test is run repeatedly with each run receiving a different
-        ordering of data items from the catalog for the corresponding system calls. One example of a fault
-        CrashSimulator can inject in such situations is unhandled out of order UDP datagrams. Consider the following
-        pseudo-code listing:
-
-        % TODO: Use the real C Code here
-        \begin{verbatim}
+            % TODO: Use the real C Code here
+            \begin{verbatim}
 int main() {
     socket = setupUdpSocket()
     data1 = recvfrom(socket)
@@ -135,13 +171,13 @@ int main() {
     data2 = recvfrom(socket)
     processData2(data2)
 }
-        \end{verbatim}
+            \end{verbatim}
 
-        This listing sets up a UDP socket and receives two datagrams from the socket processing each with the
-        appropriate function. A C program that implements this pseudo-code will produce a normal flow system call trace
-        as follows:
+            This listing sets up a UDP socket and receives two datagrams from the socket processing each with the
+            appropriate function. A C program that implements this pseudo-code will produce a normal flow system call trace
+            as follows:
 
-        \begin{verbatim}
+            \begin{verbatim}
 ...
 socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
 bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
@@ -151,16 +187,22 @@ write(1, "Process 1: test\n", 16)       = 16
 recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
 write(1, "Process 2: testagain\n", 21)  = 21
 ...
-        \end{verbatim}
+            \end{verbatim}
 
-        The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
-        makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as
-        datagram 1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system
-        call trace and identify all calls to recvfrom, storing the data that was received in a data catalog and the
-        identifying information pertaining to the socket it was received from. Second, it would re-run the application
-        under test and send a different ordering of data from the data catalog to the socket in question. From the above
-        example, ``testagain'' would be sent to the first receive from and ``test'' would be sent to the second recvfrom
-        resulting in each data item being parsed by the incorrect function. CrashSimulator would then report
-        abnormalities in the application's behavior. \textbf{How are we going to handle situations where this is a
-        silent failure}
+            The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
+            makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as
+            datagram 1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system
+            call trace and identify all calls to recvfrom, storing the data that was received in a data catalog and the
+            identifying information pertaining to the socket it was received from. Second, it would re-run the application
+            under test and send a different ordering of data from the data catalog to the socket in question. From the above
+            example, ``testagain'' would be sent to the first receive from and ``test'' would be sent to the second recvfrom
+            resulting in each data item being parsed by the incorrect function. CrashSimulator would then report
+            abnormalities in the application's behavior. \textbf{How are we going to handle situations where this is a
+            silent failure}
 
+        \subsubsection{Blind Data Modification}
+
+            supported by pattern matching, catalog based, conditional
+            Identify system call in question
+            Perform modification described in test to data
+            Doesn't depend on data from the ideal run
