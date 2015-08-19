@@ -1,6 +1,6 @@
 \section{CrashSimulator Approach Details}
 
-    % TODO: Verify information on supported trace formats %%%
+    % TODO: Verify information on supported trace formats
     % TODO: Assume all program are deterministic and will end. Unit test individual functions by putting in script
 
     \subsection{Architecture}
@@ -81,9 +81,9 @@
             This injection point identification strategy is the most straightforward in description and implementation.
             CrashSimulator simply searches through the system call trace line-by-line identifying all system calls that
             match a rule in CrashSimulator's pattern matching rule set. For example of rule that results in a ``return
-            value modification'' injection could be as follows: Find all calls to the \emph{connect} system call that
-            are successful (i.e.\ the system call returns 0) and modify the return value to be -1 (i.e.\ failure) during
-            a subsequent test run. This strategy generates a single test for each line in the system call trace that
+            value modification'' injection could be as follows: Match a call to the \emph{connect} system call that was
+            successful (i.e.\ the system call returns 0) and modify the return value to be -1 (i.e.\ failure) during a
+            subsequent test run. This strategy generates a single test for each line in the system call trace that
             matches a rule.
 
             This strategy has two main advantages. First, it is relatively simple to implement and processing the system
@@ -91,6 +91,7 @@
             very large number of tests and an extensive rule set can provide a high degree of system call coverage.
 
         % TODO: More Detail!!!
+        % TODO: Rename to group based? Or something similar?
         \subsubsection{Catalog Based}
 
             This injection point identification strategy is a step up in complexity from the Pattern Matching strategy
@@ -106,13 +107,13 @@
         \subsubsection{Conditional Based}
 
             This injection point identification strategy is the most complex offered by CrashSimulator. Rules for this
-            strategy allow for the identification of system calls based on the success or failure of previous system calls.
-            Rules are specified in the form of an ordered list of system calls and their expected return values. A match
-            occurs when the final system call in the list is reached and the prior system calls occurred in order with the
-            appropriate return values. An example would be modifying a subsequent call to recv to fail only if the prior
-            call to recv was successful.
+            strategy allow for the identification of system calls based on the success or failure of previous system
+            calls.  Rules are specified in the form of an ordered list of system calls and their expected return values.
+            A match occurs when the final system call in the list is reached and the prior system calls occurred in
+            order with the appropriate return values. An example would be modifying a subsequent call to recv to fail
+            only if the prior call to recv was successful.
 
-    \subsection{Supported Anomaly Types}
+    \subsection{Supported Fault Types}
 
         \textbf{I would really like to find another term besides anomaly}
 
@@ -147,6 +148,7 @@
             Should modification of return value depend on the value from the initial run or the value returned during
             the test???
 
+            % TODO: Rework the example described here
         \subsubsection{Data Reordering}
 
             supported by catalog based
