@@ -42,6 +42,8 @@
 
     \subsection{System Call Traces}
 
+        % TODO: What denotes an interesting system call??
+
         The first step in CrashSimulator's operation is to gather a trace of the system calls made by the application
         during a normal run. Where other tools base their operation of direct analysis of the application under test
         CrashSimulator operates based on information gleaned from system call traces. This gives CrashSimulator several
@@ -74,6 +76,27 @@
 
         \subsubsection{Return Value Modification}
 
+            One way CrashSimulator can inject faults into the running application is to modify the return values of
+            interesting system calls identified in the previous trace analysis step. The primary driver behind injecting
+            this type of fault is the tendency of developers to misuse common API functions or misunderstand their
+            failure modes. For example, a developer that is unfamiliar with the operation of a \emph{recv} system call
+            may fail to account for cases where it return all of the data expected. A well written application might
+            make repeated calls to recv until it has gathered all the data it needs while an incorrectly written
+            application may only call it once resulting in a fault when it tries to process incomplete data in the
+            future.
+
+            % TODO: Make sure terminology is correct in this paragraph
+            % TODO: Is this methodology reasonable?
+            The authors' implementation of CrashSimulator injects this fault using ptrace. The application under test is
+            executed in a process that is hooked by ptrace and each system call made by the application is examined.
+            When a system call that was previously identified as a target is encountered execution interrupted
+            immediately upon its completion. At this point the return value of the system call is modified using rules
+            defined on a per system call basis. These rules are based on the system calls normal operation and return
+            values. For example, if a recv call is identified as interesting and returns a positive value (i.e.\ success)
+            in the normal system call trace, this same call would be modified to return -1 (i.e.\ error) during a test
+            run. Other modifications would include changing the positive return value to 0 and to some other positive
+            number that is less than the original return value.
+
         \subsubsection{Data Reordering}
 
         \subsubsection{Data Truncation}
@@ -90,24 +113,6 @@
         were chosen because of high impact they can have on applications that don't handle them properly and the
         frequency with which developers have an incorrect understanding of how these system calls can behave in an
         imperfect environment.
-
-        %% I can go into much more detail with the ptrace implementation stuff if I need to
-        \subsection{Return Value Modification}
-
-        One way CrashSimulator can inject faults into the running application is to
-        modify the return values of interesting system calls identified in the previous trace analysis step. First, the
-        CrashSimulator parent application is launched and configured.
-
-        \begin{verbatim}
-        launching of parent application
-            setup of child application under test
-            run child application
-            For for each system call determine if it is one we are interested in as determined by analysis
-                e.g.\ is this the 4th call to recv?
-            Modify EAX/RAX register after system call completion to contain new return value
-                New return value random? Smaller than present return value? Some constant -1?
-                What do we do about 32-bit vs 64-bit
-        \end{verbatim}
 
         % What is the process for culling our set of unit tests for instances where there are a huge number of
         % permutations of packet orderings
