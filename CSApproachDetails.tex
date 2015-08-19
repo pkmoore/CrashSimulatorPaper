@@ -84,15 +84,12 @@
 
     \subsection{Fault Injection}
 
-
-        % TODO: Talk about why we choose to to serial tests rather than parallel
-
-         Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
-         faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
-         supported: modification of return values from network system calls and reordering of UDP packets.  These faults
-         were chosen because of high impact they can have on applications that don't handle them properly and the
-         frequency with which developers have an incorrect understanding of how these system calls can behave in an
-         imperfect environment.
+        Once a set of potential fault injection points has been identified CrashSimulator uses \emph{ptrace} inject
+        faults on a live execution of the program. At this point, two faults types identifiable by NetCheck are
+        supported: modification of return values from network system calls and reordering of UDP packets.  These faults
+        were chosen because of high impact they can have on applications that don't handle them properly and the
+        frequency with which developers have an incorrect understanding of how these system calls can behave in an
+        imperfect environment.
 
         %% I can go into much more detail with the ptrace implementation stuff if I need to
         \subsection{Return Value Modification}
