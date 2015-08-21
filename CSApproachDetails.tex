@@ -179,18 +179,18 @@ int main() {
             appropriate function. A C program that implements this pseudo-code will produce a normal flow system call trace
             as follows:
 
-            \begin{verbatim}
-...
-socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
-bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
-recvfrom(3, "test\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 5
-...
-write(1, "Process 1: test\n", 16)       = 16
-recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
-write(1, "Process 2: testagain\n", 21)  = 21
-...
-            \end{verbatim}
-
+            %\begin{verbatim}
+% ...
+% socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP) = 3
+% bind(3, {sa_family=AF_INET, sin_port=htons(6666), sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+% recvfrom(3, "test\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 5
+% ...
+% write(1, "Process 1: test\n", 16)       = 16
+% recvfrom(3, "testagain\n", 256, 0, {sa_family=AF_INET, sin_port=htons(51490), sin_addr=inet_addr("127.0.0.1")}, [16]) = 10
+% write(1, "Process 2: testagain\n", 21)  = 21
+% ...
+            %\end{verbatim}
+            \textbf{\emph{Sample trace removed}}
             The above program assumes that datagram 1 will always arrive first and datagram 2 will always arrive second. UDP
             makes no ordering guarantees so the reverse is possible. This would result in datagram 2 being processed as
             datagram 1 and vice versa. Crash simulator would inject this fault as follows. First, it would parse the system
