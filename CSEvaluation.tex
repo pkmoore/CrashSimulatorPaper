@@ -212,6 +212,54 @@
         % TODO: complete
         \subsection{Firefox}
 
+            \textbf{\emph{Note: This is fake data. Also, I would like to have better ways of quantifying some of this}}
+            From Firefox's bug tracker 10 bugs in the ``networking'' category with successful resolutions were selected
+            as good candidates for this portion of CrashSimulator's evaluation. Successfully resolved bugs were chosen
+            because they had sufficient documentation to identify their exact cause. This was essential to determining
+            the likelihood of their being identified.
+
+            Five of the bugs were judged as ``likely to be identified by CrashSimulator'' by the authors. This opinion
+            was based on how closely the abnormal behavior, and its resolution, described in the bug report related to
+            faults that CrashSimulator can inject. \textbf{\emph{FAKE}} For example, one of these bugs related to a
+            failure in Firefox's handling of DNS responses due to duplicated UDP datagrams. This is a fault that
+            CrashSimulator is readily able to inject so it was expected that CrashSimulator would cause the fault to
+            occur and report it.
+
+            The other five bugs where judged by the authors as ``unlikely to be identified by CrashSimulator.'' These
+            bugs were, once again, selected from the ``networking'' category and had successful resolutions. These bugs
+            were chosen because the abnormal behavior they produced and their resolutions indicated that they were
+            caused by faults that CrashSimulator does not currently have the capability of injecting. For example, one
+            bug related to an application logic error related to a specific edge case malformation in a TCP packet
+            received from a particular version of the IIS web server. CrashSimulator is unlikely identify this bug
+            because it does not support the specific modification of TCP packets required to trigger it.
+
+            The identification status of each bug is listed in the table below.
+
+            \begin{table}[H]
+                \scriptsize{}
+                \begin{tabular}{l  l  l  l}
+                    \toprule{}
+                        Bug Tracker ID & Likely to be Identified & Identified & Notes \\
+                        0001 & True & True & Note \\
+                        0002 & True & True & Note \\
+                        0003 & True & True & Note \\
+                        0004 & True & True & Note \\
+                        0005 & True & True & Note \\
+                        0006 & False & False & Note \\
+                        0007 & False & False & Note \\
+                        0008 & False & False & Note \\
+                        0009 & False & False & Note \\
+                        0010 & False & False & Note \\
+                    \bottomrule{}
+                \end{tabular}
+            \end{table}
+
+            As can be see from the results above, CrashSimulator performed as expected based on the selected bug's
+            likeliness to be identified. In addition, CrashSimulator also identified a previously unreported bug in
+            Firefox's network code. This bug results in a denial of service condition caused by a failure to check the
+            return value of a call to \emph{socket} and the subsequent use of the invalid socket handle it can produce.
+            This bug was reported to Mozilla (bug ID# 0011) and was corrected in the next release of Firefox.
+
         % TODO: complete
         \subsection{Apache 2}
 
