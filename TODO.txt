@@ -1,0 +1,10 @@
+TODO: Some of the stuff in the background section could be in related work
+TODO: Put a bulleted list of contributions into the introduction
+TODO: Write out simple example traces
+TODO: Work with Lois on the thesis statement for the paper
+
+TODO: Need Trace-Repeater of some sort
+    TODO: Non-Race conditions -> probably make calls in the same order anyway
+    TODO: Might be an off the shelf tool for replaying traces
+
+TODO: Clean up the tables and formatting issues in the paper
