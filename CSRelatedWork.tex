@@ -14,3 +14,14 @@ CrashSimulator's trace analysis engine is based on NetCheck. NetCheck uses two s
     call is evaluated. If the system call is not feasible given the current system call context it is rejected and
     logged. These rejected system calls are treated as opportunities to inject faults during the next step of the
     process.
+
+\emph{This may belong in Background and Motivation} Existing white-box testing tools like DART and SAGE testing
+    tools rely on static analysis and symbolic execution of code in order to determine sets of inputs that exercise
+    particular code paths. DART symbolically executes an applications source code in order to facilitate its testing.
+    This limits DART to operating only on programs written in C. SAGE improves on this strategy symbolically executing
+    an application's x86 machine code instructions but this results in an architecture based rather than programming
+    language based limitation. CrashSimulator avoids these issues by relying on transparent observation of native
+    execution of an application.
+
+DART assumes that external
+    functions are side effect free (I.e.\ their execution does not modify program memory).

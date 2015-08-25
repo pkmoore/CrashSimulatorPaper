@@ -19,36 +19,47 @@
     due to the inability of the developer to replicate all possible application environments and exhaust all possible
     code paths.
 
-    \emph{This may belong in Background and Motivation} Existing white-box testing tools like DART and SAGE testing
-    tools rely on static analysis and symbolic execution of code in order to determine sets of inputs that exercise
-    particular code paths. DART symbolically executes an applications source code in order to facilitate its testing.
-    This limits DART to operating only on programs written in C. SAGE improves on this strategy symbolically executing
-    an application's x86 machine code instructions but this results in an architecture based rather than programming
-    language based limitation. CrashSimulator avoids these issues by relying on transparent observation of native
-    execution of an application.
+    Existing tools can be roughly divided into two categories, black-box and white-box, based on the techniques they use
+    to perform their testing. Black-box tools simply manipulate the inputs of the application under test and observe the
+    resultant outputs. White-box tools, on the other hand, perform complex analysis of the application under test's
+    source code in order to reason about what inputs are likely to produce interesting outputs. Each of these
+    methodologies have their own advantages and disadvantages.
 
-    \emph{Does this need to be here? Am I just arguing against static analysis???} Symbolic execution is computationally
-    expensive and can result in deviations where the symbolic execution of code Doesn't accurately represent the actual
-    execution of code. \emph{Is this a true sentence??} Both tools focus on how the application under test behaves when
-    given a particular set of inputs without taking the program's environment into account. DART assumes that external
-    functions are side effect free (I.e.\ their execution does not modify program memory). Alternatively, CrashSimulator
-    executes standard, non-instrumented versions of an application and transparently injects faults via the programs
-    interaction with the environment in which it is running through system calls.
+    White-box testing tools typically rely on a similar set of techniques including constraint solving of branch
+    statements in an application's code and symbolic execution of an application's code in order to generate inputs that
+    optimally exercise the application's code paths. These techniques, while powerful, are not without their downsides.
+    First, symbolic execution is computationally expensive and can result in deviations where the symbolic execution of
+    code doesn't accurately represent the actual execution of code. Similarly, efficiently solving a series of
+    constraints in order to exercise a particular code path can be computationally expensive and it can be difficult to
+    guarantee that a particular set of generated inputs will exercise the intended code path in many circumstances due
+    to external dependencies that the tool cannot analyze. For example, a white-box testing tool cannot generate inputs
+    that are guaranteed to exercise a code path that relies on an operating system resource being available. Finally,
+    white-box tools typically require than an application's source code be available which is not always the case. Even
+    advanced white-box tools that analyze an application's machine code can be stymied in situations where an
+    application's executable has been packed or encrypted.
 
-    % TODO: Need examples of black-box testing tools
     The alternative, black-box tools, have their own set of issues. They do not have an understanding of what an
     application is actually doing during execution which means they are only able to submit inputs and observe outputs.
-    They cannot identify specifically the source of faults in an application.
+    The upside of this technique is simplicity. Black-box tools do not need the capability to understand and analyze an
+    application's code which reduces their complexity immensely. Also, their testing process, mutating inputs and
+    observing outputs, is computationally inexpensive. The downside of simplicity is that they cannot craft inputs with
+    any sort of intelligence. This means that a great deal of time can be spent mutating inputs without much success
+    in terms of bug identification. Also, they cannot identify specifically the source of faults in an application. They
+    can only signal that a fault has occurred at some point during a test run. Furthermore, like white-box tools, these
+    tools fail to take into account the environment in which the application is running.
 
+    %TODO: Rework this paragraph
     In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
     applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
     need by providing automated identification of environment-induced faults through simulated deviations from the
-    normal flow of system calls an application makes to interact with its environment.
-
-    CrashSimulator is able to test applications in a completely black-box manner. It utilizes system call traces
-    collected during execution of the program to identify points for fault injection and injects the faults on
-    subsequent runs using ptrace to hook the applications execution and access its memory and registers. It then
-    evaluates whether the program successfully handled the injected fault or not and reports these results to the
-    developer.
-
-
+    normal flow of system calls an application makes when interacting with its environment. Like other white-box tools,
+    CrashSimulator attempts to analyze an application in order to understand where it can inject faults.  However,
+    unlike other tools it bypasses the application's source code entirely -- instead relying on system call traces.
+    Because it analyzes these traces rather than the application itself, CrashSimulator is able to test applications in
+    a completely black-box manner and because it bases its analysis on a successful run of the application in a real
+    environment this analysis takes into account the application's interactions with its environment. During its
+    analysis, CrashSimulator identifies sets of system calls that represent areas likely to contain faults. Once
+    analysis is complete, CrashSimulator runs the application under test and injects the faults it identified previously
+    and reports to the developer whether or not the application successfully handled them or not. For example,
+    CrashSimulator might identify a system call that rarely fails and, as a result, this failure is rarely handled in
+    practice. It can then inject this failure and observe the results.
