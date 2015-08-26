@@ -1,7 +1,12 @@
-V1 - The purpose of CrashSimulator is to expose faults in applications that result from an incomplete understanding of common
-APIs used by the application.
+V1 - The purpose of CrashSimulator is to expose faults in applications that result from an incomplete understanding of
+common APIs used by the application.
 
-V2 (from Lois) - “Robust applications must run in a number of different environments and over multiple platforms. By identifying the
-weaknesses in a program that may not be obvious on its ‘native” platform, but could manifest themselves when run over a
-more complex network, CrashSimulator can help designers anticipate and adjust programs by providing automated
+V2 (from Lois) - “Robust applications must run in a number of different environments and over multiple platforms. By
+identifying the weaknesses in a program that may not be obvious on its ‘native” platform, but could manifest themselves
+when run over a more complex network, CrashSimulator can help designers anticipate and adjust programs by providing
+automated identification of environment-induced faults”
+
+V3 (Preston - “Robust applications must run in a number of different environments and over multiple platforms. By
+identifying the weaknesses in a program that may not be obvious on its ‘native” platform, but could manifest themselves
+when on a different platform, CrashSimulator can help designers anticipate and adjust programs by providing automated
 identification of environment-induced faults”
