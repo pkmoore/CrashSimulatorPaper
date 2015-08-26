@@ -262,17 +262,40 @@
             return value of a call to \emph{socket} and the subsequent use of the invalid socket handle it can produce.
             This bug was reported to Mozilla (bug ID\# 0011) and was corrected in the next release of Firefox.
 
-        % TODO: complete
         \subsection{Apache 2}
 
-       %  Next, CrashSimulator was run against these tools fault counts were collected. A comparison of the number of
-       %  faults identified by the tool's users in the tool's bug tracker to the number of faults identified by
-       %  CrashSimulator is presented in the table below.
+            \textbf{\emph{This is fake, placeholder data and information}}
+            For this evaluation, the same setup as was described in the Apache performance evaluation was used.
 
-       %  Select potential anomaly, come up with search terms, search for bugs, choose candidates, run crash simulator,
-       %  determine if bugs were identified.
+            Like the Firefox evaluation, a set of bugs with successful resolutions were chosen from Apache's bug tracker
+            from the ``networking and communication'' category. Once again, these bugs were divided into ``likely to be
+            identified by CrashSimulator'' and ``not likely to be identified by CrashSimulator'' based on an analysis of
+            their root cause and eventual resolution. The table below lists the bugs that were chosen, whether or not
+            they were likely to be identified and whether or not CrashSimulator identified them in the end.
 
-       %  \emph{\textbf{INSERT TABLE HERE}}
+            \begin{table}[H]
+                \scriptsize{}
+                \begin{tabular}{l  l  l  l}
+                    \toprule{}
+                        Bug Tracker ID & Likely to be Identified & Identified & Notes \\
+                        0001 & True & True & Note \\
+                        0002 & True & True & Note \\
+                        0003 & True & True & Note \\
+                        0004 & True & True & Note \\
+                        0005 & True & True & Note \\
+                        0006 & False & False & Note \\
+                        0007 & False & False & Note \\
+                        0008 & False & False & Note \\
+                        0009 & False & False & Note \\
+                        0010 & False & False & Note \\
+                    \bottomrule{}
+                \end{tabular}
+            \end{table}
+
+            In addition to these bugs, one yet undiscovered bug was identified during the course of this evaluation.
+            The bug related to a denial of service condition caused by one of Apache's low level network operations
+            failing to handling low MTU values. This bug was reported to Apache's bug tracker (Bug ID\# 2007) and was
+            successfully resolved in the latest release.
 
     \subsection{Test Coverage Improvement}
 
