@@ -48,18 +48,18 @@
     can only signal that a fault has occurred at some point during a test run. Furthermore, like white-box tools, these
     tools fail to take into account the environment in which the application is running.
 
-    %TODO: Rework this paragraph
     In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
     applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
     need by providing automated identification of environment-induced faults through simulated deviations from the
     normal flow of system calls an application makes when interacting with its environment. Like other white-box tools,
     CrashSimulator attempts to analyze an application in order to understand where it can inject faults.  However,
-    unlike other tools it bypasses the application's source code entirely -- instead relying on system call traces.
-    Because it analyzes these traces rather than the application itself, CrashSimulator is able to test applications in
-    a completely black-box manner and because it bases its analysis on a successful run of the application in a real
-    environment this analysis takes into account the application's interactions with its environment. During its
-    analysis, CrashSimulator identifies sets of system calls that represent areas likely to contain faults. Once
-    analysis is complete, CrashSimulator runs the application under test and injects the faults it identified previously
-    and reports to the developer whether or not the application successfully handled them or not. For example,
-    CrashSimulator might identify a system call that rarely fails and, as a result, this failure is rarely handled in
-    practice. It can then inject this failure and observe the results.
+    unlike other tools it bypasses the application's source code entirely -- instead relying on system call traces. This
+    reduces CrashSimulator's footprint by eliminating complex language analysis code while still allowing insight into
+    the application's operation. At the same time, CrashSimulator, like other black-box tools, is able to test
+    applications in the absence of source code. Furthermore, because it bases its analysis on a successful run of the
+    application in a real environment this analysis takes into account the application's interactions with its
+    environment. During its analysis, CrashSimulator identifies sets of system calls that represent areas likely to
+    contain faults. Once analysis is complete, CrashSimulator runs the application under test and injects the faults it
+    identified previously and reports to the developer whether or not the application successfully handled them or not.
+    For example, CrashSimulator might identify a system call that rarely fails and, as a result, this failure is rarely
+    handled in practice. It can then inject this failure and observe the results.
