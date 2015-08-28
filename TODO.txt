@@ -1,6 +1,19 @@
-TODO: Put a bulleted list of contributions into the introduction
 TODO: Write out simple example traces
-
 TODO: Need Trace-Repeater of some sort
-    TODO: Non-Race conditions -> probably make calls in the same order anyway
-    TODO: Might be an off the shelf tool for replaying traces
+    TODO: Trace-Repeater: Non-Race conditions -> probably make calls in the same order anyway
+    TODO: Trace-Repeater: Might be an off the shelf tool for replaying traces
+TODO: Write about how this can be a general technique but this paper focuses on network faults as those are what we
+chose to implement
+TODO: Decide whether or not to include the detailed information about how Firefox and apache were scripted
+TODO: Look at the bugs that were identified in the NetCheck and CheckAPI papers
+TODO: General rework to focus on NetCheck and CheckAPI. Consider them a "box" that feeds into CrashSimulator
+TODO: Look into related work for NetCheck, CheckAPI
+TODO: Look at Christmas Tree TCP Checks
+TODO: Anomalies from specifications -> Formal language to define specifications
+What about feeding already tainted traces back into CrashSimulator
+    The "all possible bugs" example
+    Is it then easier to permute through this very broken text
+TODO: traces come from unit tests. What happens if we permute the unit tests from which the pristine test was taken
+    One trace per test
+TODO: Look into the Apache portable runtime
+Doodle pole to find meeting times

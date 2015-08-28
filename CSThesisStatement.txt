@@ -1,3 +1,8 @@
+TODO: Thesis Statement: Settle on the word "environment" as a replacement for words like platform, etc. In thesis
+statement
+
+TODO: Thesis Statement: Consider rewording "native platform" to something like "development environment".
+
 V1 - The purpose of CrashSimulator is to expose faults in applications that result from an incomplete understanding of
 common APIs used by the application.
 
