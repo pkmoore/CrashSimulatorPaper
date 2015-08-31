@@ -1,29 +1,20 @@
 % TODO: Re-read and rework
 \begin{abstract}
-%\boldmath
 
-    % What does "correctly" mean in general? % Correct -> does the program behave the same as in the happy path when it
-    % encounters an error. % Too specific on the what we are breaking, only return values. Could be misordered UDP.  Be
-    % more general about the faults we are trying to do.  Intro sentence -> may programmers have programs that work fine
-    % in development environment and then fail in production % We are able to use this tool to induce and observe
-    % behavior without having to go through deployment % Introduction has to have a story like this % Motivation about
-    % problem, summary about contribution, more detail about contribution %
-
-    One of the challenges of software development is anticipating and dealing with the differences in the variety of
-    environments in which an application may run. For example, an application may work correctly on the developer's low
-    latency, local network but fail when run across a node that performs network address translation or across a link
-    that introduces high latency into network communications. This paper introduces CrashSimulator, a tool designed to
-    induce crashes in applications that do not properly handle these unanticipated conditions.  CrashSimulator
-    accomplishes this in three steps. First, it analyzes a system call trace of an application collected using a utility
-    like \emph{strace} in order to identify a set of system calls that are commonly mishandled by developers. Next, it
-    injects faults into the running application at the previously identified points by using \emph{ptrace}. Finally, it
-    observes whether or not the application continued to operate normally after the encountering the error and reports
-    its findings to the developer. As a result, the developer is made aware of deficiencies in the application without
-    having to go through a potentially complex and costly deployment or beta test scenario. Because CrashSimulator
-    operates using black-box analysis utilities it does not require access to an application's source code.
-    CrashSimulator was used to analyze \emph{<<somenumber>>} commonly used open and closed source applications.  Its
-    findings were compared to tickets listed in the bug tracking suites of these applications.  It was able to
-    successfully identify \emph{<<somenumber>>} of bugs listed in these suites and \emph{<<someothernumber>>} of bugs
-    that had not yet been discovered.
+    One of the challenges of software development is anticipating and dealing with the variety of environments in which
+    an application may run. For example, an application may work correctly on the developer's low latency, local network
+    but fail when run across a node that performs network address translation or across a link that introduces high
+    latency into network communications. This paper introduces CrashSimulator, a tool designed to determine whether or
+    not an application can handle these unanticipated conditions.  CrashSimulator accomplishes this in three steps.
+    First, it analyzes a system call trace of an application collected using a utility like \emph{strace} in order to
+    identify a set of system calls that are commonly mishandled by developers. Next, it injects faults into the running
+    application at the previously identified points by using \emph{ptrace}. Finally, it observes whether or not the
+    application continued to operate normally after the encountering the error and reports its findings to the
+    developer. As a result, the developer is made aware of deficiencies in the application without having to go through
+    a potentially complex and costly deployment or beta test scenario. Because CrashSimulator operates using black-box
+    analysis utilities it does not require access to an application's source code.  CrashSimulator was used to analyze
+    \emph{<<somenumber>>} commonly used open and closed source applications.  Its findings were compared to tickets
+    listed in the bug tracking suites of these applications.  It was able to successfully identify \emph{<<somenumber>>}
+    of bugs listed in these suites and \emph{<<someothernumber>>} of bugs that had not yet been discovered.
 
 \end{abstract}
