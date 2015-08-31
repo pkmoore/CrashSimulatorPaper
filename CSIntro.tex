@@ -55,9 +55,9 @@
     need by providing automated identification of environment-induced faults through simulated deviations from the
     normal flow of system calls an application makes when interacting with its environment. Like other white-box tools,
     CrashSimulator attempts to analyze an application in order to understand where it can inject faults.  However,
-    unlike other tools it bypasses the application's source code entirely -- instead relying on system call traces. This
-    reduces CrashSimulator's footprint by eliminating complex language analysis code while still allowing insight into
-    the application's operation. At the same time, CrashSimulator, like other black-box tools, is able to test
+    unlike other tools it bypasses the application's source code entirely --- instead relying on system call traces.
+    This reduces CrashSimulator's footprint by eliminating complex language analysis code while still allowing insight
+    into the application's operation. At the same time, CrashSimulator, like other black-box tools, is able to test
     applications in the absence of source code. Furthermore, because it bases its analysis on a successful run of the
     application in a real environment this analysis takes into account the application's interactions with its
     environment. During its analysis, CrashSimulator identifies sets of system calls that represent areas likely to
