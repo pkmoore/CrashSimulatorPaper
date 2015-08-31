@@ -16,11 +16,10 @@
         the application under test and performing the interactions necessary to inject the test fault and monitor the
         application's response.
 
-        CrashSimulator was architected this was in order to maximize code reuse and portability. A great deal of work
-        has already been accomplished by NetCheck and CheckAPI in the domain of system call trace parsing. \emph{Strace}
-        and \emph{dtrace} both produce output that was primarily intended for human rather than programmatic
-        consumption. As such, reuse of their parsing code resulted in a large time savings and increased confidence in
-        parsing accuracy.
+        CrashSimulator was designed this was in order to maximize code reuse and portability. A great deal of work has
+        already been accomplished by NetCheck and CheckAPI in the domain of system call trace parsing. \emph{Strace} and
+        \emph{dtrace} both produce output that was primarily intended for human rather than programmatic consumption. As
+        such, reuse of their parsing code resulted in a large time savings and increased confidence in parsing accuracy.
 
         % TODO: More Detail!!!
         During parsing CrashSimulator makes use of a group of supported strategies. These strategies along with
@@ -60,7 +59,7 @@
 
         \begin{enumerate}
             \item{The application can run in the testing environment}
-            \item{The testing environment has the tooling required to take a system call trace of the application during
+            \item{The testing environment has the tools required to take a system call trace of the application during
             a normal run}
         \end{enumerate}
 
@@ -107,7 +106,7 @@
             of system calls.
 
         % TODO: More Detail!!!
-        \subsubsection{Conditional Based}
+        \subsubsection{Condition Based}
 
             This injection point identification strategy is the most complex offered by CrashSimulator. Rules for this
             strategy allow for the identification of system calls based on the success or failure of previous system
@@ -116,25 +115,27 @@
             order with the appropriate return values. An example would be modifying a subsequent call to recv to fail
             only if the prior call to recv was successful.
 
-    \subsection{Supported Fault Types}
+    \subsection{Potential Deviations}
 
         \textbf{I would really like to find another term besides anomaly}
 
         CrashSimulator's goal when analyzing a normal run system call trace is to identify individual system calls or
         patterns of system calls that it recognizes as an opportunity to inject a fault during subsequent runs. These
-        signatures are referred to as ``potential anomalies.'' CrashSimulator has the ability to identify and make use
-        of several classifications of potential anomalies.
+        signatures are referred to as ``potential anomalies.'' CrashSimulator has the ability to identify and classify
+        anomalies into the following categories.
 
         \subsubsection{Return Value Modification}
 
             One way CrashSimulator can inject faults into the running application is to modify the return values of
             interesting system calls identified in the previous trace analysis step. The primary driver behind injecting
             this type of fault is the tendency of developers to misuse common API functions or misunderstand their
-            failure modes. For example, a developer that is unfamiliar with the operation of a \emph{recv} system call
-            may fail to account for cases where it return all of the data expected. A well written application might
-            make repeated calls to recv until it has gathered all the data it needs while an incorrectly written
-            application may only call it once resulting in a fault when it tries to process incomplete data in the
-            future.
+            failure modes. The \emph{recv} system call, for example, returns the number of bytes of data it was able to
+            copy into the requested buffer from the specified socket. A developer that is unfamiliar with the operation
+            of \emph{recv} may assume that a positive return value means that \textbf{all} of the requested data was
+            successfully copied. This assumption fails to account for cases where the system call completed successfully
+            but copied less data than the developer was expecting. A well written application might make repeated calls
+            to recv until it has gathered all the data it needs while an incorrectly written application may only call
+            it once resulting in a fault when it tries to process incomplete data in the future.
 
             % TODO: Make sure terminology is correct in this paragraph
             % TODO: Is this methodology reasonable?
@@ -154,10 +155,13 @@
             % TODO: Rework the example described here
         \subsubsection{Data Reordering}
 
-            supported by catalog based
-            identify group of system calls in question
-            hand in re-ordered data from ideal run
-            dependent on data collected in the ideal run
+        \emph{I need to write these bullet points up in paragraph form}
+        \begin{itemize}
+            \item{supported by catalog based}
+            \item{identify group of system calls in question}
+            \item{hand in re-ordered data from ideal run}
+            \item{dependent on data collected in the ideal run}
+        \end{itemize}
 
 
             First, the normal run trace is parsed in its entirety for system calls in a specific set

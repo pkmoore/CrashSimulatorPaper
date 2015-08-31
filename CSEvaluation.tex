@@ -47,12 +47,10 @@
             amount of time. In short, the sample programs allow an accurate evaluation of CrashSimulator's performance
             by acting as ideal testing candidates.
 
-            Performance tests using the sample programs were performed five times in order to account for differences in
-            execution times related varying resource loads on the test hardware at the time the tests were run. The
-            results are recorded below. Repeated executions of the sample programs outside of crash simulator provide a
-            control run time for comparison to times recorded from the CrashSimulator test sessions. Because
-            CrashSimulator will potentially execute the application under test \emph{thousands} of times, it is not
-            appropriate to compare test run times to the run time of a single run of the application.
+            Repeated executions of the sample programs outside of crash simulator provide a control run time for
+            comparison to times recorded from the CrashSimulator test sessions. Because CrashSimulator will potentially
+            execute the application under test \emph{thousands} of times, it is not appropriate to compare test run
+            times to the run time of a single run of the application. The results are recorded below.
 
             \begin{table}[H]
                 \scriptsize{}
@@ -94,7 +92,7 @@
 
                 In order to achieve consistent test runs the following setup was constructed. The Firefox scripting API
                 was used in order to modify the behavior of the browser in two key aspects. First, the browser was
-                modified to automatically request a static web page with no dynamic content from a server hosted and
+                configured to automatically request a static web page with no dynamic content from a server hosted and
                 operated by the authors. A static web page was chosen to reduce the chances of any script parsing and
                 execution code present in Firefox confounding the run time measurements. Second, Firefox's scripting API
                 was used to end execution of the browser immediately upon the completion of the page's rendering. This
@@ -142,11 +140,10 @@
 
                 Evaluating CrashSimulator's performance against Apache saw similar challenges to its evaluation against
                 Firefox. Apache is a complex piece of software and, while its normal use cases don't require user
-                interaction, it presents challenges due to its typically long-lived nature. Apache's primary use case is
-                evaluation methodology should primarily exercise this functionality to serve content to a client program
-                upon the client's request. As such, it was determined that the evaluation methodology should primarily
-                exercise this functionality evaluation methodology should primarily exercise this functionality. To this
-                end, the following evaluation setup was constructed.
+                interaction, it presents challenges due to its typically long-lived nature. Apache's primary use case
+                serving documents and files to a client program over a network connection. As such, it was decided that
+                this evaluation should focus on this use case. To this end, the following evaluation setup was
+                constructed.
 
                 For this evaluation one execution of Apache consists of the following steps:
 
@@ -158,24 +155,24 @@
                 \end{enumerate}
 
                 A Python script was written in order to execute these steps in a consistent manner. First, an instance
-                of Apache was launched. This instance of Apache was configured to serve a single directory on the host
-                machine using a single static host entry. This directory contained a single static web page with 100
-                bytes of HTML content. Apache was also configured to perform \emph{no} caching of local resources. This
-                setup was chosen in order to reduce the amount of extraneous functionality executed by Apache. A single
-                static host entry eliminates Apache's virtual host parsing and a single static HTML document eliminates
-                the need for apache to execute any external parsing engine such as mod\_php. Once Apache has completed
-                its startup, the script requests the static web page using the \emph{wget} utility. The page is not
-                rendered or displayed in any way upon receipt as these processes are not relevant to this evaluation.
-                Once the web page has been retrieved the script instructs the Apache instance to terminate and waits for
-                it to do so. Termination of the Apache instance concludes the measured run time for the execution.
-                Because the control script needed to be able to directly manage both client and server activates, in
-                this setup, both the ``client'' script and the Apache instance were run on the same machine.
+                of Apache was launched. It was configured to serve a single directory on the host machine using a single
+                static host entry. This directory contained a single static web page with 100 bytes of HTML content.
+                Apache was also configured to perform \emph{no} caching of local resources. This setup was chosen in
+                order to reduce the amount of extraneous functionality executed by Apache. A single static host entry
+                eliminates Apache's virtual host parsing and a single static HTML document eliminates the need to
+                execute any external parsing engine such as mod\_php. Once Apache has completed its startup, the script
+                requests the static web page using the \emph{wget} utility. The page is not rendered or displayed in any
+                way upon receipt as these processes are not relevant to this evaluation.  Once the web page has been
+                retrieved the script instructs the Apache instance to terminate and waits for it to do so.  Termination
+                of the Apache instance concludes the measured run time for the execution.  Because the control script
+                needed to be able to directly manage both client and server activates, in this setup, both the
+                ``client'' script and the Apache instance were run on the same machine.
 
-                Once again, CrashSimulator's performance was evaluated in terms of the run time of CrashSimulator's
-                executions versus the run time of the same number of executions performed without CrashSimulator's
-                involvement. The actual run times measured are for the complete execution for the Apache control script
-                described above. As such, some run time accumulated is the result of non-Apache client code and control
-                script overhead. The following table contains the results collected.
+                Once again, CrashSimulator's performance was evaluated in terms of the run time of its executions versus
+                the run time of the same number of executions performed without CrashSimulator's involvement. The actual
+                run times measured are for the complete execution for the Apache control script described above. As
+                such, some run time accumulated is the result of non-Apache client code and control script overhead. The
+                following table contains the results collected.
 
                 \begin{table}[H]
                     \scriptsize{}
@@ -215,8 +212,8 @@
         known bugs that were listed in the bug tracking suites of two major open source projects. Firefox and Apache 2
         were chosen because of their use in the previously discussed evaluations. The goal was to identify bugs from
         each tool's bug tracker (both fixed and unfixed) that are related to the faults that CrashSimulator can inject
-        and determine whether or not CrashSimulator was able to identify them. As a side effect, this process also
-        yielded a number of new bugs that were previously unreported in these projects' bug trackers.
+        and determine whether or not it was able to identify them. As a side effect, this process also yielded a number
+        of new bugs that were previously unreported in these projects' bug trackers.
 
         \subsection{Firefox}
 
