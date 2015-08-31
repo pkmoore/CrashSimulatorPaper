@@ -1,8 +1,3 @@
-TODO: Thesis Statement: Settle on the word "environment" as a replacement for words like platform, etc. In thesis
-statement
-
-TODO: Thesis Statement: Consider rewording "native platform" to something like "development environment".
-
 V1 - The purpose of CrashSimulator is to expose faults in applications that result from an incomplete understanding of
 common APIs used by the application.
 
@@ -11,7 +6,12 @@ identifying the weaknesses in a program that may not be obvious on its ‘native
 when run over a more complex network, CrashSimulator can help designers anticipate and adjust programs by providing
 automated identification of environment-induced faults”
 
-V3 (Preston - “Robust applications must run in a number of different environments and over multiple platforms. By
+V3 (Preston) - “Robust applications must run in a number of different environments and over multiple platforms. By
 identifying the weaknesses in a program that may not be obvious on its ‘native” platform, but could manifest themselves
 when on a different platform, CrashSimulator can help designers anticipate and adjust programs by providing automated
 identification of environment-induced faults”
+
+v4 (Preston) - “Robust applications must run in a number of different environments. By identifying the weaknesses in a
+program that may not be obvious in its development environment, but could manifest themselves when in different
+environments, CrashSimulator can help designers anticipate and adjust programs by providing automated identification of
+environment-induced faults”
