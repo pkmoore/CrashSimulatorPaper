@@ -16,4 +16,5 @@ What about feeding already tainted traces back into CrashSimulator
 TODO: traces come from unit tests. What happens if we permute the unit tests from which the pristine test was taken
     One trace per test
 TODO: Look into the Apache portable runtime
-Doodle pole to find meeting times
+TODO: Doodle pole to find meeting times
+
