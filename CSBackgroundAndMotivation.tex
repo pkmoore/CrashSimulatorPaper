@@ -1,5 +1,3 @@
-% TODO: Incorporate changes from Lois' markup
-
 \section{Background and Motivation}
 
     CrashSimulator operates in a unique niche in relation to other testing tools and techniques. As a result, it is
@@ -40,20 +38,21 @@
 
     \subsection{System Call Trace Analysis}
 
-        CrashSimulator is based on prior work from two projects: NetCheck and CheckAPI. It, like these tools, analyzes
-        system call traces captured from an execution of the application under test in order to determine locations that
-        are likely to to be sources of faults. These traces are captured using strace and dtrace, the standard tools
-        made available for this purpose in Linux and OS X respectively. Each system call is evaluated within the context
-        of prior system calls, their parameters, and return values. This system call context is compared an ideal model
-        and deviations from this model are logged.
+        CrashSimulator is based on prior work from two projects: NetCheck and CheckAPI. It makes use of these tools to
+        analyze system call traces captured from an execution of the application under test in order to determine
+        locations that are likely to to be sources of faults. At this time, traces captured using strace and dtrace are
+        supported as they are the standard tools made available for this purpose in Linux and OS X respectively. Each
+        system call is evaluated within the context of prior system calls. NetCheck and CheckAPI take system call
+        ordering, parameters and return values into account as it looks for opportunities to inject anomalies.
 
     \subsection{Crash Simulation}
 
         Once CrashSimulator has generated a series of potential faults from its analysis of an application's system call
-        trace the process of verifying the presence of faults can begin. Verification is handled by running an instance
-        of the application and injecting one of the potential faults identified during the analysis step.  The results
-        of this faulty execution are monitored and any deviations in output from the ``correct'' output are recorded.
-        Faults that result in an application crashing are also recorded.
+        trace the process of verifying the presence of faults can begin. This is accomplished by producing a new copy of
+        the ideal system call trace that has been mutated to include an anomaly that was identified during analysis.
+        Next, this system call trace is replayed. The results of this faulty execution are monitored and any deviations
+        in output from the ``correct'' output are recorded.  Faults that result in an application crashing are also
+        recorded.
 
     \subsection{A Real World Example}
 
