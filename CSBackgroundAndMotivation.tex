@@ -1,14 +1,10 @@
 % TODO: Incorporate changes from Lois' markup
-% TODO: Background And Motivation: Come up with some concrete examples
-%    Linux app that runs fine on one network but not another
-%    Write this as section II.d
-%    Some sort of diagram
-%    Talk at a high level -> likely to change depending on the evaluation
-
 
 \section{Background and Motivation}
 
-    This section describes the techniques and terminologies used in other automatic testing frameworks.
+    CrashSimulator operates in a unique niche in relation to other testing tools and techniques. As a result, it is
+    better suited to identify and report on certain types of error that relate to the environment in which an
+    application is running.
 
     \subsection{Existing Techniques}
 
@@ -58,3 +54,28 @@
         of the application and injecting one of the potential faults identified during the analysis step.  The results
         of this faulty execution are monitored and any deviations in output from the ``correct'' output are recorded.
         Faults that result in an application crashing are also recorded.
+
+    \subsection{A Real World Example}
+
+        \textbf{\emph{This is an example based on a fake tool. It is rough but I can polish it more if this example is
+        on the right track.}}
+
+        TimeSync hosts hardware atomic clocks and leases access to them for clock synchronization purposes to
+        organizations with highly sensitive timing needs. As part of this service they distribute TDaemon, a Linux
+        daemon that make use of a proprietary protocol to synchronize the clock of the machine it is running on with the
+        TimeSync's atomic clocks. TimeSync's expertise was in the setup and maintenance of atomic clocks, not in the
+        construction and maintenance of a highly distributed system. A few years after opening for business, TimeSync's
+        developers decided that the low level communication code for TDaemon needed to be re-written in a newer
+        programming language. Unfortunately, during this rewrite a junior developer failed to handle situations where a
+        \emph{connect} attempt failed. These failed connects caused TDaemon to silently retry its connection without
+        success. All testing of TDaemon utility was performed on TimeSync's local network which had firewall rules in
+        place that allowed development environments to freely access the atomic clocks. When the new version of TDaemon
+        was rolled out, it began silently failing on networks with more restrictive firewall rules. Because TDaemon was
+        written to silently retry the connection until successful, these failures went unnoticed. As a result, at many
+        of TimeSync's locations, system clocks slowly became out of sync resulting in significant damage to experiments
+        and experimental data.
+
+        The above events are a prime situation in which automated testing and CrashSimulator in particular would have
+        saved a great deal of trouble. CrashSimulator is capable of injecting failed \emph{connect} calls into
+        applications during its test runs. As a result, CrashSimulator would produced and reported TDaemon's abnormal
+        behavior in spite of the ideal network conditions present in TDaemon's development environment.
