@@ -21,34 +21,7 @@
     due to the inability of the developer to replicate all possible application environments and exhaust all possible
     code paths.
 
-    Existing tools can be roughly divided into two categories, black-box and white-box, based on the techniques they use
-    to perform their testing. Black-box tools simply manipulate the inputs of the application under test and observe the
-    resultant outputs. White-box tools, on the other hand, perform complex analysis of the application under test's
-    source code in order to reason about what inputs are likely to produce interesting outputs. Each of these
-    methodologies have their own advantages and disadvantages.
-
-    White-box testing tools typically rely on a similar set of techniques including constraint solving of branch
-    statements in an application's code and symbolic execution of an application's code in order to generate inputs that
-    optimally exercise the application's code paths. These techniques, while powerful, are not without their downsides.
-    First, symbolic execution is computationally expensive and can result in deviations where the symbolic execution of
-    code doesn't accurately represent the actual execution of code. Similarly, efficiently solving a series of
-    constraints in order to exercise a particular code path can be computationally expensive and it can be difficult to
-    guarantee that a particular set of generated inputs will exercise the intended code path in many circumstances due
-    to external dependencies that the tool cannot analyze. For example, a white-box testing tool cannot generate inputs
-    that are guaranteed to exercise a code path that relies on an operating system resource being available. Finally,
-    white-box tools typically require than an application's source code be available which is not always the case. Even
-    advanced white-box tools that analyze an application's machine code can be stymied in situations where an
-    application's executable has been packed or encrypted.
-
-    The alternative, black-box tools, have their own set of issues. They do not have an understanding of what an
-    application is actually doing during execution which means they are only able to submit inputs and observe outputs.
-    The upside of this technique is simplicity. Black-box tools do not need the capability to understand and analyze an
-    application's code which reduces their complexity immensely. Also, their testing process, mutating inputs and
-    observing outputs, is computationally inexpensive. The downside of simplicity is that they cannot craft inputs with
-    any sort of intelligence. This means that a great deal of time can be spent mutating inputs without much success
-    in terms of bug identification. Also, they cannot identify specifically the source of faults in an application. They
-    can only signal that a fault has occurred at some point during a test run. Furthermore, like white-box tools, these
-    tools fail to take into account the environment in which the application is running.
+    % TODO: Write a short paragraph about black-box and white-box stuff here
 
     In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
     applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
