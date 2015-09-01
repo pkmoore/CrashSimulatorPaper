@@ -21,7 +21,12 @@
     due to the inability of the developer to replicate all possible application environments and exhaust all possible
     code paths.
 
-    % TODO: Write a short paragraph about black-box and white-box stuff here
+    In an attempt to remedy this situation, a wide variety of automated testing tools have been developed. These tools
+    typically follow either a black-box or white-box approach. In the case of white-box testing, the tools attempt to
+    gain an understanding of the application by analyzing its code with the goal of generating inputs that most
+    efficiently exercise the application's code paths. In the case of black-box testing, the tools simply mutate inputs
+    in order to achieve a similar goal. Both of these techniques have their advantages and disadvantages. CrashSimulator
+    attempts to collect the good parts from each of these techniques into a single utility.
 
     In light of these shortcomings, an alternative approach is needed to provide developers with confidence that their
     applications are sufficiently free of environment induced faults.  CrashSimulator is a tool designed to meet this
