@@ -6,15 +6,11 @@ TODO: Write about how this can be a general technique but this paper focuses on 
 chose to implement
 TODO: Decide whether or not to include the detailed information about how Firefox and apache were scripted
 TODO: Look at the bugs that were identified in the NetCheck and CheckAPI papers
-TODO: General rework to focus on NetCheck and CheckAPI. Consider them a "box" that feeds into CrashSimulator
 TODO: Look into related work for NetCheck, CheckAPI
 TODO: Look at Christmas Tree TCP Checks
-TODO: Anomalies from specifications -> Formal language to define specifications
 What about feeding already tainted traces back into CrashSimulator
     The "all possible bugs" example
     Is it then easier to permute through this very broken text
 TODO: traces come from unit tests. What happens if we permute the unit tests from which the pristine test was taken
     One trace per test
 TODO: Look into the Apache portable runtime
-TODO: Doodle pole to find meeting times
-
