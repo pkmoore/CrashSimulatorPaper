@@ -1,27 +1,56 @@
 % TODO: Flesh this out a __LOT__ MORE
 \section{Related Work}
 
-CrashSimulator's trace analysis engine is based on NetCheck. NetCheck uses two strategies
-    to identify potential fault areas from system call trace. The first is a model based simulation of the system calls
-    relevant to network communication from the input trace. System calls are organized according to a POSIX socket API
-    dependency graph and prioritized based on the order in which the system calls should be made in an ideal scenario.
-    For example, a client application should not be making a \emph{connect} system call before it has set up its
-    socket with the appropriate \emph{socket} system call. The model assumes that all system calls are atomic and that
-    they cannot happen simultaneously. This allows a definite global order to be created.
+    \subsection{White-box Tools}
 
-    Once a global ordering is in place each system call is evaluated based on the previous system calls. Return values
-    and parameters passed in are taken into account. If the system call is feasible it is accepted and the next system
-    call is evaluated. If the system call is not feasible given the current system call context it is rejected and
-    logged. These rejected system calls are treated as opportunities to inject faults during the next step of the
-    process.
+        White-box testing has been an area of intense interest in recent writing. Microsoft's SAGE and Bell Labs' DART
+        are two examples of such tools that take different approaches to the same overall white-box technique.
 
-\emph{This may belong in Background and Motivation} Existing white-box testing tools like DART and SAGE testing
-    tools rely on static analysis and symbolic execution of code in order to determine sets of inputs that exercise
-    particular code paths. DART symbolically executes an applications source code in order to facilitate its testing.
-    This limits DART to operating only on programs written in C. SAGE improves on this strategy symbolically executing
-    an application's x86 machine code instructions but this results in an architecture based rather than programming
-    language based limitation. CrashSimulator avoids these issues by relying on transparent observation of native
-    execution of an application.
+        \subsubsection{DART}
 
-DART assumes that external
-    functions are side effect free (I.e.\ their execution does not modify program memory).
+            DART is a white-box testing tool that supports testing of applications written in the C programming language. It
+            is capable of generating a test harness for an application's functions by through static analysis of the
+            application's source code. This harness is then used for two phases of testing. First, it performs random
+            testing and observes the application's behavior. Based on this random testing and symbolic execution of the
+            application's source code, DART generates a series of inputs that will be used in the second phase of testing.
+            These inputs are designed to direct the application down specific execution paths, observing the programs
+            behavior and reporting faults as they are identified. DART operates on the assumption that the functions being
+            evaluated have no side-effects and that the application is able to interact appropriately with its environment.
+            More information can be found in \textbf{\emph{PAPER TITLE HERE}}
+
+        \subsubsection{SAGE}
+
+            SAGE differs from many other white-box testing tools in that it analyzes a compiled application's machine code
+            rather than the application's uncompiled source code. This allows SAGE to operate on applications that were
+            compiled from a variety of programming languages. It first runs the application under test with a set of well
+            formed inputs and records an instruction-level trace of the application's execution. Next, it analyzes this
+            trace in order to identify constraints that guard different paths of execution. SAGE then solves these
+            constraints and, based on these solutions, generates inputs that are able to exercise specific paths of
+            execution.
+
+    \subsection{Black-box tools}
+
+        % TODO: Find examples of black box tools
+
+    \subsection{Trace Analysis Tools}
+
+        Much of CrashSimulator's work on system call trace analysis is based on previous work on NetCheck and CheckAPI
+
+        \subsubsection{NetCheck}
+
+            This implementation of CrashSimulator relies of NetCheck for system call trace analysis. NetCheck uses two
+            strategies to identify potential fault areas from system call trace. The first is a model based simulation
+            of the system calls relevant to network communication from the input trace. System calls are organized
+            according to a POSIX socket API dependency graph and prioritized based on the order in which the system
+            calls should be made in an ideal scenario.  For example, a client application should not be making a
+            \emph{connect} system call before it has set up its socket with the appropriate \emph{socket} system call.
+            The model assumes that all system calls are atomic and that they cannot happen simultaneously. This allows a
+            definite global order to be created.
+
+            Once a global ordering is in place each system call is evaluated based on the previous system calls. Return
+            values and parameters passed in are taken into account. If the system call is feasible it is accepted and
+            the next system call is evaluated. If the system call is not feasible given the current system call context
+            it is rejected and logged. In addition, system calls that return a value indicating some sort of network
+            failure are recorded. After all system calls have been evaluated a NetCheck attempts to diagnose the
+            source of any errors encountered. It is this diagnosis that CrashSimulator uses when deciding where and how
+            to mutate the ``ideal run'' system call trace it is operating on.
