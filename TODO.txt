@@ -14,3 +14,38 @@ What about feeding already tainted traces back into CrashSimulator
 TODO: traces come from unit tests. What happens if we permute the unit tests from which the pristine test was taken
     One trace per test
 TODO: Look into the Apache portable runtime
+
+
+Ask about title information
+Move research questions to the beginning of the evaluation section
+
+For research contributions, not usually a sentence
+    Include Examples?
+    Have two that are design focused
+    Include one with an evaluation focus
+    Add another one (4 total)
+    Show what it does that makes it differ from other stuff
+    "we are the only tool out there that does X, Y, and Z"
+        Analyze system call traces (first bullet)
+        Replay system call traces (second bullet)
+        Evaluation (third bullet)
+    Look at bulleted lists at the end of intros of other papers from the conference
+    design-eval-design-eval-design-eval
+TODO: Move the figure to the top of the page
+
+Traces don't have to be from the application under test. Traces from firefox in a bad environment can be used to
+generate anomalies for other application
+"weird environment"
+
+Figure out googlegroup stuff
+
+Find a real world example that fits our tool rather than the made up example. Clear, small code example that we can walk
+through.
+    Python NetCheck ONONBLOCK bug -> replace the made up example with this one
+
+Author Order: put mine in the front, and Justin at the end and include email addresses
+
+
+!!! BIG THING faults in other applications to generate fault cases for other applications!!!
+Traces kinda represent a buggy environment that we can test for in our good environment
+TODO: Make a better working title
