@@ -45,7 +45,12 @@
     CrashSimulator makes the following contributions:
 
     \begin{enumerate}
-        \item{CrashSimulator is able to identify environment-related faults that can be easily overlooked.}
-        \item{CrashSimulator is able to reproduce faults predicted by other tools}
-        \item{CrashSimulator is able to test applications in a language independent manner}
+        \item{CrashSimulator is the first tool to use system call traces recorded in one environment as a basis for
+            injecting faults into an application running in another environment}
+        \item{CrashSimulator is able to produce thousands of mutated system call traces per minute even when operating
+            on large system call traces from complex applications}
+        \item{CrashSimulator's pluggable anomaly generation utilities allow new anomalies to be identified with minimal
+            new code}
+        \item{CrashSimulator is able to identify errors listed in the bug trackers of major projects and predicted by
+            other testing tools}
     \end{enumerate}
