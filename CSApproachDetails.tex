@@ -11,16 +11,11 @@
         At a high level CrashSimulator is organized into three primary modules. The first module is responsible for
         interpreting the input system call traces and identifying opportunities to inject faults into the application
         under test. The second module's primary purpose is producing mutated versions of the input ``clean'' system call
-        trace. The specific mutations it makes are based on the potential anomalies identified during analysis of the
-        trace. Third, there is the test launcher. This module is responsible for iterating through the set of anomalous
-        system call traces in order to test each one of them. For each anomalous trace, this module launches a test
-        instance of the application under test and replays the anomalous system call trace. During this process, it
-        monitors the application's behavior and reports any faults.
-
-        CrashSimulator was designed to have support any system call trace analysis tool that can output a list of
-        anomalies in the correct format. In this implementation, CrashSimulator was written to accept the output of
-        NetCheck. NetCheck readily able to identify a wide variety of anomalous behaviors related to network
-        communication between one or more hosts.
+        trace. The specific mutations it makes are based on the anomalies identified during analysis of the input system
+        call traces. The final module is responsible for iterating through the set of anomalous system call traces in
+        order to test each one of them. For each anomalous trace, this module launches a test instance of the
+        application under test and replays the anomalous system call trace. During this process, it monitors the
+        application's behavior and reports any faults.
 
         The test launcher was separated from the test controller for the sake of portability. A great deal of the test
         launcher's code deals with the low level details of process manipulation and monitoring and, as such, will
@@ -44,27 +39,48 @@
         CrashSimulator's source code is available and, while other environments may be untested, it should function
         correctly on any platforms that meet the criteria described above.
 
+    \subsection{Anomaly Identification}
+
+        The first step in CrashSimulator's operation is the analysis of the set of input system call traces recorded
+        from other applications running in the intended deployment environment. These traces can be taken from any
+        application that as environmental requirements that are reasonably similar to the application under test. For
+        example, a web server could likely be effectively tested by CrashSimulator when CrashSimulator is given system
+        call traces from other applications that make heavy use of the network. Testing a web browser with traces from
+        an application that has no network usage at all would result in less effective testing.
+
+        CrashSimulator was designed to accept identified anomalies from any tool that can output them in the proper
+        format. In this implementation, CrashSimulator was written to accept the output of NetCheck. NetCheck readily
+        able to identify a wide variety of anomalous behaviors related to network communication between one or more
+        hosts. During normal operation, NetCheck analyzes a group of input system call traces and attempts to produce a
+        diagnosis for network related faults. When operating as an anomaly identification tool for CrashSimulator its
+        operation remains the same. Adapter code in CrashSimulator allows the normal output from NetCheck to be consumed
+        without any modifications to NetCheck itself. This output is used to derive the mutations that will be made to
+        the application under test's ``ideal'' system call trace in order to induce the faults NetCheck identified in
+        the applications that yielded the input system call traces.
+
     \subsection{System Call Traces}
 
-        The first step in CrashSimulator's operation is to gather a trace of the system calls made by the application
-        during a normal run. Where other tools base their operation of direct analysis of the application under test
-        CrashSimulator operates based on information gleaned from system call traces. This gives CrashSimulator several
-        advantages over similar tools. First, CrashSimulator operates in a language independent manner. It can test any
-        program given two conditions hold true:
+        Where other tools base their operation of direct analysis of the application under test CrashSimulator operates
+        based on information gleaned from system call traces. This gives CrashSimulator several advantages over similar
+        tools. First, CrashSimulator operates in a language independent manner. It can test any program given two
+        conditions hold true:
 
         \begin{enumerate}
             \item{The application can run in the testing environment}
-            \item{The testing environment has the tools required to take a system call trace of the application during
-            a normal run}
+            \item{System call traces can be recorded from from applications similar to the application under test while
+                they run in the intended deployment environment}
         \end{enumerate}
 
-        This removes the need for the complex language parsing that other similar tools rely on. Second, the faults
-        injected by CrashSimulator test the interface between the application under test and its environment. Other
-        similar testing tools focus on testing the logic within the application under test which missing faults that
-        only appear when the application is run in an imperfect, real world environment.
-
-        Because this implementation of CrashSimulator uses NetCheck for system call trace analysis, supported trace
-        gathering tools include \emph{strace} on Linux and \emph{dtrace} on OS X.
+        Utilizing system call traces provides CrashSimulator with two advantages over similar tools. First,
+        CrashSimulator has no need for complex language parsing and analysis code. It can test an application regardless
+        of the programming language it was written in. Second, while other tools focus on the application under test in
+        isolation, CrashSimulator is able to extensively test the interfaces between the application under test and its
+        environment. This means that faults resultant from these interfaces are readily identified. For example,
+        existing tools are able to quickly test for flaws that result from improper parsing of data once it
+        has been received from across a network. CrashSimulator is able to induce and identify flaws that result from
+        improper behavior during the network communication itself. This second type of flaw is much more difficult to
+        identify replicating the application's intended deployment environment or deploying the application and testing
+        it live.
 
     \subsection{Potential Deviations}
 
