@@ -58,6 +58,13 @@
         the application under test's ``ideal'' system call trace in order to induce the faults NetCheck identified in
         the applications that yielded the input system call traces.
 
+        This process of identifying anomalies does not need to be performed for each run of the test suite.
+        CrashSimulator maintains a corpus of anomalies it has extracted from sample traces. These anomalies can be used
+        to produce mutated traces for any future application that it tests. This allows a developer to build up a set of
+        anomalies that were identified from each of their target environments. The developer can then test an
+        application against this set of anomalies and get an idea of how their application will behave should it
+        encounter the anomalies a deployment environment.
+
     \subsection{System Call Traces}
 
         Where other tools base their operation of direct analysis of the application under test CrashSimulator operates
