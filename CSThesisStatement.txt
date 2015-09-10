@@ -15,3 +15,9 @@ v4 (Preston) - “Robust applications must run in a number of different environm
 program that may not be obvious in its development environment, but could manifest themselves when in different
 environments, CrashSimulator can help designers anticipate and adjust programs by providing automated identification of
 environment-induced faults”
+
+v5 (Preston) - “Robust applications must run in a number of different environments. By analyzing the problems
+encountered by other software running in a given environment, CrashSimulator can expose weaknesses in a program that may
+not be obvious in its development environment, but could manifest themselves when in its eventual target environment.
+This automated identification of environment-induced faults allows CrashSimulator to help designers anticipate flaws and
+adjust their programs accordingly."
