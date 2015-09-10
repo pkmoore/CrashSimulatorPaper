@@ -36,12 +36,20 @@
         Furthermore, like white-box tools, these tools fail to take into account the environment in which the
         application is running.
 
+    \subsection{Definitions}
+        \textbf{This is a temporary section for collecting definitions. It will likely be removed in the final paper as
+        these definitions are worked into the body of the paper.}
+        \begin{enumerate}
+            \item{\textbf{Sample Trace}: a trace collected from an application running in a targeted deployment
+                environment}
+        \end{enumerate}
+
     \subsection{A Real World Example}
 
         During the course of its evaluation, NetCheck was able to identify a bug in Python's socket handling code that
         compromised portability of Python applications. In short, calling accept on a socket that was created in
         non-blocking mode would return a new socket in blocking mode on Linux where the same calls would return a
-        non-blocking socket on OS X, Windows, and various flavors of BSD. This caused code that assumed the return
+        non-blocking socket on OS X, Windows, and various flavors of BSD\@. This caused code that assumed the return
         socket would always be blocking to work correctly on Linux but fail when an unhandled EWOULDBLOCK error was
-        encountered on the non-blocking socket under OS X, Windows, and BSD. This type of environment-related error is
+        encountered on the non-blocking socket under OS X, Windows, and BSD\@. This type of environment-related error is
         exactly the type of fault that CrashSimulator was designed to identify.
