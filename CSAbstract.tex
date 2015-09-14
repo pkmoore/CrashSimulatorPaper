@@ -2,18 +2,22 @@
 
     One of the challenges of software development is anticipating and dealing with the variety of environments in which
     an application may run. For example, an application may work correctly on the developer's low latency, local network
-    but fail when run across a node that performs network address translation or across a link that introduces high
-    latency into network communications. This paper introduces CrashSimulator, a tool designed to determine whether or
-    not an application can handle these unanticipated conditions.  CrashSimulator accomplishes this in three steps.
-    First, it analyzes a system call trace of an application collected using a utility like \emph{strace} in order to
-    identify areas where anomalies could potentially be injected. Next, it produces a new system call trace with the
-    anomalies present. It then evaluates whether or not the application properly handles the anomaly replaying the
-    mutated system call trace. Finally, it observes whether or not the application continued to operate normally after
-    the encountering the anomaly and reports its findings to the developer. As a result, the developer is made aware of
-    deficiencies in the application without having to deploy the application to other environments for the purpose of
-    testing. CrashSimulator was used to analyze \emph{<<somenumber>>} commonly used open and closed source applications.
-    Its findings were compared to tickets listed in the bug tracking suites of these applications.  It was able to
-    successfully identify \emph{<<somenumber>>} of bugs listed in these suites and \emph{<<someothernumber>>} of bugs
-    that had not yet been discovered.
+    but fail when it communicates across a node that performs network address translation or  a link that introduces
+    high latency into network communications. This paper introduces CrashSimulator, a tool designed to determine whether
+    or not an application can handle these, and other,  unanticipated conditions.  CrashSimulator accomplishes this in
+    two phases. First, is the anomaly identification phase. In this phase, CrashSimulator's anomaly identification tools
+    analyze system call traces from existing applications that are running in a given environment with the purpose of
+    identifying anomalous behaviors or conditions. These anomalies are collected an anomaly store for later during the
+    testing phase. In the testing phase, the anomalies stored in the anomaly store are used to mutate a system call
+    trace taken from the application under test running under normal circumstances in order to introduce into it one or
+    more of the anomalous behaviors identified previously. Once a set of mutated traces has been generated the
+    application under test is run repeatedly with each run replaying one of the mutated system call traces. These test
+    runs are monitored and any faults in the application are reported. As a result, the developer is made aware of
+    deficiencies in the application that may result in it operating incorrectly in the environment from which the
+    anomalous traces were taken. This allows the application to be tested as if it were running in one or more of the
+    environments from which anomalous traces were collected. CrashSimulator was used to analyze \emph{<<somenumber>>}
+    commonly used open and closed source applications.  Its findings were compared to tickets listed in the bug tracking
+    suites of these applications.  It was able to successfully identify \emph{<<somenumber>>} of bugs listed in these
+    suites and \emph{<<someothernumber>>} of bugs that had not yet been discovered.
 
 \end{abstract}
