@@ -50,9 +50,16 @@
     \subsection{A Real World Example}
 
         During the course of its evaluation, NetCheck was able to identify a bug in Python's socket handling code that
-        compromised portability of Python applications. In short, calling accept on a socket that was created in
+        compromised portability of Python applications. In short, calling \emph{accept} on a socket that was created in
         non-blocking mode would return a new socket in blocking mode on Linux where the same calls would return a
         non-blocking socket on OS X, Windows, and various flavors of BSD\@. This caused code that assumed the return
         socket would always be blocking to work correctly on Linux but fail when an unhandled EWOULDBLOCK error was
         encountered on the non-blocking socket under OS X, Windows, and BSD\@. This type of environment-related error is
         exactly the type of fault that CrashSimulator was designed to identify.
+
+        Because NetCheck was able to identify this anomaly in Python, CrashSimulator is able to produce mutated system
+        call traces that can induce it in other applications. NetCheck identifies situations where a socket received
+        from a call to \emph{accept} has inherited the non-blocking flag from the socket initially passed into
+        \emph{accept}. This anomaly will be recored and during future test runs CrashSimulator will be able to produce
+        mutated system calls containing when it encounters a call to accept on a non-blocking socket in a system call
+        trace taken from the application under test.
