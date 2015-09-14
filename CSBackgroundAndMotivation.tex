@@ -20,10 +20,11 @@
         solving a series of constraints in order to exercise a particular code path can be computationally expensive and
         it can be difficult to guarantee that a particular set of generated inputs will exercise the intended code path
         in many circumstances due to external dependencies that the tool cannot analyze. For example, a white-box
-        testing tool cannot generate inputs that are guaranteed to exercise a code path that relies on an operating
-        system resource being available. Finally, white-box tools typically require than an application's source code be
-        available which is not always the case. Even advanced white-box tools that analyze an application's machine code
-        can be stymied in situations where an application's executable has been packed or encrypted.
+        testing tool cannot reliably generate inputs that are guaranteed to exercise a code path that relies on an
+        operating system resource being available. Finally, white-box tools typically require that an application's
+        source code be available which is not always the case. Even advanced white-box tools that analyze an
+        application's machine code can be stymied in situations where an application's executable has been packed or
+        encrypted.
 
         The alternative, black-box tools, have their own set of issues. They do not have an understanding of what an
         application is actually doing during execution which means they are only able to submit inputs and observe
@@ -42,6 +43,8 @@
         \begin{enumerate}
             \item{\textbf{Sample Trace}: a trace collected from an application running in a targeted deployment
                 environment}
+            \item{\textbf{Original Trace}: a trace collected from the application under test while it was running in an
+                its original development environment}
         \end{enumerate}
 
     \subsection{A Real World Example}
