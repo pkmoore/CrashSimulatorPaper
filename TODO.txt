@@ -15,24 +15,12 @@ TODO: traces come from unit tests. What happens if we permute the unit tests fro
     One trace per test
 TODO: Look into the Apache portable runtime
 TODO: Make a better working title
-TODO: Discuss the fact that the NetCheck component can be run once and then CrashSimulator repeatedly
-TODO: Make the font in the figure bigger but fit the figure into the same space as much as possible
-TODO: Use shading rather than colored highlights
-TODO: Choose colors that are easier to see
-TODO: Don't use colored text
 TODO: Make the figure fit the width of the paper
 TODO: One or two sentences for the caption -- Look at other papers
 TODO: Describe the figure in the text
-TODO: Use real world applications and environments in the diagram
-TODO: Split into two processes: Generating anomalies with NetCheck, repeatedly testing off the generated corpus of
-anomalies
 TODO: Make the corpus of anomalies an entity in the diagram
-TODO: Make an entity for the application under test. It feeds into test runner along with mutated traces.
-TODO: Test runner's output is the report
 TODO: Add a definitions section to the background and motivation section
-TODO: Convey the fact that there can be hundreds of mutated traces
 TODO: Thesis: "Only manifest themselves in the target environment"
 TODO: Use the python running example
 TODO: Use this as an entity in the diagram
 TODO: Include a mutated trace with the EWOULDBLOCK issue
-TODO: Talk about other bug reports that were related to this issue
