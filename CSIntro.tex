@@ -13,7 +13,7 @@
     hardware and software systems that can make up the environment.
 
     This problem is of particular concern in the context of today's highly network dependent applications. With the
-    explosion of mobile computing and ``software as a service'' products applications that are completely reliant on
+    explosion of mobile computing and ``software as a service'' products, applications that are completely reliant on
     well-behaved network communication are increasingly common. As a result a great deal of emphasis must be placed on
     properly dealing with faults in these network communications. Unfortunately, identifying these faults is difficult
     due to the inability of the developer to replicate all possible application environments and exhaust all possible
@@ -26,24 +26,24 @@
     in order to achieve a similar goal. Both of these techniques have their advantages and disadvantages. CrashSimulator
     attempts to collect the good parts from each of these techniques into a single utility.
 
-    In light of the shortcomings of these approaches, an alternative approach is needed to provide developers with
-    confidence that their applications are sufficiently free of environment induced faults.  CrashSimulator is a tool
-    designed to meet this need by providing automated identification of environment-induced faults through simulated
-    deviations from the normal flow of system calls an application makes when interacting with its environment. Like
-    other white-box tools, CrashSimulator attempts to analyze an application in order to understand where it can inject
-    faults.  However, unlike other tools it bypasses the application's source code entirely --- instead relying on
-    system call traces.  This reduces CrashSimulator's footprint by eliminating complex language analysis code while
-    still allowing insight into the application's operation. Furthermore, because it bases its analysis on system call
-    traces from the application running in a real environment this analysis takes into account the application's
-    interactions with that environment.
+    In light of the shortcomings of the previous approaches, an alternative approach is needed to provide developers
+    with confidence that their applications are sufficiently free of environment induced faults.  CrashSimulator is a
+    tool designed to meet this need by providing automated identification of environment-induced faults through
+    simulated deviations from the normal flow of system calls an application makes when interacting with its
+    environment. Like other white-box tools, CrashSimulator attempts to analyze an application in order to understand
+    where it can inject faults.  However, unlike other tools it bypasses the application's source code entirely ---
+    instead relying on system call traces.  This reduces CrashSimulator's footprint by eliminating complex language
+    analysis code while still allowing insight into the application's operation. Furthermore, because it bases its
+    analysis on system call traces from the application running in a real environment this analysis takes into account
+    the application's interactions with that environment.
 
     During its analysis, CrashSimulator identifies faults from system call traces recorded as applications were run in a
     real-world environment that is intended to be a deployment target for the application under test. Next, it mutates
-    an ``ideal run'' system call from the application under test based on its previous observations. Typically, this
-    ideal run will be performed in a reliable development environment. The mutations CrashSimulator makes are designed
-    to induce the faults identified earlier into a run of the application under test. Once analysis is complete,
-    CrashSimulator runs the application under test and replays the mutated system call traces. The behavior of the
-    application under test is monitored and CrashSimulator reports to the developer whether or not the application
+    an ``normal run'' system call trace from the application under test based on its previous observations. Typically,
+    this ideal run will be performed in a reliable development environment. The mutations CrashSimulator makes are
+    designed to induce the faults identified earlier into a run of the application under test. Once analysis is
+    complete, CrashSimulator runs the application under test and replays the mutated system call traces. The behavior of
+    the application under test is monitored and CrashSimulator reports to the developer whether or not the application
     successfully handled the injected faults or not.
 
     CrashSimulator makes the following contributions:
