@@ -213,6 +213,23 @@
                 CrashSimulator sees in identifying faults in the applications under test, the authors do not see this
                 increase in execution time as a significant impediment to the adoption of CrashSimulator as part of a
                 rigorous testing process.
+    \subsection{System Call Trace Mutation Performance}
+
+        Another critical metric for CrashSimulator's feasibility in the real world is the speed with which it can
+        mutate original system call traces with the anomalies from its store. CrashSimulator must be able to accomplish
+        this task with sufficient speed that it shows a marked improvement over the alternative --- deploying the
+        application to an environment and testing it there. To this end, the following evaluation was performed.
+
+        CrashSimulator's anomaly store was manually seeded with 10 easily reproducible network anomalies. These
+        anomalies were chosen based on their high likely-hood of being able to be injected into original system call
+        traces. Next, original system call traces were collected from 10 common network-oriented applications.
+        Finally CrashSimulator was executed using this seeded anomaly store and the 10 original traces. The time to
+        complete the resultant mutations was recorded.
+
+        From these inputs CrashSimulator was able to generate 100 mutated traces in 5 minutes and 30 seconds.
+        This means that CrashSimulator was able to provide what amounts to 100 new unit tests with a few minutes of
+        processing time. This is orders of magnitude faster than these unit tests could have been written by hand. Based
+        on this result, the authors feel that CrashSimulator is a worthwhile addition to standard testing processes.
 
     \subsection{Bugs Identified}
 
