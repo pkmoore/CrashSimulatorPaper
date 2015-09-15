@@ -1,7 +1,4 @@
-
 % TODO: Evaluation: Time the amount of time to run the tests
-% TODO: Evaluation: Time the amount of time required to permute the traces (the analysis steps)
-% TODO: Evaluation: Make the case that this isn't a slow part of the system
 % TODO: Evaluation: Count how many anomalies could be injected into a particular trace
 % TODO: Evaluation: How many of these are useful
 % TODO: Evaluation: Threats to validity
@@ -17,7 +14,8 @@
             \item{Is CrashSimulator able to generate tests in a performant manner?}
             \item{Is CrashSimulator able to execute tests in a performant manner?}
         \end{enumerate}
-        In order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
+
+    In order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
     code reuse from the previous work on CheckAPI and NetCheck. This implementation of CrashSimulator was evaluated on
     the basis of execution performance and number of bugs detected across a set of small test programs and larger, more
     mainstream applications.
@@ -34,9 +32,8 @@
 
         \subsubsection{Evaluation Against Sample Programs}
 
-            The Python implementation of CrashSimulator was performance
-            tested against two sample programs that were seeded with specific counts of potential anomalies. The two sample
-            programs were seeded as follows:
+            The Python implementation of CrashSimulator was performance tested against two sample programs that were
+            seeded with specific counts of potential anomalies. The two sample programs were seeded as follows:
 
             \begin{table}[H]
                 \scriptsize{}
