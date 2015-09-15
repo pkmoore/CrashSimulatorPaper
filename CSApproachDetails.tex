@@ -13,19 +13,14 @@
         under test. The second module's primary purpose is producing mutated versions of the input ``clean'' system call
         trace. The specific mutations it makes are based on the anomalies identified during analysis of the input system
         call traces. The final module is responsible for iterating through the set of anomalous system call traces in
-        order to test each one of them. For each anomalous trace, this module launches a test instance of the
-        application under test and replays the anomalous system call trace. During this process, it monitors the
-        application's behavior and reports any faults.
+        order to test each one of them. For each anomalous trace, this module launches a instance of the application
+        under test and replays the anomalous system call trace. During this process, it monitors the application's
+        behavior and reports any faults.
 
-        The test launcher was separated from the test controller for the sake of portability. A great deal of the test
-        launcher's code deals with the low level details of process manipulation and monitoring and, as such, will
-        likely require modification in order to operate on different platforms than the authors' original development
-        environments. For example, in order to modify the return value of particular system calls on x86 systems, the
-        test launcher must hook the application under test using \emph{ptrace} and modify the values of the EAX register
-        upon completion of the system call. This modification is tightly coupled to x86 calling conventions. Even the
-        relatively similar x86--64 differs in that the test launcher must use \emph{ptrace} to modify the RAX register
-        rather than the EAX register. Other architectures, such as ARM, will likely require more extensive
-        modifications.
+        For this implementation, the first module's duties are handled by NetCheck. CrashSimulator's architecture allows
+        for one or more tools that can identify anomalies in a system call trace to fill this role assuming appropriate
+        adapter code exists. This code must transform the output from the tool or tools performing the system call trace
+        analysis into a format that can be inserted into CrashSimulator's anomaly store.
 
         All three primary CrashSimulator modules are packaged together and interact with each other at the appropriate
         times without user intervention. At this point, CrashSimulator itself is available as a virtual machine
