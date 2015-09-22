@@ -5,15 +5,15 @@
     but fail when it communicates across a node that performs network address translation or a link that introduces high
     latency into network communications. These types of failures are difficult anticipate and test for without deploying
     the application to each target environment. This paper introduces CrashSimulator, a tool designed to determine
-    whether or not an application can handle these, and other, unanticipated conditions as part of its normal testing
-    process. CrashSimulator accomplishes this in two phases. First, its anomaly identification tools analyze system call
-    traces taken from the application's target environment with the purpose of identifying irregular (or unusual)
-    behaviors. These anomalies are used to mutate a system call trace taken from the application under test when it was
-    running under normal circumstances. This process generates mutated system call traces that each contain one of the
-    previously identified anomalies. These traces are replayed in test runs of the application and any faults that occur
-    are reported. In this way, CrashSimulator allows the application to be tested as if it were running in one or more
-    of the environments from which anomalous traces were collected. As a result, the developer is made aware of
-    deficiencies in the application that may result in it operating incorrectly in the environment from which the
+    whether or not an application can handle these, and other, unanticipated conditions as part of the application's
+    normal testing process. CrashSimulator accomplishes this in two phases. First, its anomaly identification tools
+    analyze system call traces taken from the application's target environment with the purpose of identifying irregular
+    (or unusual) behaviors. These anomalies are used to mutate a system call trace taken from the application under test
+    when it was running under normal circumstances. This process generates mutated system call traces that each contain
+    one of the previously identified anomalies. These traces are replayed in test runs of the application and any faults
+    that occur are reported. In this way, CrashSimulator allows the application to be tested as if it were running in
+    one or more of the environments from which anomalous traces were collected. As a result, the developer is made aware
+    of deficiencies in the application that may result in it operating incorrectly in the environment from which the
     anomalous traces were taken. CrashSimulator was used to analyze \emph{<<somenumber>>} commonly used open and closed
     source applications. Its findings were compared to tickets listed in the bug tracking suites of these applications.
     It was able to successfully identify \emph{<<somenumber>>} of bugs listed in these suites and
