@@ -1,29 +1,29 @@
 \section{Background and Motivation}
 
     CrashSimulator operates in a unique niche in relation to other testing tools and techniques. As a result, it is
-    better suited to identify and report on certain types of error that relate to the environment in which an
+    better suited to identify and report on certain types of errors that relate to the environment in which an
     application is running.
 
     \subsection{Existing Techniques}
 
         Existing tools can be roughly divided into two categories, black-box and white-box, based on the techniques they
         use to perform their testing. Black-box tools simply manipulate the inputs of the application under test and
-        observe the resultant outputs. White-box tools, on the other hand, perform complex analysis of the application
-        under test's source code in order to reason about what inputs are likely to produce interesting outputs. Each of
-        these methodologies have their own advantages and disadvantages.
+        observe the resultant outputs. White-box tools, on the other hand, perform complex analysis of the application's
+        source code in order to reason about what inputs are likely to produce interesting outputs. Each of these
+        methodologies have their own advantages and disadvantages.
 
-        White-box testing tools typically rely on a similar set of techniques including constraint solving of branch
+        White-box testing tools typically rely on a similar set of techniques, including constraint solving of branch
         statements in an application's code and symbolic execution of an application's code in order to generate inputs
         that optimally exercise the application's code paths. These techniques, while powerful, are not without their
-        downsides.  First, symbolic execution is computationally expensive and can result in deviations where the
-        symbolic execution of code doesn't accurately represent the actual execution of code.  Similarly, efficiently
-        solving a series of constraints in order to exercise a particular code path can be computationally expensive and
-        it can be difficult to guarantee that a particular set of generated inputs will exercise the intended code path
-        in many circumstances due to external dependencies that the tool cannot analyze. For example, a white-box
-        testing tool cannot generate inputs that are guaranteed to exercise a code path that relies on an operating
-        system resource being available. Finally, white-box tools typically require than an application's source code be
-        available which is not always the case. Even advanced white-box tools that analyze an application's machine code
-        can be stymied in situations where an application's executable has been packed or encrypted.
+        downsides. First, both techniques are computationally-expensive. Furthermore, symbolic execution can not always
+        accurately represent actual execution and so there may be deviations in results. Similarly, efficiently solving
+        a series of constraints in order to exercise a particular code path can be can be difficult to guarantee that a
+        particular set of generated inputs will exercise the intended code path in many circumstances due to external
+        dependencies that the tool cannot analyze. For example, a white-box testing tool cannot reliably generate inputs
+        that are guaranteed to exercise a code path that relies on an operating system resource being available.
+        Finally, white-box tools typically require that an application's source code be available which is not always
+        the case. Even advanced white-box tools that analyze an application's machine code can be stymied in situations
+        where an application's executable has been packed or encrypted.
 
         The alternative, black-box tools, have their own set of issues. They do not have an understanding of what an
         application is actually doing during execution which means they are only able to submit inputs and observe
@@ -42,14 +42,25 @@
         \begin{enumerate}
             \item{\textbf{Sample Trace}: a trace collected from an application running in a targeted deployment
                 environment}
+            \item{\textbf{Original Trace}: a trace collected from the application under test while it was running in an
+                its original development environment}
         \end{enumerate}
 
     \subsection{A Real World Example}
 
         During the course of its evaluation, NetCheck was able to identify a bug in Python's socket handling code that
-        compromised portability of Python applications. In short, calling accept on a socket that was created in
+        compromised portability of Python applications. In short, calling \emph{accept} on a socket that was created in
         non-blocking mode would return a new socket in blocking mode on Linux where the same calls would return a
         non-blocking socket on OS X, Windows, and various flavors of BSD\@. This caused code that assumed the return
         socket would always be blocking to work correctly on Linux but fail when an unhandled EWOULDBLOCK error was
-        encountered on the non-blocking socket under OS X, Windows, and BSD\@. This type of environment-related error is
-        exactly the type of fault that CrashSimulator was designed to identify.
+        encountered on the non-blocking socket under OS X, Windows, and BSD\@. This fault was a source of error for
+        several major Python applications. Many put in place work-arounds without knowing the actual source of the
+        problems.  This type of environment-related error is exactly the type of fault that CrashSimulator was designed
+        to identify.
+
+        Because NetCheck was able to identify this anomaly in Python, CrashSimulator is able to produce mutated system
+        call traces that can induce it in other applications. NetCheck identifies situations where a socket received
+        from a call to \emph{accept} has inherited the non-blocking flag from the socket initially passed into
+        \emph{accept}. This anomaly will be recored and during future test runs CrashSimulator will be able to produce
+        mutated system calls containing when it encounters a call to accept on a non-blocking socket in a system call
+        trace taken from the application under test.

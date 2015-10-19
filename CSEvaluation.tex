@@ -1,7 +1,4 @@
-
 % TODO: Evaluation: Time the amount of time to run the tests
-% TODO: Evaluation: Time the amount of time required to permute the traces (the analysis steps)
-% TODO: Evaluation: Make the case that this isn't a slow part of the system
 % TODO: Evaluation: Count how many anomalies could be injected into a particular trace
 % TODO: Evaluation: How many of these are useful
 % TODO: Evaluation: Threats to validity
@@ -17,7 +14,8 @@
             \item{Is CrashSimulator able to generate tests in a performant manner?}
             \item{Is CrashSimulator able to execute tests in a performant manner?}
         \end{enumerate}
-        In order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
+
+    In order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
     code reuse from the previous work on CheckAPI and NetCheck. This implementation of CrashSimulator was evaluated on
     the basis of execution performance and number of bugs detected across a set of small test programs and larger, more
     mainstream applications.
@@ -34,9 +32,8 @@
 
         \subsubsection{Evaluation Against Sample Programs}
 
-            The Python implementation of CrashSimulator was performance
-            tested against two sample programs that were seeded with specific counts of potential anomalies. The two sample
-            programs were seeded as follows:
+            The Python implementation of CrashSimulator was performance tested against two sample programs that were
+            seeded with specific counts of potential anomalies. The two sample programs were seeded as follows:
 
             \begin{table}[H]
                 \scriptsize{}
@@ -213,6 +210,23 @@
                 CrashSimulator sees in identifying faults in the applications under test, the authors do not see this
                 increase in execution time as a significant impediment to the adoption of CrashSimulator as part of a
                 rigorous testing process.
+    \subsection{System Call Trace Mutation Performance}
+
+        Another critical metric for CrashSimulator's feasibility in the real world is the speed with which it can
+        mutate original system call traces with the anomalies from its store. CrashSimulator must be able to accomplish
+        this task with sufficient speed that it shows a marked improvement over the alternative --- deploying the
+        application to an environment and testing it there. To this end, the following evaluation was performed.
+
+        CrashSimulator's anomaly store was manually seeded with 10 easily reproducible network anomalies. These
+        anomalies were chosen based on their high likely-hood of being able to be injected into original system call
+        traces. Next, original system call traces were collected from 10 common network-oriented applications.
+        Finally CrashSimulator was executed using this seeded anomaly store and the 10 original traces. The time to
+        complete the resultant mutations was recorded.
+
+        From these inputs CrashSimulator was able to generate 100 mutated traces in 5 minutes and 30 seconds.
+        This means that CrashSimulator was able to provide what amounts to 100 new unit tests with a few minutes of
+        processing time. This is orders of magnitude faster than these unit tests could have been written by hand. Based
+        on this result, the authors feel that CrashSimulator is a worthwhile addition to standard testing processes.
 
     \subsection{Bugs Identified}
 
