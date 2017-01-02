@@ -37,17 +37,21 @@
     application's operation. Furthermore, because it bases its analysis on system call traces from the application
     running in a real environment this analysis takes into account the application's interactions with that environment.
 
-    During its analysis, CrashSimulator identifies faults from system call traces that were recorded as applications
-    were run in an environment intended as a deployment target for the application under test. In this case, an
-    application's environment refers to the hardware, software, and network setup on which the application is expected
-    to run. Next, it mutates an original system call trace taken from the application under test based on its previous
-    observations. Typically, this ideal run will be performed in the application's development environment. The
-    mutations CrashSimulator makes are designed to induce the faults identified earlier into a run of the application.
-    Once analysis is complete, CrashSimulator runs the application under test and replays the mutated system call
-    traces. The behavior of the application is monitored and CrashSimulator reports to the developer whether or not the
-    application successfully handled the injected faults or not.
+    \emph{Everything above seems high level enough to be ok right now, I've outlined new technical details
+      below. Removed material related to automatically identifying faults in other traces.}
+    
+    CrashSimulator's analysis relies on two concepts. The first is encoding bad system call patterns as deterministic
+    computation models (i.e. DFA, PDA, etc.....) Encoding behavior in this way allows us to identify the correct point
+    to inject failures \emph{wording bad... need to describe this better} into a given execution and to make an 
+    assessment about whether the application responded to the injected failure \emph{wording...} correctly................
 
-    CrashSimulator makes the following contributions:
+    The second is deterministic replay of the application under test's system call behavior. Replaying an earlier
+    execution allows us to treat these anomalous executions like test cases. \emph{Wording... blah...}That is, they can be
+    run in any environment simulating, from the application's perspective, the environment we want to test the application
+    in............
+
+
+    CrashSimulator makes the following contributions: \emph{Do we need to rework contributions?}
 
     \begin{enumerate}
         \item{CrashSimulator is the first tool to use system call traces recorded in one environment as a basis for
