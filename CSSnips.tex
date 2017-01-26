@@ -1,0 +1,12 @@
+%  -- What do you mean by environments?  Are you trying to detect bugs that would occur if an application was run on a different operating system?  The same operating system (Windows, Linux, etc) but different release?  Different kinds of filesystems (USB vs NTFS vs NFS?)?  *This is important: the reader needs to know extremely soon how big a problem we're tackling!*  
+
+\paragraph
+
+For the purposes of this work an application's environment consists of two sets of entities.  The first is the
+application's software dependencies on a given system.  For example, multiplatform applications intended for Unix-like
+environments typically depend on a POSIX implementation to operate on both Linux and Apple's OS X.  The second set is
+resources the application interacts with for the purposes of gathering the data it needs for processing.  Examples
+include files on a filesystem from which the application needs to read or hosts on a network with which the application
+exchanges data.  
+q
+    gn order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
