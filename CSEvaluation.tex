@@ -1,9 +1,3 @@
-% TODO: Evaluation: Time the amount of time to run the tests
-% TODO: Evaluation: Count how many anomalies could be injected into a particular trace
-% TODO: Evaluation: Threats to validity
-%     Programming languages of test applications
-% TODO: Do different input trace applications have an effect?
-
 \section{Evaluation}
 
     This work hopes to answer the following questions about CrashSimulator's operation:
@@ -31,238 +25,43 @@
 
         \subsubsection{Evaluation Against Sample Programs}
 
-            The Python implementation of CrashSimulator was performance tested against two sample programs that were
-            seeded with specific counts of potential anomalies. The two sample programs were seeded as follows:
+        Each of the following evaluations eamines the completion times for 20 consecurive executions of the specified
+        application in both native and replay execution modes.  Multiple conseuritve executions were used for two
+        reasons.  First, a single execution in either mode completes so quickly for the applications in question as to
+        be nearly indistinguishable from the other mode.  Second, multiple executions somewhat contros for varying
+        conditions like filesystem activity or network latency that can vary between individual executions.
 
             \begin{table}[H]
                 \scriptsize{}
                 \begin{tabular}{l  l  l  l}
                     \toprule{}
-                        Title & Return Value Modification & Catalog Based & Data Fragmentation \\
-                        Sample A & 20 & 2 & 2 \\
-                        Sample B & 100 & 20 & 20 \\
+                        Execution Description & Native Eecution & Replay Execution\\
+                        network\_speedtest & 0.024 & 2.407 \\
+                        filesystem\_speedtest & 0.038 & 2.604 \\
                     \bottomrule{}
                 \end{tabular}
             \end{table}
 
-            These sample applications were written with two goals in mind. First, their system call related behavior
-            should be deterministic and repeatable in nature. Second, they should be able to run to completion without
-            user interaction and with a completion time that would allow for hundreds of executions in a reasonable
-            amount of time. In short, the sample programs allow an accurate evaluation of CrashSimulator's performance
-            by acting as ideal testing candidates.
+        \paragraph{Discussion on network\_speedtest}
 
-            Repeated executions of the sample programs outside of crash simulator provide a control run time for
-            comparison to times recorded from the CrashSimulator test sessions. Because CrashSimulator will potentially
-            execute the application under test \emph{thousands} of times, it is not appropriate to compare test run
-            times to the run time of a single run of the application. The results are recorded below.
+        Sample application opens a TCP connection toan already running listener (netcat), sends a message, and
+        exits. For simple applications like this, native execution is significantly faster than replay execution...
 
-            \begin{table}[H]
-                \scriptsize{}
-                \begin{tabular} {l  l  l}
-                    \toprule{}
-                    This Table Consists Entirely of \textbf{FAKE DATA} \\
-                    Title & Number of Executions & Run Time \\
-                    Sample A (No CrashSimulator Tests) & 10000 & 1m 50s \\
-                    Sample B (No CrashSimulator Tests) & 10000 & 2m 30s \\
-                    Sample A (CrashSimulator) & 10000 & 2m 13s \\
-                    Sample B (CrashSimulator) & 10000 & 3m 15s \\
-                    \bottomrule{}
-                \end{tabular}
-            \end{table}
+        \paragraph{Discussion on filesystem\_speedtest}
 
-            As expected, CrashSimulator is responsible for adding some overhead as compared to the non-CrashSimulator
-            executions of the sample applications. For each sample program, a group of executions through CrashSimulator
-            took approximately 30 percent longer to complete than an identically sized group of executions performed by
-            repeatedly executing the sample program.
-
+        This ample application create a new file with open(), writes a message to it, closes the file descriptor, and
+        exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
+        all sorts of applications in Linux...
+            
+            
         \subsubsection{Evaluation Against Major Programs}
 
-            Next, CrashSimulator's performance was evaluated against two major open source applications: Firefox and
-            Apache 2. In these cases, the evaluation methodology required modification because these applications are
-            not specifically engineered to meet the same criteria the sample programs were. Firefox, on one hand,
-            typically requires user input in order carry out its purpose of retrieving content hosted on a remote
-            server. On the other hand, Apache 2 runs as a background service and is intended under ideal conditions to
-            continually serve content indefinitely. In both cases, the complexity of these pieces of software result in
-            system call traces that are likely not deterministic or repeatable.
 
-            \paragraph{Firefox}
 
-                Because Firefox is a large application with a great deal of complex functionality and behavior it was
-                determined that a specific use case should be identified for the purposes of evaluating CrashSimulator's
-                performance. The primary use of Firefox for most of its users is the retrieval, rendering and display of
-                content from a remote server. In the vast majority of cases this is web content retrieved over HTTP As
-                such, it was decided that this use case would be appropriate for CrashSimulator's performance
-                evaluation.
 
-                In order to achieve consistent test runs the following setup was constructed. The Firefox scripting API
-                was used in order to modify the behavior of the browser in two key aspects. First, the browser was
-                configured to automatically request a static web page with no dynamic content from a server hosted and
-                operated by the authors. A static web page was chosen to reduce the chances of any script parsing and
-                execution code present in Firefox confounding the run time measurements. Second, Firefox's scripting API
-                was used to end execution of the browser immediately upon the completion of the page's rendering. This
-                allows for the measurement of one complete ``execution'' of Firefox from start to finish. Additionally,
-                Firefox was configured to cache no content so each run was required to perform the complete set of
-                communications with the server necessary to retrieve the static web page prior to displaying it. In
-                order to reduce the effect of network latency on execution times both the client machine running Firefox
-                and the server machine serving the static web page were located on the same network. Also, the server
-                software was configured to cache no content in order to reduce the chances of server side resource
-                caching affecting execution times.
 
-                Actual evaluation of CrashSimulator's performance was conducted in a similar manner to the methodology
-                described for the sample programs. The scripted version of Firefox was executed a number of times by
-                CrashSimulator for testing purposes and the total time required to complete these test executions was
-                recorded. For comparison purposes, the scripted version of Firefox was executed the same number of times
-                \emph{without} CrashSimulator.  The following table contains the total execution times required to
-                complete the listed number of executions.
+    \subsection{Bugs Identified in Major Applications}
 
-                \begin{table}[H]
-                    \scriptsize{}
-                    \begin{tabular}{l l l}
-                        \toprule{}
-                        Title & Number Of Executions & Execution Time \\
-                        \multirow{3}{*}{Firefox} \\
-                        & 1 & 300ms \\
-                        & 10 & 3000ms \\
-                        & 100 & 30000ms \\
-                        \multirow{3}{*}{Firefox (CrashSimulator)} \\
-                        & 1 & 450ms \\
-                        & 10 & 4500ms \\
-                        & 100 & 45000ms \\
-                        \bottomrule{}
-                    \end{tabular}
-                \end{table}
-
-                From these results it is apparent that CrashSimulator  increased the time required to complete a given
-                number of executions of the modified version of Firefox. The results above show an approximately 50
-                percent increase in run time between the non-CrashSimulator and CrashSimulator runs. This increase is
-                greater than the increase observed during the sample program evaluations. This is likely due to the high
-                count of opportunities for fault injection present in a complex piece of software like Firefox as
-                opposed to the sample programs. From this, it can be inferred that CrashSimulator would cause a similar
-                increase in the amount of time required to complete a test of a standard version of Firefox.
-
-            \paragraph{Apache}
-
-                Evaluating CrashSimulator's performance against Apache saw similar challenges to its evaluation against
-                Firefox. Apache is a complex piece of software and, while its normal use cases don't require user
-                interaction, it presents challenges due to its typically long-lived nature. Apache's primary use case
-                serving documents and files to a client program over a network connection. As such, it was decided that
-                this evaluation should focus on this use case. To this end, the following evaluation setup was
-                constructed.
-
-                For this evaluation one execution of Apache consists of the following steps:
-
-                \begin{enumerate}
-                    \item{} Launch an instance of Apache
-                    \item{} Request the static web page from Apache
-                    \item{} Wait for transmission of the static web page to complete
-                    \item{} Terminate the execution of Apache
-                \end{enumerate}
-
-                A Python script was written in order to execute these steps in a consistent manner. First, an instance
-                of Apache was launched. It was configured to serve a single directory on the host machine using a single
-                static host entry. This directory contained a single static web page with 100 bytes of HTML content.
-                Apache was also configured to perform \emph{no} caching of local resources. This setup was chosen in
-                order to reduce the amount of extraneous functionality executed by Apache. A single static host entry
-                eliminates Apache's virtual host parsing and a single static HTML document eliminates the need to
-                execute any external parsing engine such as mod\_php. Once Apache has completed its startup, the script
-                requests the static web page using the \emph{wget} utility. The page is not rendered or displayed in any
-                way upon receipt as these processes are not relevant to this evaluation.  Once the web page has been
-                retrieved the script instructs the Apache instance to terminate and waits for it to do so.  Termination
-                of the Apache instance concludes the measured run time for the execution.  Because the control script
-                needed to be able to directly manage both client and server activates, in this setup, both the
-                ``client'' script and the Apache instance were run on the same machine.
-
-                Once again, CrashSimulator's performance was evaluated in terms of the run time of its executions versus
-                the run time of the same number of executions performed without CrashSimulator's involvement. The actual
-                run times measured are for the complete execution for the Apache control script described above. As
-                such, some run time accumulated is the result of non-Apache client code and control script overhead. The
-                following table contains the results collected.
-
-                \begin{table}[H]
-                    \scriptsize{}
-                    \begin{tabular}{l l l}
-                        \toprule{}
-                        Title & Number Of Executions & Execution Time \\
-                        \multirow{3}{*}{Apache Control Script} \\
-                        & 1 & 300ms \\
-                        & 10 & 3000ms \\
-                        & 100 & 30000ms \\
-                        \multirow{3}{*}{Apache Control Script (CrashSimulator)} \\
-                        & 1 & 450ms \\
-                        & 10 & 4500ms \\
-                        & 100 & 45000ms \\
-                        \bottomrule{}
-                    \end{tabular}
-                \end{table}
-
-                As expected, the run times of the CrashSimulator-involved executions shows an increase over the
-                non-CrashSimulator executions. The results above show an approximately 50 percent increase in run time
-                between the CrashSimulator controlled executions and the non-CrashSimulator executions. This increase is
-                in line with what was expected based on the previously discussed Firefox evaluation for similar reasons
-                related to complexity. One difference with this evaluation is there is a higher likely-hood of the
-                accumulated run time being affected by overhead introduced by the control script. That said, this
-                overhead would be similar across all executions.
-
-                This evaluation has shown that CrashSimulator causes an increase in run time for executions of both the
-                sample programs and common major applications. That said, the total time is still well within what the
-                authors define as a reasonable time frame for test suite completion. Given the high degree of success
-                CrashSimulator sees in identifying faults in the applications under test, the authors do not see this
-                increase in execution time as a significant impediment to the adoption of CrashSimulator as part of a
-                rigorous testing process.
-    \subsection{System Call Trace Mutation Performance}
-
-        Another critical metric for CrashSimulator's feasibility in the real world is the speed with which it can
-        mutate original system call traces with the anomalies from its store. CrashSimulator must be able to accomplish
-        this task with sufficient speed that it shows a marked improvement over the alternative --- deploying the
-        application to an environment and testing it there. To this end, the following evaluation was performed.
-
-        CrashSimulator's anomaly store was manually seeded with 10 easily reproducible network anomalies. These
-        anomalies were chosen based on their high likely-hood of being able to be injected into original system call
-        traces. Next, original system call traces were collected from 10 common network-oriented applications.
-        Finally CrashSimulator was executed using this seeded anomaly store and the 10 original traces. The time to
-        complete the resultant mutations was recorded.
-
-        From these inputs CrashSimulator was able to generate 100 mutated traces in 5 minutes and 30 seconds.
-        This means that CrashSimulator was able to provide what amounts to 100 new unit tests with a few minutes of
-        processing time. This is orders of magnitude faster than these unit tests could have been written by hand. Based
-        on this result, the authors feel that CrashSimulator is a worthwhile addition to standard testing processes.
-
-    \subsection{Bugs Identified}
-
-        A second way CrashSimulator was evaluated was on the basis of how well it was able to independently identify
-        known bugs that were listed in the bug tracking suites of two major open source projects. Firefox and Apache 2
-        were chosen because of their use in the previously discussed evaluations. The goal was to identify bugs from
-        each tool's bug tracker (both fixed and unfixed) that are related to the faults that CrashSimulator can inject
-        and determine whether or not it was able to identify them. As a side effect, this process also yielded a number
-        of new bugs that were previously unreported in these projects' bug trackers.
-
-        \subsection{Firefox}
-
-            For this evaluation, the same Firefox test setup as was described in the Firefox performance evaluation was
-            used.
-
-            \textbf{\emph{Note: This is fake data. Also, I would like to have better ways of quantifying some of this}}
-            From Firefox's bug tracker 10 bugs in the ``networking'' category with successful resolutions were selected
-            as good candidates for this portion of CrashSimulator's evaluation. Successfully resolved bugs were chosen
-            because they had sufficient documentation to identify their exact cause. This was essential to determining
-            the likelihood of their being identified.
-
-            Five of the bugs were judged as ``likely to be identified by CrashSimulator'' by the authors. This opinion
-            was based on how closely the abnormal behavior, and its resolution, described in the bug report related to
-            faults that CrashSimulator can inject. \textbf{\emph{FAKE}} For example, one of these bugs related to a
-            failure in Firefox's handling of DNS responses due to duplicated UDP datagrams. This is a fault that
-            CrashSimulator is readily able to inject so it was expected that CrashSimulator would cause the fault to
-            occur and report it.
-
-            The other five bugs where judged by the authors as ``unlikely to be identified by CrashSimulator.'' These
-            bugs were, once again, selected from the ``networking'' category and had successful resolutions. These bugs
-            were chosen because the abnormal behavior they produced and their resolutions indicated that they were
-            caused by faults that CrashSimulator does not currently have the capability of injecting. For example, one
-            bug related to an application logic error related to a specific edge case malformation in a TCP packet
-            received from a particular version of the IIS web server. CrashSimulator is unlikely identify this bug
-            because it does not support the specific modification of TCP packets required to trigger it.
-
-            The identification status of each bug is listed in the table below.
 
             \begin{table}[H]
                 \scriptsize{}
@@ -283,58 +82,11 @@
                 \end{tabular}
             \end{table}
 
-            As can be see from the results above, CrashSimulator performed as expected based on the selected bug's
-            likeliness to be identified. In addition, CrashSimulator also identified a previously unreported bug in
-            Firefox's network code. This bug results in a denial of service condition caused by a failure to check the
-            return value of a call to \emph{socket} and the subsequent use of the invalid socket handle it can produce.
-            This bug was reported to Mozilla (bug ID\# 0011) and was corrected in the next release of Firefox.
-
-        \subsection{Apache 2}
-
-            \textbf{\emph{This is fake, placeholder data and information}}
-            For this evaluation, the same setup as was described in the Apache performance evaluation was used.
-
-            Like the Firefox evaluation, a set of bugs with successful resolutions were chosen from Apache's bug tracker
-            from the ``networking and communication'' category. Once again, these bugs were divided into ``likely to be
-            identified by CrashSimulator'' and ``not likely to be identified by CrashSimulator'' based on an analysis of
-            their root cause and eventual resolution. The table below lists the bugs that were chosen, whether or not
-            they were likely to be identified and whether or not CrashSimulator identified them in the end.
-
-            \begin{table}[H]
-                \scriptsize{}
-                \begin{tabular}{l  l  l  l}
-                    \toprule{}
-                        Bug Tracker ID & Likely to be Identified & Identified & Notes \\
-                        0001 & True & True & Note \\
-                        0002 & True & True & Note \\
-                        0003 & True & True & Note \\
-                        0004 & True & True & Note \\
-                        0005 & True & True & Note \\
-                        0006 & False & False & Note \\
-                        0007 & False & False & Note \\
-                        0008 & False & False & Note \\
-                        0009 & False & False & Note \\
-                        0010 & False & False & Note \\
-                    \bottomrule{}
-                \end{tabular}
-            \end{table}
-
-            In addition to these bugs, one yet undiscovered bug was identified during the course of this evaluation.
-            The bug related to a denial of service condition caused by one of Apache's low level network operations
-            failing to handling low MTU values. This bug was reported to Apache's bug tracker (Bug ID\# 2007) and was
-            successfully resolved in the latest release.
 
     \subsection{Test Coverage Improvement}
 
         \textbf{\emph{There needs to be more exploration put into this test methodology. Much more description needs to
         be written.}}
-
-        A final way CrashSimulator was evaluated was on the extent to which it was able to improve upon the existing
-        unit test suites of major applications make them available publicly. At a high level, this evaluation was
-        performed as follows. The unit test suites of Firefox and Apache were reviewed and a count was made of tests
-        that fell into CrashSimulator's domain was made. Next, a CrashSimulator was run against each application and a
-        count of tests performed was recorded. These values were used to determine a percent increase number of useful
-        tests ``added'' through the use of CrashSimulator
 
     \subsection{Limitations}
 
