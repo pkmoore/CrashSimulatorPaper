@@ -1,12 +1,20 @@
 %  -- What do you mean by environments?  Are you trying to detect bugs that would occur if an application was run on a different operating system?  The same operating system (Windows, Linux, etc) but different release?  Different kinds of filesystems (USB vs NTFS vs NFS?)?  *This is important: the reader needs to know extremely soon how big a problem we're tackling!*  
 
-\paragraph
+\paragraph{What is an ``Environment''}
 
 For the purposes of this work an application's environment consists of two sets of entities.  The first is the
 application's software dependencies on a given system.  For example, multiplatform applications intended for Unix-like
 environments typically depend on a POSIX implementation to operate on both Linux and Apple's OS X.  The second set is
 resources the application interacts with for the purposes of gathering the data it needs for processing.  Examples
 include files on a filesystem from which the application needs to read or hosts on a network with which the application
-exchanges data.  
-q
-    gn order to measure its efficacy CrashSimulator was implemented in Python. Python was chosen in order to facilitate
+exchanges data.
+
+
+\paragraph{Why system call traces?}
+
+System call traces record every system call an application makes including its parameters, return value, and data copied
+into application buffers.  For example, a system call trace entry for a read() call can tell us what file descriptor was
+read from, whether or not the call was successful (via its return value) and what data was copied into the
+application-specified buffer by the kernel in as a result of the system call being fulfilled.  Having this information
+allows us to construct a tool that can simulate all of these system call level operations completely (our replay tool)
+in order to achieve the advantage that deterministic replay provides.
