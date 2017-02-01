@@ -18,3 +18,64 @@ read from, whether or not the call was successful (via its return value) and wha
 application-specified buffer by the kernel in as a result of the system call being fulfilled.  Having this information
 allows us to construct a tool that can simulate all of these system call level operations completely (our replay tool)
 in order to achieve the advantage that deterministic replay provides.
+
+% -- Some idea of impact: are you finding bugs that are difficult to find in other ways, or finding the same sort of bugs faster/easier?  If this was read by a Microsoft employee, for instance, how would they determine whether or not they should say "We're going to have to make a production version of this tool right now!!"?
+\paragraph{Why does our method find bugs faster?}
+
+In short, CrashSimulator helps us find bugs faster by allowing to inject problematic behavior into an application at the
+system call level. For example, we can make a call to rename() fail with the EXDEV errno value which should force
+well-behaved applications to either initiate a manual cross-device file copy procedure or fail out indicating an
+error. At this point, checkers detect bad behavior and inform the user that the application has improperly handled an
+error.
+
+Repeat this process many times over with multiple anomaly types and checkers and you have something that acts like a
+test suite. Because you can inject these anomalies into any application that presents the appropriate opportunity, the
+``tests'' are applicable across applications. The end goal is to have a suite of these tests built from all the
+applications you work from so you can leverage it on any othe project you touch.
+
+%First, in your introduction, you first define white-box testing tools as those which analyze application code, and then state that CrashSimulator "bypasses the application's source code entirely".  Then, logically, CrashSimulator must be black-box, even though you say that it combines both black and white box testing.  You should re-write this, making it both more succinct and clearer.  It might be easier to just not discuss black/white box testing in the introduction at all, just to avoid definitional problems.
+\paragraph{Why talk about white box and black box testing?}
+
+I'm trying to position CrashSimulator as something between the two methodologies. It isn't white box testing because it
+doesn't analyze application source code. The advantage I talk about in this case is avoiding all the difficulties around
+this source code analysis. On the flips side, CrashSimulator isn't a standard black box utility because it does have
+some gather some information about the applications execution by analyzing and working with system calls. This is in
+contrast to black box tools that simply throw mutated or completely random inputs at an application in order to see what
+shakes out. So I argue that CrashSimulator takes some good parts from both methodologies and forms something somewhere
+in the middle.
+
+% More importantly, there's a major conceptual jump in the paper (and, truthfully, in the project as well).  You go from
+%   1.  Trying to detect bugs by programs not handling "unusual" environmental events to
+%   2. Measuring and replaying system call traces.
+% This is a HUGE step!  
+\paragraph{The conceptual jump}
+
+I definitely need to explain this more.  The idea is that by looking replaying a system call trace and injecting bad
+behavior we can place the application's behavior into two categories: definitely bad, and maybe good.  The definitely
+bad category is occurs when we inject an anomaly and the application continues trucking along as if nothing bad has
+happened.  A good example from the cross-device-move bug class we have been working with would be making a call to
+stat() return that the file is a block device rather than a regular file. If the application keeps going with a normal
+copy then it is performing bad behavior for sure. Alternatively, if we inject the same situation at the same stat()
+call and the application does something different then all we can say is that the application is acting
+differently. Maybe it is performing a recovery procedure that will succeed or maybe it is performing some other bad
+behavior.
+
+\paragraph{Definitely Bad vs Maybe Good}
+% Testing tools are only able to identify situations are for sure bad. It is not possible for a test or suites of test to
+% be constructed proves a program is correct.
+
+CrashSimulator is able to divide test executions into two categories: ``definitely bad'' and ``maybe good.''  If
+CrashSimulator injects an anomalous condition and the application continues as if nothing is wrong then we know that the
+condition has not been correctly handled.  For example, CrashSimulator could inject results into a call to stat64() that
+indicate that a file in question is a device rather than a regular file.  The application continues execution as if
+it is working with a regular file then it is not handling the situation correctly. This situation assumes that the
+injected anomalous condition requires special action to handle correctly.
+
+The opposite condition is when an application begins to do something differently upon encountering an anomalous
+situation.  In this case, the application may either be successfully handling the condition or it may be going off onto
+some erroneous execution path.  Given this, all we can say is that the application \emph{may} be handling the situation
+correctly.
+
+This situation is present in most other testing strategies. It is difficult, if not impossible, to generate a test or
+suite of tests that absolutely proves the correctness of a program. Tests are able to show that a program perfroms a
+specific bad behavior in a specific situation. 
