@@ -2,7 +2,9 @@
 
 \paragraph{What is an ``Environment''}
 
-For the purposes of this work an application's environment consists of two sets of entities.  The first is the
+\textbf{These ideas are discussed in a subsection of the Background and Motivation setion}
+
+For the purposes of this work an application's environment consists of two sets of entities.  he first is the
 application's software dependencies on a given system.  For example, multiplatform applications intended for Unix-like
 environments typically depend on a POSIX implementation to operate on both Linux and Apple's OS X.  The second set is
 resources the application interacts with for the purposes of gathering the data it needs for processing.  Examples
@@ -10,7 +12,11 @@ include files on a filesystem from which the application needs to read or hosts 
 exchanges data.
 
 
+
 \paragraph{Why system call traces?}
+
+\textbf{These ideas are discussed in a subsubsection of the architecture section}
+
 
 System call traces record every system call an application makes including its parameters, return value, and data copied
 into application buffers.  For example, a system call trace entry for a read() call can tell us what file descriptor was
@@ -50,6 +56,8 @@ in the middle.
 % This is a HUGE step!  
 \paragraph{The conceptual jump}
 
+\emph{This is covered in the background and motivation section as well as the approach details section}
+
 I definitely need to explain this more.  The idea is that by looking replaying a system call trace and injecting bad
 behavior we can place the application's behavior into two categories: definitely bad, and maybe good.  The definitely
 bad category is occurs when we inject an anomaly and the application continues trucking along as if nothing bad has
@@ -63,6 +71,8 @@ behavior.
 \paragraph{Definitely Bad vs Maybe Good}
 % Testing tools are only able to identify situations are for sure bad. It is not possible for a test or suites of test to
 % be constructed proves a program is correct.
+
+\emph{Handled in Approach Details}
 
 CrashSimulator is able to divide test executions into two categories: ``definitely bad'' and ``maybe good.''  If
 CrashSimulator injects an anomalous condition and the application continues as if nothing is wrong then we know that the
