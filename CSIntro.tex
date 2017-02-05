@@ -49,7 +49,17 @@
     execution allows us to treat these anomalous executions like test cases. \emph{Wording... blah...}That is, they can be
     run in any environment simulating, from the application's perspective, the environment we want to test the application
     in............
+    
+    In short, CrashSimulator helps us find bugs faster by allowing to inject problematic behavior into an application at
+    the system call level.  For example, we can make a call to rename() fail with the EXDEV errno value which should
+    force well-behaved applications to either initiate a manual cross-device file copy procedure or fail out indicating
+    an error.  If the application continues as if nothing is amiss, then it has failed to properly handle the anomaly
+    (an ``unusual'' condition).
 
+    If this process is repeated many times over with multiple anomaly types and checkers and it acts like a test suite.
+    Because anomalies can be injected into any application that presents the appropriate opportunity, the ``tests'' that
+    make up this ``suite'' are applicable across applications.  This allows CrashSimulator s user to construct a suite
+    of tests built from all the applications they work on so it can be leveraged on any project  touch.
 
     CrashSimulator makes the following contributions: \emph{Do we need to rework contributions?}
 
