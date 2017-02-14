@@ -73,14 +73,3 @@ running.
     of faults in an application. They can only signal that a fault has occurred at some point during a test run.
     Furthermore, like white-box tools, these tools fail to take into account the environment in which the
     application is running.
-
-    \paragraph{What can a test tell us?}
-
-    In short, a test can only tell is if an application performs a specific bad behavior in a specific situation.  This
-    is in opposition to telling us that an application is bug free in a given situation.  With this in mind, the usual
-    approach is to construct a large enough test suite that some desired degree of coverage is achieved.  CrashSimulator
-    operates according to this approach as well.  Each injected anomaly can be considered a test case and a set of
-    anomalies can be considered a test suite.  The advantage CrashSimulator has over other tools is that these ``tests''
-    can be utilized across a variety of applications whereas a traditional test suite is closely coupled to the
-    application it tests.  As with traditional tests, CrashSimulator cannot tell us that an applcation is bug free in a
-    given situation -- instead it can assert that an application has incorrectly handled a given situation based.

@@ -7,6 +7,96 @@
 
     \end{figure*}
 
+    \subsection{CrashSimulator's Approach}
+
+    CrashSimulator's testing process is based on two concepts: the encoding of error conditions as a generic
+    computational model and the deterministic replay of a system call trace recorded from the application being tested.
+
+    Prior to beginning CrashSimulator's testing process, a set of bad behaviors (which we refer to as anomalies) to test
+    for must be identified.  A variety of tools capable of identifying anomalies usable by CrashSimulator already
+    exist.  This work relies on NetCheck and CheckAPI for this purpose. NetCheck readily able to identify a wide variety
+    of anomalous behaviors related to network communication between one or more hosts. During normal operation, NetCheck
+    analyzes a group of input system call traces and attempts to produce a diagnosis for network related
+    faults. CheckAPI peforms a similar function by comparing ``behavior of an API implementation to a reference model.''
+
+    Additionally, anomalies can be identified through standard bug hunting techniques.  In this work we constructed
+    models that identified bad behavior around moving files from one filesystem to another.  Using these models,
+    CrashSimulator was identify when applications (nodejs etc.) performed this operation incorrectly.
+
+    Once a set of anomalies have been identified, they must be converted to a format that CrashSimulator is able to
+    utilize.  This process involves examining the traces containing anomalies in order to identify a series of system
+    calls indicative of the presence of the anomaly.  In this work, this series of system calls is encoded as a
+    computational model (e.g. a deterministic finite automaton, a push down automaton, etc.) that, when provided with as
+    input the system calls made during the course of an execution, can decide whether or the series of system calls is
+    present.
+
+    For example, if an anomaly is identified in a web server application, this behavior can likely distilled down to a
+    series of system calls indicitive of the anomaly being present.  If this bad behavior is present in other
+    network-reliant applications it too can be identified by looking for the same series of system calls.  This series
+    of system calls can then be transformed into a computational model as described above.
+
+    The next step in CrashSimulator's testing process is to run CrashSimulator's replay tool against the application
+    being tested.  In the simplest case, this involves first recording a system call trace of a ``normal'' execution of
+    the application.  This system call trace is replayed -- an operation that allows CrashSimulator to monitor the
+    execution utilizing the computational models discussed above.  After the replayed execution concludes,
+    CrashSimulator is able to use the ending state of the models to report whether or not anomalous behavior was
+    present.
+
+    In a more complex case, CrashSimulator's replay capability can be exploited in order to control execution of the
+    application under test in order to force an anomalous condition.  For example, a set of bugs that will be discussed
+    later were found by modifying a rename() system call to return a result indicating that the application is
+    attempting to move a file across disks -- an operation the system call cannot perform.  In a well behaved
+    application, this will trigger an alternative execution path wherein the file is manually copied by the application.
+    In a buggy application either this case will be handled incorrectly (i.e. the appliation will fail to perform all of
+    the steps required to properly copy a file across devices, a situation caught by well-constructed anomaly models) or
+    will not be handled at all, that is, the application will fail eventually because it did not recognize that the call
+    to rename was not successful.
+
+    The steps of this process related to constructing the computational models do not need to be repeated.  Instead, the
+    models and, if necessary, their associated modifications to the ``normal'' trace can be accumulated into waht
+    amounts to a test suite that can be run against any application the CrashSimulator's user is interested in.  This is
+    one of CrashSimulator's primary advantages over application-specific test suites or other testing techniques -- the
+    upfront work can be performed once and then used repeatedly across any application.
+
+    \paragraph{Active vs. Passive Bugs}
+
+    The set of bugs that CrashSimulator can identify can be broken up into two classes based on what action is necessary
+    in order to make them appear.  This work refers to the simplest case as ``passive'' bugs.  These are bugs that can
+    be identified by a computational model as it monitors a replayed execution based on an \emph{unmodified} system call
+    trace of the application being tested.  That is, the replayed execution exhibits the series of system call
+    indiciative of the target anomalous behavior without CrashSimulator having to inject some ``trigger'' behavior from
+    a modified version of the trace (e.g. the modifications to the rename() call discussed above).   This work refers to
+    the second class of the bug as ``active'' bugs.  In this case, some modification must be made to the trace that is
+    going to be replayed in order to coerce execution a targeted execution path where anomalous behavior may be present.
+    
+    \paragraph{What Can a Test Tell Us?}
+
+    In short, a test can only tell is if an application performs a specific bad behavior in a specific situation.  This
+    is in opposition to telling us that an application is bug free in a given situation.  With this in mind, the usual
+    approach is to construct a large enough test suite that some desired degree of coverage is achieved.  CrashSimulator
+    operates according to this approach as well.  Each injected anomaly can be considered a test case and a set of
+    anomalies can be considered a test suite.  The advantage CrashSimulator has over other tools is that these ``tests''
+    can be utilized across a variety of applications whereas a traditional test suite is closely coupled to the
+    application it tests.  As with traditional tests, CrashSimulator cannot tell us that an applcation is bug free in a
+    given situation -- instead it can assert that an application has incorrectly handled a given situation based.
+
+    \paragraph{Making Determinations About Program Behavior}
+
+    For ``active'' bugs, if CrashSimulator injects behavior that \emph{should} necesistate some deviant behavior but the
+    application continues along the the same execution path as is recorded in the system call trace then the application
+    has not properly handled the injected bejavior.  For example, if CrashSimulator modifies the data structure
+    ``returned'' by a call to stat64() such that the target file appears to be a symlink rather than a regular file and
+    the application being replayed does not alter its behavior to deal with this fact, the application has not correctly
+    handled the injected behavior -- a failing result.  Alternatively, if the application deivates from the behavior
+    described in the system call trace driving the replay it is likely that the application is taking some action to
+    handle the injected condition -- an indiciation of possibly correct behavior.
+
+    In the case of both ``active'' and ``passive'' bugs, determinations about program behavior can be made based on the
+    ending states of any computational models employed during CrashSimulator's replay of the execution.  Part of
+    encoding a series of system calls as an appropriate computational model is identifying what states constitute a
+    situation where the model ``accepts'' (i.e. asserts as correct) the programs behavior and what states make up a
+    situation where the model ``rejects'' (i.e. asserts as incorrect) the programs behavior.
+
     \subsection{Architecture}
         
     At a high level CrashSimulator is organized into three primary modules. The first module is responsible for
@@ -47,34 +137,6 @@
 
     CrashSimulator's source code is available and, while other environments may be untested, it should function
     correctly on any platforms that meet the criteria described above.
-
-    \subsection{Anomaly Identification}
-    
-    \emph{This is an old paragraph but I'm leaving it in because I think the general idea it conveys is
-      good. -Preston}The first step in CrashSimulator's operation is the analysis of the set of input system call traces
-    recorded from other applications running in the intended deployment environment. These traces can be taken from any
-    application that as environmental requirements that are reasonably similar to the application under test. For
-    example, a web server could likely be effectively tested by CrashSimulator when CrashSimulator is given system call
-    traces from other applications that make heavy use of the network. Testing a web browser with traces from an
-    application that has no network usage at all would result in less effective testing.
-    
-    A variety of tools capable of identifying anomalies usable by CrashSimulator already exist. This work relies on
-    NetCheck and CheckAPI for this purpose. NetCheck readily able to identify a wide variety of anomalous behaviors
-    related to network communication between one or more hosts. During normal operation, NetCheck analyzes a group of
-    input system call traces and attempts to produce a diagnosis for network related faults. These faults can be
-    analyzed by CrashSimulator's user so that models that encode them can be constructed. CheckAPI peforms a similar
-    function by comparing ``behavior of an API implementation to a reference model.''
-    
-    Additionally, models were constructed that encoded issues identified through manual bug hunting. Specifically,
-    we constructed models that identified bad behavior around moving files from one filesystem to another. Using these
-    models, CrashSimulator was identify when applications (nodejs etc.) performed this operation incorrectly.
-
-    This process of identifying anomalies does not need to be performed for each run of the test suite.  CrashSimulator
-    maintains a corpus of anomalies it has extracted from sample traces. These anomalies can be used to produce mutated
-    traces for any future application that it tests. This allows a developer to build up a set of anomalies that were
-    identified from each of their target environments. The developer can then test an application against this set of
-    anomalies and get an idea of how their application will behave should it encounter the anomalies a deployment
-    environment.
 
     \subsection{System Call Traces and Replay}
 
@@ -135,16 +197,3 @@
     between the application under test and another host on a network, CrashSimulator can fragment, modify, or even drop
     data ``incoming'' from the simulated remote host in order to determine whether or not the application appropriately
     handles the situation. 
-    
-    \paragraph{Making Determinations About Program Behavior}
-
-    From a system call perspective, replaying an application implies that the application makes the same system calls
-    with the same parameters in the same order as is present in the system call trace being used to drive the replay.
-    If CrashSimulator injects behavior that \emph{should} necesistate some deviant behavior but the application
-    continues along the the same execution path as is recorded in the system call trace then the application has not
-    properly handled the injected bejavior.  For example, if CrashSimulator modifies the data structure ``returned'' by
-    a call to stat64() such that the target file appears to be a symlink rather than a regular file and the application
-    being replayed does not alter its behavior to deal with this fact, the application has not correctly handled the
-    injected behavior -- a failing result.  Alternatively, if the application deivates from the behavior described in
-    the system call trace driving the replay it is likely that the application is taking some action to handle the
-    injected condition -- an indiciation of possibly correct behavior.
