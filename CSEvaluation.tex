@@ -53,34 +53,23 @@
         exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
         all sorts of applications in Linux...
             
-            
-        \subsubsection{Evaluation Against Major Programs}
-
-
-
-
-
     \subsection{Bugs Identified in Major Applications}
 
+        \subsubsection{Identification of Known Bugs}
 
-            \begin{table}[H]
-                \scriptsize{}
-                \begin{tabular}{l  l  l  l}
-                    \toprule{}
-                        Bug Tracker ID & Likely to be Identified & Identified & Notes \\
-                        0001 & True & True & Note \\
-                        0002 & True & True & Note \\
-                        0003 & True & True & Note \\
-                        0004 & True & True & Note \\
-                        0005 & True & True & Note \\
-                        0006 & False & False & Note \\
-                        0007 & False & False & Note \\
-                        0008 & False & False & Note \\
-                        0009 & False & False & Note \\
-                        0010 & False & False & Note \\
-                    \bottomrule{}
-                \end{tabular}
-            \end{table}
+        Another way we evaluated the efficacy of CrashSimulator was on its ability to detect known bugs as recorded in
+        the bug trackers of major open source software projects.
+
+            \paragraph{Race Condition in shutil.copy, shutil.copy2, shutil.copyfile - Bug ID\# 15100}
+              
+            This bug describes a situation where the described functions in the shutil package do not perform the checks
+            necessary to prevent a race condition around the process of copying a file from one filesystem to another --
+            a situation that prevents the use of the safer rename() system call.  CrashSimulator is able to detect this
+            issue in replayed executions of python applications that make use of these functions by identifying the
+            applications failure to use fstat() to verify that a file has not changed between the time the file was
+            first checked with stat() and when it was open()'d at the start of the copy process.
+
+        \subsubsection{Identification of Unknown Bugs}
 
 
     \subsection{Test Coverage Improvement}
