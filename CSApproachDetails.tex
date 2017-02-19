@@ -23,6 +23,11 @@
     models that identified bad behavior around moving files from one filesystem to another.  Using these models,
     CrashSimulator was identify when applications (nodejs etc.) performed this operation incorrectly.
 
+    Another source of anomalies is the public bug trackers of projects available on the web.  The presence of a bug can
+    be defined as a series of system calls then a model that identifies during execution can be constructed.  This can
+    be useful in the case of the major, highly publicized bugs that have been found recently.  Similarly, bugs can be
+    taken from similar projects in order to expand a project's ``test suite.''
+
     Once a set of anomalies have been identified, they must be converted to a format that CrashSimulator is able to
     utilize.  This process involves examining the traces containing anomalies in order to identify a series of system
     calls indicative of the presence of the anomaly.  In this work, this series of system calls is encoded as a
@@ -38,9 +43,11 @@
     The next step in CrashSimulator's testing process is to run CrashSimulator's replay tool against the application
     being tested.  In the simplest case, this involves first recording a system call trace of a ``normal'' execution of
     the application.  This system call trace is replayed -- an operation that allows CrashSimulator to monitor the
-    execution utilizing the computational models discussed above.  After the replayed execution concludes,
-    CrashSimulator is able to use the ending state of the models to report whether or not anomalous behavior was
-    present.
+    execution utilizing the computational models discussed above.  The reply process consists of CrashSimulator
+    launching the application under test as a child process and interceeding in its execution at approprate times in
+    order to simulate the results and side effects of any system calls the application makes.  After the repayed
+    execution concludes, CrashSimulator able to use the ending state of the models to report whether or not anomalous
+    behavior was present.
 
     In a more complex case, CrashSimulator's replay capability can be exploited in order to control execution of the
     application under test in order to force an anomalous condition.  For example, a set of bugs that will be discussed
@@ -80,7 +87,7 @@
     application it tests.  As with traditional tests, CrashSimulator cannot tell us that an applcation is bug free in a
     given situation -- instead it can assert that an application has incorrectly handled a given situation based.
 
-    \paragraph{Making Determinations About Program Behavior}
+    \paragraph{Classifying Program Behavior}
 
     For ``active'' bugs, if CrashSimulator injects behavior that \emph{should} necesistate some deviant behavior but the
     application continues along the the same execution path as is recorded in the system call trace then the application
@@ -119,8 +126,8 @@
     application makes, preventing the actual system call from being carried out by the kernel (i.e. no-oping out the
     real system call, that is replacing it with a call to getpid()), identifying the matching system call from the
     previously recorded trace, and replicating the return value and side effects such that the application believes that
-    the system call it made actually took place. We have found that faithfully emulating the post conditions of the
-    system calls an application makes results in deterministic replay of a previous execution in most cases.
+    the system call it made actually took place. We have found that emulating the post conditions of the system calls an
+    application makes results in faithful replay of a previous execution in most cases.
 
     Replay is important because it allows CrashSimulator to execute an application free from dependencies on things like
     file system contents, network configuration, or communication with other applications....... \emph{need more here
