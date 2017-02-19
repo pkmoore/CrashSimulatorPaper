@@ -38,7 +38,11 @@
     For example, if an anomaly is identified in a web server application, this behavior can likely distilled down to a
     series of system calls indicitive of the anomaly being present.  If this bad behavior is present in other
     network-reliant applications it too can be identified by looking for the same series of system calls.  This series
-    of system calls can then be transformed into a computational model as described above.
+    of system calls can then be transformed into a computational model as described above.  As another example, consider
+    the bugs in Python's shutils that were discussed earlier.  In the case of the ``race condition'' bug, the series of
+    system calls indicative of its presence is an application using stat() to check a file, open() to open it, and a
+    series of read() and write() calls to copy its contents to the destination without a call to fstat() that to confirm
+    that the file was not modified after the initial call to stat().
 
     The next step in CrashSimulator's testing process is to run CrashSimulator's replay tool against the application
     being tested.  In the simplest case, this involves first recording a system call trace of a ``normal'' execution of
@@ -47,7 +51,10 @@
     launching the application under test as a child process and interceeding in its execution at approprate times in
     order to simulate the results and side effects of any system calls the application makes.  After the repayed
     execution concludes, CrashSimulator able to use the ending state of the models to report whether or not anomalous
-    behavior was present.
+    behavior was present.  In the case of the Python shutils race condition, the faulty behavior can be identified using
+    a simple python script that calls shutils.move() to move a file between directories located on different storage
+    devices.  CrashSimulator is able to identify the bad behavior by replaying a system call trace taken of an
+    execution of the Python interpreter while it executes the script in question.
 
     In a more complex case, CrashSimulator's replay capability can be exploited in order to control execution of the
     application under test in order to force an anomalous condition.  For example, a set of bugs that will be discussed
