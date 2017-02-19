@@ -14,7 +14,9 @@ running.
     makes during the course of its execution.  Consider the following hypothetical example: an application utilizing the
     POSIX API is executed on a Linux machine and an OS X machine.  Because the API's called in each situation
     superficially act the same, a developer might make the assumption that they are identical in all regards -- an
-    assumption that will result in bugs when in cases where it does not hold.
+    assumption that will result in bugs in cases where it does not hold.  In the OS X and Linux example, an instance of
+    this might be the differing contents returned in the output structure from a call to stat(), an API that
+    superficially appears to be the same on both platforms.
 
     Another interesting case is the situation where the actual API's in question work correctly but the resources they
     operate on do not.  Consider the case where an application is executed on two different hosts with the same
