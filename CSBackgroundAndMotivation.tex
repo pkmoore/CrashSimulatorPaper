@@ -8,40 +8,61 @@ running.
 
     An application's environment is the collection of all resources external to the application with which the
     application communicates.  These external resources can be thought of as an implicit input to the program as their
-    presence and contents alter the flow of any application executed in there presence.  This work is concerned with bugs
-    that arise from subtle differences in behavior between executions in one environment versus another. Specifically, the
-    files and network communications visible through the monitoring the system calls the application makes during the course
-    of its execution.  Consider the following hypothetical example: an application utilizing the POSIX API is executed on a
-    Linux machine and an OS X machine.  Because the API's called in each situation superficially act the same, a developer might
-    make the assumption that they are identical in all regards -- an assumption that will result in bugs when in cases where
-    it does not hold.
+    presence and contents alter the flow of any application executed in their presence.  This work is concerned with
+    bugs that arise from subtle differences in behavior between executions in one environment versus
+    another. Specifically, the files and network communications visible through the monitoring the system calls the
+    application makes during the course of its execution.  Consider the following hypothetical example: an application
+    utilizing the POSIX API is executed on a Linux machine and an OS X machine.  Because the API's called in each
+    situation superficially act the same, a developer might make the assumption that they are identical in all regards
+    -- an assumption that will result in bugs when in cases where it does not hold.
 
     Another interesting case is the situation where the actual API's in question work correctly but the resources they
-    operate on do not.  Consider the case where an application is executed on two different hosts with the same environment
-    present locally but connected two different networks.  In this case, differences in the network itself can cause issues
-    with the application's execution.  For example, if the application assumes that it will receive messages of a particular
-    length from a network host it will not execute correctly when messages of that length are dropped, or fragmented, by a
-    intermediary host with strict MTU requirements. \emph{Do I need to define/describe MTU here? -Preston}
+    operate on do not.  Consider the case where an application is executed on two different hosts with the same
+    environment present locally but connected two different networks.  In this case, differences in the network itself
+    can cause issues with the application's execution.  For example, if the application assumes that it will receive
+    messages of a particular length from a network host it will not execute correctly when messages of that length are
+    dropped, or fragmented, by a intermediary host with strict MTU requirements.
 
     \subsection{A Real World Example}
 
-    During the course of its evaluation, NetCheck was able to identify a bug in Python's socket handling code that
-    compromised portability of Python applications. In short, calling \emph{accept} on a socket that was created in
-    non-blocking mode would return a new socket in blocking mode on Linux where the same calls would return a
-    non-blocking socket on OS X, Windows, and various flavors of BSD\@. This caused code that assumed the return
-    socket would always be blocking to work correctly on Linux but fail when an unhandled EWOULDBLOCK error was
-    encountered on the non-blocking socket under OS X, Windows, and BSD\@. This fault was a source of error for
-    several major Python applications. Many put in place work-arounds without knowing the actual source of the
-    problems.  This type of environment-related error is exactly the type of fault that CrashSimulator was designed
-    to identify.
+    Moving files around in a filesystem is an extremely common operation that, on face value, seems to fairly simplistic
+    to carry out.  In reality, things become complex quickly once a few implementation details are taken into account:
+    namely limitations in Linux's rename() system call and the way Linux's directory heirarchy can abstract away
+    complicated device configurations -- a feature is usually a boon for developers.
 
-    Because NetCheck was able to identify this anomaly in Python, CrashSimulator is able to produce mutated system
-    call traces that can induce it in other applications. NetCheck identifies situations where a socket received
-    from a call to \emph{accept} has inherited the non-blocking flag from the socket initially passed into
-    \emph{accept}. This anomaly will be recored and during future test runs CrashSimulator will be able to produce
-    mutated system calls containing when it encounters a call to accept on a non-blocking socket in a system call
-    trace taken from the application under test.
+    In this example, consider a Linux directory structure with two folders, /mnt/a/ and /mnt/b/, with each being a mount
+    point for a different storage device.  Moving a file around anywhere inside either of these directories can be
+    trivially accomplished by an application using the rename() system call.  Because it is common for systems to have
+    the majority of their directory structures residing on the same device this approach appropriate.  Another case
+    would be moving a file from /mnt/a/ to /mnt/b/.  In this case, rename() is incapable of performing the operation.
+    When situation presents itself, an application must both detect the error returned by rename() and manually copy the
+    file from one device to the other -- a complex process that is easy to carry out incorrectly.  \emph{Any}
+    application that moves files around on a Linux system must be able to deal with this situation any part of the
+    drirectory structure may physically reside on a different device.  For example, the standard log storage location,
+    /var/log/, may be stored on a separate, higher speed, device in order to accomodate a high volume of reads and writes.
 
+    During the course of its evaluation, we provided CrashSimulator with the computational models necessary to detect
+    whether or not the applications being tested successfully performed all of the steps necessary to manually copy a
+    file from one device to another.  We used the coreutils ``mv'' command source code as a guide for what constituted
+    correct behavior as this utility is a key component of Linux systems and must be robust enough to correctly deal
+    with any edge cases or unusual situations that arise.
+
+    A variety of applications that move files around in a filesystem were tested using CrashSimulator with these
+    capabilities enabled.  A particularly illustrative example is the ``shutils'' module that ships with Python 2.7.9.
+    CrashSimulator was able to diagnose the module as failing on several points: it did not correctly preserve
+    timestamps across the move, it did not correctly apply extended file attributes to the destination file after the
+    move, and it did not verify the file's inode number between initially examining the source file and when the copy
+    was initiated (a common cause of race conditions.)  After these tests were performed, we found an unresolved bug
+    report from several years ago discussing this issue on Python's bug tracker -- a nice bit of confirmation of
+    CrashSimulator's efficacy.
+
+    This is just one example.  Given the variety of device types, file systems, and configurations possible it is not
+    hard to imagine a wide extent of problematic combinations that could arise.  This is the sort of situation in which
+    CrashSimulator excells.  CrashSimulator can induce error conditions or passively monitor an execution.  It can
+    either look for the presence of good behavior (e.g. ``Did this application correctly copy extended file attributes
+    when moving a file across disks?'') or it can identify the presence of bad behavior (e.g. ``Did this application try to
+    interact with a block device as if it were a regular file?'').  
+    
     \subsection{Existing Techniques}
 
     Existing tools can be roughly divided into two categories, black-box and white-box, based on the techniques they
