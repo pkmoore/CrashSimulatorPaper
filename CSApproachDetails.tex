@@ -21,7 +21,7 @@
 
     Additionally, anomalies can be identified through standard bug hunting techniques.  In this work we constructed
     models that identified bad behavior around moving files from one filesystem to another.  Using these models,
-    CrashSimulator was identify when applications (nodejs etc.) performed this operation incorrectly.
+    CrashSimulator was able to identify when applications (nodejs etc.) performed this operation incorrectly.
 
     Another source of anomalies is the public bug trackers of projects available on the web.  The presence of a bug can
     be defined as a series of system calls then a model that identifies during execution can be constructed.  This can
@@ -113,10 +113,10 @@
     process we refer to as ``replaying'' a system call trace. The third module orchestrates the process of running
     multiple different anomalies against the application under test, much like a unit test suite.
         
-    The first step in CrashSimulator's work flow is to identify anomalous behavior in an arbitrary application. For the
-    purposes of this work, this step is accomplished through manual bug hunting and through examination of diagnostic
-    output from NetCheck and CheckAPI. CrashSimulator's user examines the system call behavior that resulted in this bad
-    behavior and constructs a model defines what triggers the anomalous behavior and the subsequent ``bad'' system call
+    The first step in CrashSimulator's work flow is to identify anomalous behavior in an arbitrary application.
+    Currently, this step is accomplished through manual bug hunting and through examination of diagnostic output from
+    NetCheck and CheckAPI. CrashSimulator's user examines the system call behavior that resulted in this bad behavior
+    and constructs a model that defines what triggers the anomalous behavior and the subsequent ``bad'' system call
     behavior (\emph{Do we need to say something about future work doing this step automatically here?}.
     CrashSimulator's first module operates by using this model to analyzed the system call behavior of the application
     under test(e.g. order, parameters, side effects, return values).
@@ -156,11 +156,11 @@
         \paragraph{Tooling}
 
         Operating at the system call level allows this work to take advantage of two key pieces of tooling that already
-        exist in mature form on Linux.  The first is ptrace. Ptrace is an process manipulation interface provided by the
-        Linux kernel whose primary use case is debugger development.  This work leverages ptrace in order to start and stop
-        execution of a process as well as read and write the contents of the processes registers and memory.  Using these
-        operations allows CrashSimulator to pause execution before and after each system call an application makes in order
-        to manage execution and inject anomalies where appropriate.
+        exist in mature form on Linux.  The first is ptrace. Ptrace is a process manipulation interface provided by the
+        Linux kernel whose primary use case is debugger development.  This work leverages ptrace in order to start and
+        stop execution of a process as well as read and write the contents of the processes registers and memory.  Using
+        these operations allows CrashSimulator to pause execution before and after each system call an application makes
+        in order to manage execution and inject anomalies where appropriate.
 
         This CrashSimulator also relies on system call traces recorded using strace.  The strace system call trace format is
         extensive and captures the parameters, return values, and side effects of each system call an application makes.
