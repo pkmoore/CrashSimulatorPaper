@@ -1,22 +1,74 @@
-% TODO: Re-read and rework
 \section{Conclusion}
 
-    Minimizing the number of faults present in the applications they write is a key concern for software developers. A
-    number of automated testing techniques have been created in order to meet this goal. The most sophisticated of these
-    existing techniques focus on either analyzing an applications source code or machine code in order to gain an
-    understanding of the inputs required to exercise an applications code paths and then exercising them with the goal
-    of exposing faults. These techniques focus on the application itself to the neglect of the application's environment
-    which can be a source of numerous faults that cannot be identified by testing the application in isolation. To
-    combat this problem this work presents CrashSimulator, a tool that analyzes system call traces of application in
-    order to facilitate the injection of environment-based faults into the application for testing purposes.
+Minimizing the number of faults present in the applications they write is a key concern for software developers.  A
+number of automated testing techniques have been created in order to meet this goal.  The most sophisticated of these
+existing techniques focus on either analyzing an applications source code or machine code in order to gain an
+understanding of the inputs required to exercise an applications code paths and then exercising them with the goal of
+exposing faults.  These techniques focus on the application itself to the neglect of the application's environment which
+can be a source of numerous faults that cannot be identified by testing the application in isolation.  To combat this
+problem this work presents CrashSimulator, a tool that utilizes replay of system call traces in order to facilitate the
+injection of environment-based faults into the application for testing purposes.
 
-    The goal of CrashSimulator is to allow developers to identify unhandled edge cases at the intersection of their
-    application and the environment it is running in an automated fashion. CrashSimulator's ability to test an
-    application in a completely black-box manner, as well as its language-agnostic approach to application analysis,
-    gives considerable advantage over similar tools in the space. \textbf{NUMBER} major applications with public facing
-    bug trackers were tested using CrashSimulator and CrashSimulator was able to identify \textbf{PERCENT} of bugs
-    related to anomalies it tests for that had previously been located manually and reported. Additionally,
-    \textbf{NUMBER} of open source projects with existing unit test suites were examined and CrashSimulator was able to
-    improve test coverage in each of them by providing additional meaningful unit tests.
+CrashSimulator's focus on bugs that can occur at the interace between an appication and its environment allow it to fill
+a gap in the landscape of existing testing techniques.  CrashSimulator can supplement existing testing processes for an
+application by providing additional ``unit tests'' that cover areas that are often missed.
 
+CrashSimulator's key features, operating on system calls and analysis of replayed executions set it apart from other
+tools in the space.  By operating at the system call level CrashSimulator is able to avoid the complexities around
+language specific processing while still having a level of control not present in tools that generate inputs in a
+blackbox fashion.  CrashSimulator's method of testing using replayed execution is novel and provides a few unique
+opportunities.  Performing its analysis on a replayed execution of an application allows CrashSimulator to remove the
+filesystem, network, etc. dependancies of the application under test allowing removing many of the complications of
+testing applications across different environments.  It also allows CrashSimulator to easily influence execution in ways
+that are advantageous for testing.
 
+We have shown that CrashSimulator is able to find a class of bugs that is often neglected.  The ability to take bugs
+from a variety of sources, transform them into generic computational models, and use them to analyze the execution of a
+variety of applications showed that the same sorts of mistakes were being made across many different projects.
+Specifically, CrashSimulator found bugs in Python's shutils, mmv............ Additionally, CrashSimulator found bugs
+from a different class in gpg........
+
+    \subsubsection{Future Work}
+
+    Future work on CrashSimulator can be broken down into three main areas:
+
+        \paragraph{Automatic Identifications of ``Bad'' System Call Sequences}
+
+        The current implementation of CrashSimulator relies on the user to translate an observed bad behavior into a
+        sequence of system calls indicative of its presence.  This is an area in which some work has already been
+        accomplished by NetCheck and CheckAPI.  The internal state of these tools that identifies a bad sequence of
+        system calls could be output and used for the creation of computational models.
+
+        \paragraph{Automatic Generation of Computational Models for ``Bad'' System Call Sequences}
+
+        CrashSimulator also relies on the user to create the computational models that are used for identification of
+        bad behavior during a replayed execution.  Future work could include expanding its capabilities such that the
+        generation of these models is automatic based on a provided sequence of system calls.
+        
+        \paragraph{Expansion of Replay Capabilities}
+
+        Replaying an execution of an application is a core capability and contribution of CrashSimulator.  The current
+        implementation is incomplete in terms of system calls and operating systems supported.  In order to achieve the
+        goal of faithfully testing an application across multiple environments the replay tool will need to be expanded
+        to support many other operating systems, including Windows and OS X, in addition to more complete support for
+        system calls in Linux.
+
+        Another area for improvement in the replay tool is support for replaying applications that make use of
+        multi-threading or multi-processing.  There are challenges in this area around getting all processing units to
+        reliably complete operations in the same order as they did during execution recording.  Additionally, there are
+        challenges around reliably tracing all processing units of a multi-threading or multi-processing application in
+        the first place.
+    
+
+    \subsubsection{Other Considerations}
+
+    During the course of implementation pain points arose around some of the technologies chosen.  For example, the
+    potential exists for an improved implementation of CrashSimulator that uses something other than Ptrace for process
+    manipulation.  Building CrashSimulator on top of a virtual machine might provide more reliable control.
+    Additionally, there are challenges around using system call traces as the basis of the replayed execution.  One such
+    disadvantage is the size of the traces can grow dramatically in situations where an application is reading and
+    writing a great deal of data.  Potentially, a system call trace could be many times the size of the total amount of
+    data written.  Additionally, strace is imperfect in the way it captures data from some system calls and the
+    presentation of this data is difficult to process programatically.  There may be more suitable ways of logging the
+    system calls an application makes.
+    
