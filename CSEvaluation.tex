@@ -4,7 +4,6 @@
 
         \begin{enumerate}
             \item{Is CrashSimulator successful in identifying flaws in new and existing applications?}
-            \item{Is CrashSimulator able to generate tests in a performant manner?}
             \item{Is CrashSimulator able to execute tests in a performant manner?}
         \end{enumerate}
 
@@ -66,11 +65,91 @@
 
         \subsubsection{Identification of Unknown Bugs}
 
+        \subsubsection{Cross-Device Move Bugs}
 
-    \subsection{Test Coverage Improvement}
+        In Linux, the rename() system call will only move a file if the source and destination are on the same device.
+        This means that moving a file from a directory structure location on one storage device to a directory structure location on
+        another device must be handled on a case-by-case basis by any application that relies on this operation.  With
+        this in mined, we examined the process by which the coreutils ``mv'' command handles this task and constructed
+        computational models that can determine whether or not a replayed execution of an application has performed all
+        the necessary steps to successfully carry out a cross device move.  Next, these models were employed during
+        replayed executions of the listed applications in order to determine whether or not their copy operation is correct.
 
-        \textbf{\emph{There needs to be more exploration put into this test methodology. Much more description needs to
-        be written.}}
+        \paragraph{Verify Destination is not Target of Source}
+
+        In this condition, CrashSimulator confirms whether or not the application under test performs a check to ensure
+        that the source file name is not a symlink pointing to the destination file name.  If this check is not
+        performed, loss of data is possible due to removal or overwriting of the destination during the copy process
+        resulting in the source symlink pointing to nothing.
+
+        \paragraph{Preserve Extended File Attributes}
+
+        In this condition, CrashSimulator determines whether or not the application under test correctly preserves
+        extended file attributes by reading them from the source file and applying them to the destination file prior to
+        removing the source file.  Extended file attributes are often used to store information such as the original
+        providance of the file (i.e. downloaded from the internet, received from an trusted vendor, etc.).  Loss of
+        these attributes can result in security issues. For example, Apple's Gatekeeper relies on extended file
+        attributes to prevent applications downloaded untrusted developers from being executed without user
+        confirmation.
+
+        \paragraph{Ensure Source is not Replaced Between Check and Copy}
+
+        This is an example of a classic race condition.  In this case, CrashSimulator examines whether or not the
+        appication under test makes uses of fstat() to ensure that the inode number of the file being copied has not
+        changed between initial examination with a stat()-like call and the eventual copy.  
+
+        \paragraph{Preserve Timestamp and Mode}
+
+        Truely copying a file means preserving the metadata of the file as well as its contents.  In this condition,
+        CrashSimulator ascertains whether or not the application under test restores the appropriate timestamps and
+        modeline to the destination file after (or before) its contents have been copied. 
+
+        \paragraph{Move Block Device Across Disks}
+
+        Many applications fail to examine the nature of a file before engaging in a manual, cross-disk copy process.  In
+        situations where the source is a special file such as /dev/urandom.  If an application fails to detect this
+        situation, the typical steps in a manual copy process could result in the application filling the destination
+        destination device, consuming available memory, or simply hanging indefinitely as it attempts to read in the
+        full contents of an effectively infinite-sized file.
+
+        
+            \begin{table}[H]
+                \scriptsize{}
+                \begin{tabular}{l  l  l  l}
+                \toprule{}
+                  Application & Condition Tested & Correct Response\\
+                  mv & Verify Destination is not Target of Source & Yes\\
+                  mv & Preserve Extended File Attributes & Yes\\
+                  mv & File Replaced Between Check And Copy & Yes\\
+                  mv & Preserve Timestamp and Mode & Yes\\
+                  mv & Move Directory Into Itself & Yes\\
+                  mv & Move Block Device Across Disks & Yes\\
+                  Python shutils & Verify Destination is not Target of Source & Yes\\
+                  Python shutils & Preserve Extended File Attributes & \textbf{No}\\
+                  Python shutils  & File Replaced Between Check And Copy & \textbf{no}\\
+                  Python shutils  & Preserve Timestamp and Mode & \textbf{No}\\
+                  Python shutils  & Move Directory Into Itself & Yes\\
+                  Python shutils  & Move Block Device Across Disks & Yes\\
+                  mmv & Verify Destination is not Target of Source& \textbf{No}\\
+                  mmv & Preserve Extended File Attributes & \textbf{No}\\
+                  mmv & File Replaced Between Check And Copy & \textbf{No}\\
+                  mmv & Preserve Timestamp and Mode & Yes\\
+                  mmv & Move Directory Into Itself & Yes\\
+                  mmv & Move Block Device Across Disks & \textbf{No}\\
+                  rust & Verify Destination is not Target of Source& \textbf{???}\\
+                  rust & Preserve Extended File Attributes & \textbf{???}\\
+                  rust & File Replaced Between Check And Copy & \textbf{???}\\
+                  rust & Preserve Timestamp and Mode & \textbf{???}\\
+                  rust & Move Directory Into Itself & \textbf{???}\\
+                  rust & Move Block Device Across Disks & \textbf{???}\\
+                \bottomrule{}
+                \end{tabular}
+            \end{table}
+
+        \subsubsection{Non-Regular File Bugs}
+
+        
+        
 
     \subsection{Limitations}
 
