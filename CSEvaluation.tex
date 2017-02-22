@@ -148,6 +148,26 @@
 
         \subsubsection{Non-Regular File Bugs}
 
+        These bugs involve modifying the executions of applications that work with regular files such that a call to
+        stat() or lstat() indicates that the file in question is instead some sort of special file.  Well behaved
+        applications should verify that the files they are accessing are regular files before processing them.  Many
+        applications make the assumption that they will only be used to process regular files.  Encountering special
+        files tends to induce a denial of service condition that in certain circumstances, such as an automated
+        environment, can halt a scripted process or workflow.
+
+            \begin{table}[H]
+                \scriptsize{}
+                \begin{tabular}{l  l  l  l}
+                \toprule{}
+                  Application & Condition Tested & Correct Response\\
+                  gnu-gpg & Replace gpg.conf with FIFO & \textbf{no}, application hangs\\
+                  vim & Replace file being opened with FIFO & \textbf{no}, application hangs\\
+                  nano & Replace file being opened with FIFO & \textbf{no}, application hangs\\
+                  sed & Replace file being edited with FIFO & \textbf{no}, appliation hangs\\
+                \bottomrule{}
+                \end{tabular}
+            \end{table}
+        
         
         
 
