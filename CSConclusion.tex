@@ -28,38 +28,6 @@ variety of applications showed that the same sorts of mistakes were being made a
 Specifically, CrashSimulator found bugs in Python's shutils, mmv............ Additionally, CrashSimulator found bugs
 from a different class in gpg........
 
-    \subsubsection{Future Work}
-
-    Future work on CrashSimulator can be broken down into three main areas:
-
-        \paragraph{Automatic Identifications of ``Bad'' System Call Sequences}
-
-        The current implementation of CrashSimulator relies on the user to translate an observed bad behavior into a
-        sequence of system calls indicative of its presence.  This is an area in which some work has already been
-        accomplished by NetCheck and CheckAPI.  The internal state of these tools that identifies a bad sequence of
-        system calls could be output and used for the creation of computational models.
-
-        \paragraph{Automatic Generation of Computational Models for ``Bad'' System Call Sequences}
-
-        CrashSimulator also relies on the user to create the computational models that are used for identification of
-        bad behavior during a replayed execution.  Future work could include expanding its capabilities such that the
-        generation of these models is automatic based on a provided sequence of system calls.
-        
-        \paragraph{Expansion of Replay Capabilities}
-
-        Replaying an execution of an application is a core capability and contribution of CrashSimulator.  The current
-        implementation is incomplete in terms of system calls and operating systems supported.  In order to achieve the
-        goal of faithfully testing an application across multiple environments the replay tool will need to be expanded
-        to support many other operating systems, including Windows and OS X, in addition to more complete support for
-        system calls in Linux.
-
-        Another area for improvement in the replay tool is support for replaying applications that make use of
-        multi-threading or multi-processing.  There are challenges in this area around getting all processing units to
-        reliably complete operations in the same order as they did during execution recording.  Additionally, there are
-        challenges around reliably tracing all processing units of a multi-threading or multi-processing application in
-        the first place.
-    
-
     \subsubsection{Other Considerations}
 
     During the course of implementation pain points arose around some of the technologies chosen.  For example, the
