@@ -8,24 +8,24 @@ running.
 
     An application's environment is the collection of all resources external to the application with which the
     application communicates.  These external resources can be thought of as an implicit input to the program as their
-    presence and contents alter the flow of any application executed in their presence.  This work is concerned with
+    presence and contents alter the flow of any application executed in their presence. CrashSimulator is concerned with
     bugs that arise from subtle differences in behavior between executions in one environment versus another
     specifically, the files and network communications visible through the monitoring the system calls the application
-    makes during the course of its execution.  Consider the following hypothetical example: an application utilizing the
-    POSIX API is executed on a Linux machine and an OS X machine.  Because the API's called in each situation
-    superficially act the same, a developer might make the assumption that they are identical in all regards -- an
-    assumption that will result in bugs in cases where it does not hold.  In the OS X and Linux example, an instance of
-    this might be the differing contents returned in the output structure from a call to stat(), an API that
-    superficially appears to be the same on both platforms.
+    makes during the course of its execution.
 
-    Another interesting case is the situation where the actual API's in question work correctly but the resources they
-    operate on do not.  Consider the case where an application is executed on two different hosts with the same
-    environment present locally but connected two different networks.  In this case, differences in the network itself
-    can cause issues with the application's execution.  For example, if the application assumes that it will receive
-    messages of a particular length from a network host it will not execute correctly when messages of that length are
-    dropped, or fragmented, by a intermediary host with strict MTU requirements.
+    As an example of how the implementations of different environments can impact the execution of an application
+    consider the following bug identified by NetCheck.  In {\tt BSD} and {\tt OS X} sockets returned by the {\tt
+      accept()} system call inherit the values of the {\tt O_NONBLOCK} and {\tt O_ASYNC} flags from their parent
+    socket.  In {\tt Linux}, these values are not inherited.  As a result, the correct behavior is to always explicitly
+    set these flags to the appropriate values on child sockets.  This difference environmental difference presented
+    itself as a bug in the socket implementation of {\tt Python 3.2}.  Python took advantage of non-blocking sockets in
+    order to implement timeout capabilities for sockets.  Because Python did not specifically set the {\tt O_NONBLOCK}
+    flag on the child sockets underlying its socket object abstraction it was possible that, depending on the
+    environment, the Python socket object would report the socket as either blocking or non-blocking while the actual
+    underlying socket was configured for the opposite behavior.  This is the sort of bug that CrashSimulator focuses on
+    identifying and is the sort of bug that application-focused testing techniques are typically not capable of finding.
 
-    \subsection{A Real World Example}
+    \subsection{An Example from CrashSimulator}
 
     Moving files around in a filesystem is an extremely common operation that, on face value, seems to fairly simplistic
     to carry out.  In reality, things become complex quickly once a few implementation details are taken into account:
