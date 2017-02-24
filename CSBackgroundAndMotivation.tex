@@ -59,6 +59,26 @@ running.
     report from several years ago discussing this issue on Python's bug tracker -- a nice bit of confirmation of
     CrashSimulator's efficacy.
 
+    These deficiencies are not just inconveniences.  They can have a real world impact on a system's operation and
+    security.  Consider the case of not correctly copying timestamps when when moving a file.  If other code depends on
+    timestamps for ordering its processing then moving the file via {\tt shutils} can result in a silent mis-ordering of
+    its processing.  This could be disaster in order-dependent situations like batching updates to a database.
+
+    In the case of failing to confirm a file's inode before moving it a possible outcome is a completely different file
+    ending up in the destination than was at the source.  Consider the situation where a service using Python's {\tt
+      shutils} is responsible for copying files to a privileged location from a public area.  Because {\tt shutils} does
+    not open and confirm the inode number of the file prior to copying it, there is a window where some outside actor
+    could replace the file being copied silently between the first time {\tt stat()} is used to check it and when the
+    copy actually takes place.  From the service's perspective, there is no indication that anything other than the
+    correct file was copied to the privileged area while, in reality, a completely different file was copied.
+
+    There are security concerns in not correctly copying extended file attributes to the destination file as well.  Some
+    operationg systems rely on these extended file attribute attach information where a file came from to the file
+    itself.  This information is later used by these operating systems to make decision about whether the file should be
+    executed or not and by whom it may be executed.  In this case, moving the file from one device to another using
+    Python's {\tt shutils} will result in this information being stripped meaning that the operating system cannot make
+    correct decisions about how to handle the file in the future.
+
     This is just one example.  Given the variety of device types, file systems, and configurations possible it is not
     hard to imagine a wide extent of problematic combinations that could arise.  This is the sort of situation in which
     CrashSimulator excels.  CrashSimulator can induce error conditions or passively monitor an execution.  It can
