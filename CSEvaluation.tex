@@ -7,15 +7,12 @@
             \item{Is CrashSimulator able to execute tests in a performant manner?}
         \end{enumerate}
 
-    % TODO: Talk about the test platform, OS, Hardware, etc.
     \subsection{Execution Performance}
 
         One key attribute of successful testing tools is that they be able to complete their tests in a timely manner.
         If a tool takes too long to complete its tests users will be less likely to run it frequently, or at all,
         reducing the tools overall usefulness dramatically. To this end, the performance of CrashSimulator was evaluated
         in order to determine whether or not it was able to complete its test executions in an acceptable time frame.
-        \textbf{There probably needs to be a citation here related to how long a developer is typically willing to wait
-        for a test execution to complete}
 
         \subsubsection{Evaluation Against Sample Programs}
 
@@ -58,10 +55,10 @@
               
             This bug describes a situation where the described functions in the shutil package do not perform the checks
             necessary to prevent a race condition around the process of copying a file from one filesystem to another --
-            a situation that prevents the use of the safer rename() system call.  CrashSimulator is able to detect this
+            a situation that prevents the use of the safer {\tt rename()} system call.  CrashSimulator is able to detect this
             issue in replayed executions of python applications that make use of these functions by identifying the
-            applications failure to use fstat() to verify that a file has not changed between the time the file was
-            first checked with stat() and when it was open()'d at the start of the copy process.
+            applications failure to use {\tt fstat()} to verify that a file has not changed between the time the file was
+            first checked with {\tt stat()} and when it was open()'d at the start of the copy process.
 
         \subsubsection{Identification of Unknown Bugs}
 
@@ -70,7 +67,7 @@
         In Linux, the rename() system call will only move a file if the source and destination are on the same device.
         This means that moving a file from a directory structure location on one storage device to a directory structure location on
         another device must be handled on a case-by-case basis by any application that relies on this operation.  With
-        this in mined, we examined the process by which the coreutils ``mv'' command handles this task and constructed
+        this in mined, we examined the process by which the coreutils {\tt mv}command handles this task and constructed
         computational models that can determine whether or not a replayed execution of an application has performed all
         the necessary steps to successfully carry out a cross device move.  Next, these models were employed during
         replayed executions of the listed applications in order to determine whether or not their copy operation is correct.
@@ -149,7 +146,7 @@
         \subsubsection{Non-Regular File Bugs}
 
         These bugs involve modifying the executions of applications that work with regular files such that a call to
-        stat() or lstat() indicates that the file in question is instead some sort of special file.  Well behaved
+        {\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well behaved
         applications should verify that the files they are accessing are regular files before processing them.  Many
         applications make the assumption that they will only be used to process regular files.  Encountering special
         files tends to induce a denial of service condition that in certain circumstances, such as an automated
