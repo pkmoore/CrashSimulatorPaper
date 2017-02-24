@@ -109,36 +109,17 @@
         destination device, consuming available memory, or simply hanging indefinitely as it attempts to read in the
         full contents of an effectively infinite-sized file.
 
-        
-            \begin{table}[H]
+            \begin{table}[t]
                 \scriptsize{}
-                \begin{tabular}{l  l  l  l}
+                \begin{tabular}{l l l l l l | l}
                 \toprule{}
-                  Application & Condition Tested & Correct Response\\
-                  mv & Verify Destination is not Target of Source & Yes\\
-                  mv & Preserve Extended File Attributes & Yes\\
-                  mv & File Replaced Between Check And Copy & Yes\\
-                  mv & Preserve Timestamp and Mode & Yes\\
-                  mv & Move Directory Into Itself & Yes\\
-                  mv & Move Block Device Across Disks & Yes\\
-                  Python shutils & Verify Destination is not Target of Source & Yes\\
-                  Python shutils & Preserve Extended File Attributes & \textbf{No}\\
-                  Python shutils  & File Replaced Between Check And Copy & \textbf{no}\\
-                  Python shutils  & Preserve Timestamp and Mode & \textbf{No}\\
-                  Python shutils  & Move Directory Into Itself & Yes\\
-                  Python shutils  & Move Block Device Across Disks & Yes\\
-                  mmv & Verify Destination is not Target of Source& \textbf{No}\\
-                  mmv & Preserve Extended File Attributes & \textbf{No}\\
-                  mmv & File Replaced Between Check And Copy & \textbf{No}\\
-                  mmv & Preserve Timestamp and Mode & Yes\\
-                  mmv & Move Directory Into Itself & Yes\\
-                  mmv & Move Block Device Across Disks & \textbf{No}\\
-                  rust & Verify Destination is not Target of Source& \textbf{???}\\
-                  rust & Preserve Extended File Attributes & \textbf{???}\\
-                  rust & File Replaced Between Check And Copy & \textbf{???}\\
-                  rust & Preserve Timestamp and Mode & \textbf{???}\\
-                  rust & Move Directory Into Itself & \textbf{???}\\
-                  rust & Move Block Device Across Disks & \textbf{???}\\
+                  Condition & mv & mmv & shutils & rust & boost::copyfile & Mode\\
+                  Verify Destination is not Target of Source & Yes & Yes & No & ??? & ??? & Passive\\
+                  Preserve Extended File Attributes & Yes & No & No & ??? & ??? & Passive\\
+                  File Replaced Between Check and Copy & Yes & No & No & ??? & ??? & Passive\\
+                  Preserve Timestamp and Mode & Yes & No & Yes & ??? & ??? & Passive\\
+                  Move Directory Into Itself & Yes & Yes & Yes & ??? & ??? & Passive\\
+                  Move Block Device Across Disks & Yes & Yes & Yes & ??? & ??? & Passive\\
                 \bottomrule{}
                 \end{tabular}
             \end{table}
@@ -154,19 +135,17 @@
 
             \begin{table}[H]
                 \scriptsize{}
-                \begin{tabular}{l  l  l  l}
+                \begin{tabular}{l  l  l  | l}
                 \toprule{}
-                  Application & Condition Tested & Correct Response\\
-                  gnu-gpg & Replace gpg.conf with FIFO & \textbf{no}, application hangs\\
-                  vim & Replace file being opened with FIFO & \textbf{no}, application hangs\\
-                  nano & Replace file being opened with FIFO & \textbf{no}, application hangs\\
-                  sed & Replace file being edited with FIFO & \textbf{no}, appliation hangs\\
+                  Application & Condition Tested & Correct Response & Mode\\
+                  gnu-gpg & Import link to /dev/urandom as key file & \textbf{no}, application hangs & Passive\\
+                  vim & Inject S\_IFIFO as file type in stat64 call & \textbf{no}, attempts open as regular file & Active\\
+                  nano & Inject S\_IFIFO as file type in stat64() call & \textbf{no}, attempts open as regular file & Active\\
+                  wget & Inject S\_ICHR as file type in stat64() & \textbf{no}, attempts open as regular file & Active\\
                 \bottomrule{}
                 \end{tabular}
             \end{table}
-        
-        
-        
+
 
     \subsection{Limitations}
 
