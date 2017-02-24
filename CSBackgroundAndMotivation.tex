@@ -32,25 +32,26 @@ running.
     namely limitations in Linux's {\tt rename()} system call and the way Linux's directory heirarchy can abstract away
     complicated device configurations -- a feature is usually a boon for developers.
 
-    In this example, consider a Linux directory structure with two folders, /mnt/a/ and /mnt/b/, with each being a mount
-    point for a different storage device.  Moving a file around anywhere inside either of these directories can be
-    trivially accomplished by an application using the rename() system call.  Because it is common for systems to have
-    the majority of their directory structures residing on the same device this approach appropriate.  Another case
-    would be moving a file from /mnt/a/ to /mnt/b/.  In this case, rename() is incapable of performing the operation.
-    When situation presents itself, an application must both detect the error returned by rename() and manually copy the
-    file from one device to the other -- a complex process that is easy to carry out incorrectly.  \emph{Any}
-    application that moves files around on a Linux system must be able to deal with this situation any part of the
-    drirectory structure may physically reside on a different device.  For example, the standard log storage location,
-    /var/log/, may be stored on a separate, higher speed, device in order to accomodate a high volume of reads and writes.
+    In this example, consider a Linux directory structure with two folders, {\tt /mnt/a/} and {\tt /mnt/b/}, with each
+    being a mount point for a different storage device.  Moving a file around anywhere inside either of these
+    directories can be trivially accomplished by an application using the {\tt rename()} system call.  Because it is
+    common for systems to have the majority of their directory structures residing on the same device this approach
+    appropriate.  Another case would be moving a file from {\tt /mnt/a/} to {\tt /mnt/b/} when the source and destination are on
+    different storage devices.  In this case, {\tt rename()} is incapable of performing the operation.  When situation
+    presents itself, an application must both detect the error returned by {\tt rename()} and manually copy the file from one
+    device to the other -- a complex process that is easy to carry out incorrectly.  \emph{Any} application that moves
+    files around on a Linux system must be able to deal with this situation any part of the drirectory structure may
+    physically reside on a different device.  For example, the standard log storage location, {\tt /var/log/}, may be stored
+    on a separate, higher speed, device in order to accomodate a high volume of reads and writes.
 
     During the course of its evaluation, we provided CrashSimulator with the computational models necessary to detect
     whether or not the applications being tested successfully performed all of the steps necessary to manually copy a
-    file from one device to another.  We used the coreutils ``mv'' command source code as a guide for what constituted
+    file from one device to another.  We used the coreutils {\tt mv}command source code as a guide for what constituted
     correct behavior as this utility is a key component of Linux systems and must be robust enough to correctly deal
     with any edge cases or unusual situations that arise.
 
     A variety of applications that move files around in a filesystem were tested using CrashSimulator with these
-    capabilities enabled.  A particularly illustrative example is the ``shutils'' module that ships with Python 2.7.9.
+    capabilities enabled.  A particularly illustrative example is the {\tt shutils} module that ships with Python 2.7.9.
     CrashSimulator was able to diagnose the module as failing on several points: it did not correctly preserve
     timestamps across the move, it did not correctly apply extended file attributes to the destination file after the
     move, and it did not verify the file's inode number between initially examining the source file and when the copy
@@ -60,7 +61,7 @@ running.
 
     This is just one example.  Given the variety of device types, file systems, and configurations possible it is not
     hard to imagine a wide extent of problematic combinations that could arise.  This is the sort of situation in which
-    CrashSimulator excells.  CrashSimulator can induce error conditions or passively monitor an execution.  It can
+    CrashSimulator excels.  CrashSimulator can induce error conditions or passively monitor an execution.  It can
     either look for the presence of good behavior (e.g. ``Did this application correctly copy extended file attributes
     when moving a file across disks?'') or it can identify the presence of bad behavior (e.g. ``Did this application try to
     interact with a block device as if it were a regular file?'').  
