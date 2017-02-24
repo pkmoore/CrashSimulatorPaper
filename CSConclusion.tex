@@ -27,16 +27,3 @@ from a variety of sources, transform them into generic computational models, and
 variety of applications showed that the same sorts of mistakes were being made across many different projects.
 Specifically, CrashSimulator found bugs in Python's shutils, mmv............ Additionally, CrashSimulator found bugs
 from a different class in gpg........
-
-    \subsubsection{Other Considerations}
-
-    During the course of implementation pain points arose around some of the technologies chosen.  For example, the
-    potential exists for an improved implementation of CrashSimulator that uses something other than Ptrace for process
-    manipulation.  Building CrashSimulator on top of a virtual machine might provide more reliable control.
-    Additionally, there are challenges around using system call traces as the basis of the replayed execution.  One such
-    disadvantage is the size of the traces can grow dramatically in situations where an application is reading and
-    writing a great deal of data.  Potentially, a system call trace could be many times the size of the total amount of
-    data written.  Additionally, strace is imperfect in the way it captures data from some system calls and the
-    presentation of this data is difficult to process programatically.  There may be more suitable ways of logging the
-    system calls an application makes.
-    
