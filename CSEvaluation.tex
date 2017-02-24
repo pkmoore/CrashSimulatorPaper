@@ -149,12 +149,31 @@
 
     \subsection{Limitations}
 
-        Evaluation of CrashSimulator has yielded the following limitations to be addressed by future work.
+        The current implementation of CrashSimulator has the following limitations that could be addressed by future work.
 
         \paragraph{Coupling to Architecture}
 
-            As some faults injected by CrashSimulator require low level access to the test system's hardware or
-            operating system data structures there exists some degree of coupling between CrashSimulator and these
-            components. One area of expansion for CrashSimulator is support for more processor architectures and more
-            operating systems.  CrashSimulator's test launcher as been designed in such a way that these improvements
-            should be trivial to plug in once they have been implemented.
+        As some faults injected by CrashSimulator require low level access to the test system's hardware or operating
+        system data structures there exists some degree of coupling between CrashSimulator and these components. One
+        area of expansion for CrashSimulator is support for more processor architectures and more operating systems.
+        CrashSimulator's test launcher as been designed in such a way that these improvements should be trivial to plug
+        in once they have been implemented.
+
+        \paragraph{Multi-threaded or Multi-process Applications}
+
+        The current implementation cannot correctly replay applications that rely on multi-threading or
+        multi-processing.  Is due to two factors.  First, the replay tool must be able to force some pre-determined
+        order onto the threads or processes in order to prevent situations where the execution portion of a replay ends
+        up requesting system calls in a different order than was recorded in the system call trace the system is
+        attempting to replay.  Second, the tool needs to be able to correctly monitor multiple processes. {\tt Ptrace}
+        may have appropriate facilities for this task but they were not explored for this version of the tool.
+
+        \paragraph{Multi-Platform Tracing Tool}
+
+        While there are system call tracing tools available for most of the major operating systems available today
+        there is not one tool that works across all of them.  This means that if CrashSimulator is going to be able to
+        to work with traces from a given operating system, it will require specific parsing logic for the output of the
+        tool used to record the traces.  Additionally, CrashSimulator requires that the tracing tools record all data
+        passed into a system call and all data returned from the system call either as a return value or as some block
+        of memory written into the calling process's memory.  It is possible that some system call tracing tools do not
+        support this level of detail.
