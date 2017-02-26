@@ -29,6 +29,7 @@
                         Execution Description & Native Eecution & Replay Execution\\
                         network\_speedtest & 0.024 & 2.407 \\
                         filesystem\_speedtest & 0.038 & 2.604 \\
+                        mv file across disks & 0.016 & 2.995 \\
                     \bottomrule{}
                 \end{tabular}
             \end{table}
@@ -114,12 +115,12 @@
                 \begin{tabular}{l l l l l l | l}
                 \toprule{}
                   Condition & mv & mmv & shutils & rust & boost::copyfile & Mode\\
-                  Verify Destination is not Target of Source & Yes & Yes & No & ??? & ??? & Passive\\
-                  Preserve Extended File Attributes & Yes & No & No & ??? & ??? & Passive\\
-                  File Replaced Between Check and Copy & Yes & No & No & ??? & ??? & Passive\\
-                  Preserve Timestamp and Mode & Yes & No & Yes & ??? & ??? & Passive\\
-                  Move Directory Into Itself & Yes & Yes & Yes & ??? & ??? & Passive\\
-                  Move Block Device Across Disks & Yes & Yes & Yes & ??? & ??? & Passive\\
+                  Verify Destination is not Target of Source & Yes & Yes & No & ??? & No & Passive\\
+                  Preserve Extended File Attributes & Yes & No & No & No & No & Passive\\
+                  File Replaced Between Check and Copy & Yes & No & No & Yes & No & Passive\\
+                  Preserve Timestamp and Mode & Yes & No & Yes & Yes & No & Passive\\
+                  Move Directory Into Itself & Yes & Yes & Yes & N/A, won't move directories & N/A, won't move directories & Passive\\
+                  Move Block Device Across Disks & Yes & Yes & Yes & No & No & Injected\\
                 \bottomrule{}
                 \end{tabular}
             \end{table}
