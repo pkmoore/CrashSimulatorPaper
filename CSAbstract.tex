@@ -1,22 +1,14 @@
 \begin{abstract}
 
-  One of the challenges of software development is anticipating and dealing with the variety of environments in which
-  an application may run. For example, an application may work correctly on the developer's low latency, local network
-  but fail when it communicates across a network that requires data to be fragmented across multiple packets. In this
-  case, the application was likely written to expect complete messages in a single packet when it should have been
-  written to handle fragmentation, a common phenomenon. These types of failures are difficult anticipate and test for
-  without deploying the application to each target environment. This paper introduces CrashSimulator, a tool designed to
-  determine whether or not an application can handle these, and other, unanticipated conditions as part of the
-  application's normal testing process.  This is accomplished in two steps. In the first step, system call traces are
-  recorded for applications running in the ``problematic'' environment. These system call traces are analyzed and
-  anomalous system call behaviors are identified. These anomalies are encoded as deterministic computational models. In
-  the second step, the an execution of the application under test is evaluated using these models in order to determine
-  whether or not the application correctly handles the anomalous condition.  In this way, CrashSimulator allows the
-  application to be tested as if it were running in one or more of the environments from which anomalous traces were
-  collected. As a result, the developer is made aware of deficiencies in the application that may result in it operating
-  incorrectly in the environment from which the anomalous traces were taken. CrashSimulator was used to analyze
-  \emph{<<somenumber>>} commonly used open and closed source applications. Its Findingsfindings were compared to tickets
-  listed in the bug tracking suites of these applications.  It was able to successfully identify \emph{<<somenumber>>} of
-  bugs listed in these suites and \emph{<<someothernumber>>} of bugs that had not yet been discovered.
+  One of the challenges of software development is anticipating and dealing with the variety of environments in which an
+  application may run.  This work introduces CrashSimulator, a tool that identifies incorrect application behavior that
+  arises as a result of unhandled environmental conditions.  CrashSimulator replays system call traces recorded from the
+  application under test as a means to monitor and control execution.  During these replay executions, CrashSimulator
+  classifies application behavior as either correct or incorrect based on computational models that encode system call
+  sequences indicative of bad behavior. This process allows CrashSimulator to use incorrect behavior identified in one
+  application running in one environment as a ``test case'' that determines whether another application in a different
+  environment is making the same mistake.  By testing an application against a series of these ``test cases'',
+  CrashSimulator is able to give an application's developers an idea of how the application will respond were it to be
+  deployed and executed in the environment from which the ``test cases'' were generated.''
 
 \end{abstract}
