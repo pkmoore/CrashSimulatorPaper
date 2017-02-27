@@ -89,3 +89,29 @@ correctly.
 This situation is present in most other testing strategies. It is difficult, if not impossible, to generate a test or
 suite of tests that absolutely proves the correctness of a program. Tests are able to show that a program perfroms a
 specific bad behavior in a specific situation. 
+
+
+This allows CrashSimulator to find environment-related bugs in two ways.  First, CrashSimulator can passively observe
+the system calls being made during a replay execution and identify sequences of system calls that are know to be
+indactive of incorrect behavior.  Second, CrashSimulator can interrupt an interesting system call and modify its results
+and side effects in order to direct execution down a particular path that needs to be tested.
+
+CrashSimulator depends on two capabilities in order for its bug finding strategy to work.  The first is encoding bad
+system call patterns as deterministic computation models.  Encoding behavior in this way allows CrashSimulator to
+identify make an assessment about whether the application has responded to a particular environmental condition
+correctly.  For example, in Linux moving a file requires two different processes depending on whether or not the file is
+being moved across storage devices.  The case where a file is being moved from one storage device to another requires
+that the application performing the move manually re-apply the files permissions.  There is a sequence of system calls
+that identify whether or not this action has taken place.  By using a state machine that accepts executions where this
+this sequence takes place and rejects executions where it doesn't, CrashSimulator can decide whether this aspect of of
+the move happened or not.
+
+The second capability is the ability replay a recording of the application under test's system call behavior.  This
+capability is primarily useful in cases where CrashSimulator must manipulate execution in order to test some aspect of
+an application but it also provides key advantages from a usability perspective.  Replaying a system call trace involves
+executing the application under test and pairing the system calls it makes up with corresponding system calls from a
+previously recorded trace.  Instead of letting these system calls be carried out by the kernel, CrashSimulator steps in
+and replicates the results and side effects that are present in the system call trace.  In this way, CrashSimulator
+insures that the execution follows the same path as is represented in the trace.  By extension, this means that
+modifications to the system call trace are reflected in the replay execution of the application under trace.  In this
+way, CrashSimulator can inject unexpected conditions into the applications execution in order to see how it responds.
