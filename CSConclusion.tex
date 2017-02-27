@@ -1,29 +1,24 @@
 \section{Conclusion}
 
-Minimizing the number of faults present in the applications they write is a key concern for software developers.  A
-number of automated testing techniques have been created in order to meet this goal.  The most sophisticated of these
-existing techniques focus on either analyzing an applications source code or machine code in order to gain an
-understanding of the inputs required to exercise an applications code paths and then exercising them with the goal of
-exposing faults.  These techniques focus on the application itself to the neglect of the application's environment which
-can be a source of numerous faults that cannot be identified by testing the application in isolation.  To combat this
-problem this work presents CrashSimulator, a tool that utilizes replay of system call traces in order to facilitate the
+Minimizing the number of faults present in the applications they write is a key concern for software developers.  An
+under-represented source of faults are the interactions between an application and its environment.  To combat this
+problem, this work presented CrashSimulator, a tool that utilizes replay of system call traces in order to facilitate the
 injection of environment-based faults into the application for testing purposes.
 
-CrashSimulator's focus on bugs that can occur at the interace between an appication and its environment allow it to fill
-a gap in the landscape of existing testing techniques.  CrashSimulator can supplement existing testing processes for an
-application by providing additional ``unit tests'' that cover areas that are often missed.
+CrashSimulator's key features, operating on system calls and analysis of replayed executions allow it to identify bugs
+that fall outside of the application itself.  Performing its analysis on a replayed execution of an application allows
+CrashSimulator to remove the filesystem and network dependancies of the application under test.  This means
+CrashSimulator can execute and test an application on one system as if it were running on another system.  Additionally,
+it provides an interface for CrashSimulator to manipulate the execution in order to direct an application down
+testing-relevant code paths.  Finally, view of execution that can be consumed by computational models that can classify
+whether or not an application has behaved correctly in some situation.
 
-CrashSimulator's key features, operating on system calls and analysis of replayed executions set it apart from other
-tools in the space.  By operating at the system call level CrashSimulator is able to avoid the complexities around
-language specific processing while still having a level of control not present in tools that generate inputs in a
-blackbox fashion.  CrashSimulator's method of testing using replayed execution is novel and provides a few unique
-opportunities.  Performing its analysis on a replayed execution of an application allows CrashSimulator to remove the
-filesystem, network, etc. dependancies of the application under test allowing removing many of the complications of
-testing applications across different environments.  It also allows CrashSimulator to easily influence execution in ways
-that are advantageous for testing.
+Encoding bad behavior as computational models provides a generic ``signature'' for that behavior.  This signature is
+portable across applications.  This means that a set, or suite, of signatures can be collected from any existing
+application for use in testing any other new or existing application.  In this way, an ever-expanding ``test suite'' can
+be created allowing learnings from one application to benefit others.
 
-We have shown that CrashSimulator is able to find a class of bugs that is often neglected.  The ability to take bugs
-from a variety of sources, transform them into generic computational models, and use them to analyze the execution of a
-variety of applications showed that the same sorts of mistakes were being made across many different projects.
-Specifically, CrashSimulator found bugs in Python's shutils, mmv............ Additionally, CrashSimulator found bugs
-from a different class in gpg........
+We have shown CrashSimulator's approach to be successful by identifying bugs, both previously known and unknown, in
+existing popular applications.  These bugs were identified using knowledge gained from how one application correctly
+performs a particular operation (namely, copying a file across disks) by encoding that knowledge as computational models
+and allowing these models to analyze replayed executions of the other listed applications.
