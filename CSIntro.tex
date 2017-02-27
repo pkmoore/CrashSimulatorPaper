@@ -1,16 +1,58 @@
 \section{Introduction}
 
+\tw{In general: try to reuse elements of the proposal (in particular
+  from the intro). We don't have to write everything from scratch.}
+
 One major hurdle in developing robust applications is getting them to run reliably across all of the environments on
 which they may be installed.  In an increasingly diverse software ecosystem it is not uncommon for problematic
 differences to appear between these environments.  Whether it happens because of a lack of adherence to standards or
 developer error, the result is the same: software written to run in multiple environments falls victim to the
 differences between those environments.  These can easily go unnoticed due to the infeasibility of testing software
-across every combination of hardware and software on which it is expected to run.
+across every combination of hardware and software on which it is
+expected to run. \tw{We can mention the ClusterHQ survey that we cite
+  in the proposal. Also, it would be good to be more specific. Give a
+  concrete example of the kind of bugs we are after. Perhaps use the
+  file move example that you talk about later in this section.}.
 
-This is a problem area that is largely unexplored.  The most popular testing methodologies today are various flavors of
-test suites or analysis tools that have one thing in common -- they primarily focus on, and are most effective at,
-ensuring that an applications code is correct internally.  CrashSimulator has a different focus.  Its goal is to give
-identify bugs that appear as a result of the communication between an application and its environment.
+This is a problem area that is largely unexplored.  The most popular
+testing methodologies today are various flavors of test suites or
+analysis tools that have one thing in common \tw{This is not
+  true. See, e.g., work on stub injection. Making such claims will get
+  us rejected right away. We need a nuanced discussion of related work
+  here (with citations). The discussion does not have to be as
+  detailed as the related work section, but we have to cover enough
+  ground to highlight what is lacking in existing approaches and how
+  this paper improves upon them.} -- they primarily focus on, and
+are most effective at, ensuring that an applications code is correct
+internally.\tw{At this point, I don't know, yet, what CrashSimulator
+  is. I suggest to talk about CrashSimulator only when you talk about
+  the implementation and evaluation. The paper is about a set of ideas
+  and techniques that transcend the specific implementation. We want
+  to highlight these ideas and techniques.} CrashSimulator has a
+different focus.  Its goal is to give identify bugs that appear as a
+result of the communication between an application and its
+environment.
+
+\tw{As I mentioned, there are other approaches that do that. We have
+  to be more specific about what is new here. Whereas existing work
+  focuses on reasoning about individual environment interactions
+  (i.e., isolated system calls), CrashSimulator aims to detect more
+  complex bugs in an application's implementation of \emph{environment
+    protocols}. By environment protocol I mean a sequence of
+  interactions between application and environment that need to be
+  performed in order to achieve a specific goal (e.g., move a
+  file). Think of the automata we were talking about earlier as a way
+  of expressing these protocols. Detecting bugs in implementations of
+  these protocols requires the tracking of multiple consecutive
+  environment interactions as well as how the protocol state changes
+  throughout these interactions.}
+
+\tw{The following discussion jumps back and forth between what
+  CrashSimulator aims to do and how it does it. Please keep these
+  discussions separate. Start with the 'what' (i.e., the functionality
+  that the tool provides) and then talk about the 'how' (i.e. the
+  general idea of system call trace replay/perturbation, what are the
+  main technical challenges and how do we solve them.}
 
 CrashSimulator achieves this goal by analyzing and manipulating the execution of the application being tested.
 Specifically, CrashSimulator ``replays'' a previously recorded system call trace of the application being tested and
@@ -42,6 +84,9 @@ insures that the execution follows the same path as is represented in the trace.
 modifications to the system call trace are reflected in the replay execution of the application under trace.  In this
 way, CrashSimulator can inject unexpected conditions into the applications execution in order to see how it responds.
 
+\tw{The following points should be made much earlier as they describe
+  the purpose of the tool rather than how it functions.}
+
 From a usability perspective, the above provides a repeatable way to inject anomalous behavior into executions of any
 application that needs to be tested.  Essentially, a ``test suite'' of interesting injectable environment conditions can
 be accumulated from work across some number projects and applied across another project that needs to be tested.  When
@@ -52,15 +97,36 @@ is effectively executing the application inside a simulation of that environment
 this way, CrashSimulator is able to give developers a sense of how an application will perform in that evironment so
 that they can construct to deal with the enviroment correctly.
 
+\tw{We want to first highlight the contributions as they pertain to
+  the general ideas and techniques presented in the paper, not just
+  those that are specific to the tool. Then we talk about the tool and
+  its evaluation in a separate paragraph. This paragraph should
+  include the code words that communicate the badassery of the tool
+  (tons of new bugs found in programs that people care about, super
+  scalable, etc.)}
+
 CrashSimulator makes the following contributions:
 
     \begin{enumerate}
         \item{CrashSimulator is the first tool to use system call traces recorded in one environment as a basis for
-            injecting faults into an application running in another environment.}
+            injecting faults into an application running in another
+            environment. \tw{Why should I care about the fact that it
+              uses system call trace? This leaves open the possibility
+            that there are other tools that achieve the same goal by
+            other means.}}
         \item{CrashSimulator is the first tool to replay previously recorded system call traces in order find bugs by
-            monitoring and manipulating the execution of an application.}
+            monitoring and manipulating the execution of an
+            application. \tw{Again, why should I care about how it is done?}}
         \item{CrashSimulator is able to reliably identify faults that result from differences between the environments
-            in which it is expected to run.}
+            in which it is expected to run. \tw{This belongs into a
+              summary of the evaluation and should be supported by
+              concrete data.}}
         \item{CrashSimulator's efficacy can be validated by its ability to identify bugs, both previously known and
-            unknown, in major application.}
+            unknown, in major application. \tw{Again, this goes to
+              eval summary.}}
     \end{enumerate}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "CrashSimulator"
+%%% End: 
