@@ -1,0 +1,38 @@
+\ProvidesPackage{peanutgallery}
+
+\definecolor{darkgreen}{rgb}{0,0.75,0}
+
+\newcommand{\textred}[1]{\textcolor{red}{#1}}
+\ifx\noeditingmarks\undefined
+   \newcommand{\pgwrapper}[3]{\begingroup \color{#1}{#2}: {#3}\endgroup}
+   \newcommand{\pgwrapperb}[1]{\textbf{#1}}
+   \newcommand{\dangerwrapper}[1]{{\color{red}#1}}
+\else
+   \newcommand{\pgwrapperb}[1]{}
+   \newcommand{\pgwrapper}[3]{}
+   \newcommand{\dangerwrapper}[1]{}
+\fi
+
+\definecolor{darkgreen}{rgb}{0,0.65,0}
+\newcommand{\tw}[1]{\pgwrapper{red}{TW}{#1}}
+
+\def\hn{\sffamily\selectfont}
+\newcommand{\mpfont}{\hn\scriptsize}
+
+\ifx\noeditingmarks\undefined
+    \newcommand{\MPworker}[2]{\unskip{\color{#1}\vrule\vrule}{\marginpar{\raggedright\color{#1}\mpfont #2}}}
+\else
+    \newcommand{\MPworker}[2]{\unskip}
+\fi
+
+\newcommand{\TW}[1]{\MPworker{red}{TW: #1}}
+
+\ifx\noeditingmarks\undefined
+    \newcommand{\changebars}[2]{%
+    [{\color{magenta}\em\begingroup{#1}\endgroup}][{\color{magenta}\sout{#2}}]}
+\else
+    \newcommand{\changebars}[2]{#1}
+\fi
+
+\newcommand{\changebarsii}[2]{#1}
+
