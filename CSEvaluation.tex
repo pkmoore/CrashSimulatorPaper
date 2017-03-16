@@ -110,7 +110,8 @@
         destination device, consuming available memory, or simply hanging indefinitely as it attempts to read in the
         full contents of an effectively infinite-sized file.
 
-            \begin{table}[t]
+\begin{figure*}[t]
+ %           \begin{table}%[t]
                 \scriptsize{}
                 \begin{tabular}{l l l l l l | l}
                 \toprule{}
@@ -123,7 +124,8 @@
                   Move Block Device Across Disks & Yes & Yes & Yes & No & No & Injected\\
                 \bottomrule{}
                 \end{tabular}
-            \end{table}
+ %           \end{table}
+\end{figure*}
 
         \subsubsection{Non-Regular File Bugs}
 
@@ -134,7 +136,7 @@
         files tends to induce a denial of service condition that in certain circumstances, such as an automated
         environment, can halt a scripted process or workflow.
 
-            \begin{table}[H]
+            \begin{table*}[t]
                 \scriptsize{}
                 \begin{tabular}{l  l  l  | l}
                 \toprule{}
@@ -145,7 +147,7 @@
                   wget & Inject S\_ICHR as file type in stat64() & \textbf{no}, attempts open as regular file & Active\\
                 \bottomrule{}
                 \end{tabular}
-            \end{table}
+            \end{table*}
 
 
     \subsection{Limitations}
