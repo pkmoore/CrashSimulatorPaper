@@ -3,9 +3,29 @@
     This work hopes to answer the following questions about CrashSimulator's operation:
 
         \begin{enumerate}
-            \item{Is CrashSimulator successful in identifying flaws in new and existing applications?}
+            %% First cut at questions
+            \item{Is CrashSimulator successful in identifying previously-unknown flaws in existing applications?}
+            \item{Can CrashSimulator's efficacy be shown through identifying known bugs in existing applications?}
             \item{Is CrashSimulator able to execute tests in a performant manner?}
+            \item{What type of bugs is CrashSimulator able to identify?}
+            \item{Are there types of bugs that CrashSimulator is not able to identify?}
+            \item{What technical limitations are present in this implementation of CrashSimulator}
+            \item{How can CrashSimulator deal with false positives}
         \end{enumerate}
+
+    \subsection{Experimental Setup}
+
+    CrashSimulator was implemented in a combination of Python 2 and C.  Evaluations were performed using Ubuntu Linux
+    15.04 with several modifications put in place to allow CrashSimulator to operate correctly. First, because
+    CrashSimulator relies on an application's memory layout being the same across repeated executions, address space
+    layout randomization must be disabled.  Second, the kernel's virtual dynamic shared object feature must be
+    disabled.  This feature allows certain kernel data items (timestamps, kernel version information, etc.) to be stored
+    in user space.  When the system calls that retrieve this information are made by an application they are instead
+    intercepted and handled in user space -- a behavior that would preclude CrashSimulator from being able to interact
+    with these calls.  Finally, a 32-bit Linux kernel and supporting environment were chosen.  While CrashSimulator
+    could have been implemented on either a 32-bit kernel or a 64-bit kernel such a goal would have resulted in a great
+    deal of duplicated effort around dealing with the low level differences between these two kernel versions.
+    \emph{I've got a lot more I could talk about here but I'm not sure what info normally goes into this section}
 
     \subsection{Execution Performance}
 
@@ -16,7 +36,7 @@
 
         \subsubsection{Evaluation Against Sample Programs}
 
-        Each of the following evaluations eamines the completion times for 20 consecurive executions of the specified
+        Each of the following evaluations eamines the completion times for 20 consecutive executions of the specified
         application in both native and replay execution modes.  Multiple conseuritve executions were used for two
         reasons.  First, a single execution in either mode completes so quickly for the applications in question as to
         be nearly indistinguishable from the other mode.  Second, multiple executions somewhat contros for varying
@@ -29,21 +49,30 @@
                         Execution Description & Native Eecution & Replay Execution\\
                         network\_speedtest & 0.024 & 2.407 \\
                         filesystem\_speedtest & 0.038 & 2.604 \\
-                        mv file across disks & 0.016 & 2.995 \\
+                        mv (cross-disk file move) & 0.016 & 2.995 \\
                     \bottomrule{}
                 \end{tabular}
             \end{table}
 
         \paragraph{Discussion on network\_speedtest}
 
-        Sample application opens a TCP connection toan already running listener (netcat), sends a message, and
+        Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
         exits. For simple applications like this, native execution is significantly faster than replay execution...
 
         \paragraph{Discussion on filesystem\_speedtest}
 
-        This ample application create a new file with open(), writes a message to it, closes the file descriptor, and
+        This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
         exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
         all sorts of applications in Linux...
+
+        \paragraph{Discussion on mv}
+
+        In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
+          mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
+        replay this operation in a similar time period to the time in which it is able to replay the dramatically
+        simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
+        increase replay time.
+
             
     \subsection{Bugs Identified in Major Applications}
 
@@ -78,7 +107,8 @@
         In this condition, CrashSimulator confirms whether or not the application under test performs a check to ensure
         that the source file name is not a symlink pointing to the destination file name.  If this check is not
         performed, loss of data is possible due to removal or overwriting of the destination during the copy process
-        resulting in the source symlink pointing to nothing.
+        resulting in the source symlink pointing to nothing. \emph{!!!! This is likely one that we would have trouble
+          detecting based only on system call behavior}
 
         \paragraph{Preserve Extended File Attributes}
 
@@ -88,27 +118,31 @@
         providance of the file (i.e. downloaded from the internet, received from an trusted vendor, etc.).  Loss of
         these attributes can result in security issues. For example, Apple's Gatekeeper relies on extended file
         attributes to prevent applications downloaded untrusted developers from being executed without user
-        confirmation.
+        confirmation. \emph{Detect passively by monitoring a trace of cross-device copy}
+
 
         \paragraph{Ensure Source is not Replaced Between Check and Copy}
 
         This is an example of a classic race condition.  In this case, CrashSimulator examines whether or not the
         appication under test makes uses of fstat() to ensure that the inode number of the file being copied has not
-        changed between initial examination with a stat()-like call and the eventual copy.  
+        changed between initial examination with a stat()-like call and the eventual copy. \emph{Detect passively by
+          monitoring a trace of cross-device copy}
 
         \paragraph{Preserve Timestamp and Mode}
 
         Truely copying a file means preserving the metadata of the file as well as its contents.  In this condition,
         CrashSimulator ascertains whether or not the application under test restores the appropriate timestamps and
-        modeline to the destination file after (or before) its contents have been copied. 
+        modeline to the destination file after (or before) its contents have been copied. \emph{Detect passively by
+          monitoring a trace of cross-device copy}
 
-        \paragraph{Move Block Device Across Disks}
+        \paragraph{Move Infinite Character Device Across Disks}
 
         Many applications fail to examine the nature of a file before engaging in a manual, cross-disk copy process.  In
         situations where the source is a special file such as /dev/urandom.  If an application fails to detect this
         situation, the typical steps in a manual copy process could result in the application filling the destination
-        destination device, consuming available memory, or simply hanging indefinitely as it attempts to read in the
-        full contents of an effectively infinite-sized file.
+        device, consuming available memory, or simply hanging indefinitely as it attempts to read in the full contents
+        of an effectively infinite-sized file. \emph{Detect actively by injecting st_mode=S_IFCHR, or passively by
+          monitoring trace where an actual /dev/urandom copy is attempted -Preston}
 
 \begin{figure*}[t]
  %           \begin{table}%[t]
@@ -130,25 +164,92 @@
         \subsubsection{Non-Regular File Bugs}
 
         These bugs involve modifying the executions of applications that work with regular files such that a call to
-        {\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well behaved
-        applications should verify that the files they are accessing are regular files before processing them.  Many
-        applications make the assumption that they will only be used to process regular files.  Encountering special
-        files tends to induce a denial of service condition that in certain circumstances, such as an automated
-        environment, can halt a scripted process or workflow.
+        {\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well
+        behaved applications should verify that the files they are accessing are regular files before processing them.
+        Many applications make the assumption that they will only be used to process regular files.  Encountering
+        special files tends to induce a denial of service condition that in certain circumstances, such as an automated
+        environment, can halt a scripted process or workflow.  The applications below were chosen either because of
+        their widespread use (as is the case with vim, nano, sed, and gnu-gpg) or their presence in the GNU Coreutils
+        package.  When selecting applications for this work applications with non-trivial file manipulation and data
+        processing were chosen.  Applications that acted only as a dumb wrapper around some operating system
+        functionality were not examined.
 
             \begin{table*}[t]
                 \scriptsize{}
                 \begin{tabular}{l  l  l  | l}
                 \toprule{}
-                  Application & Condition Tested & Correct Response & Mode\\
-                  gnu-gpg & Import link to /dev/urandom as key file & \textbf{no}, application hangs & Passive\\
-                  vim & Inject S\_IFIFO as file type in stat64 call & \textbf{no}, attempts open as regular file & Active\\
-                  nano & Inject S\_IFIFO as file type in stat64() call & \textbf{no}, attempts open as regular file & Active\\
-                  wget & Inject S\_ICHR as file type in stat64() & \textbf{no}, attempts open as regular file & Active\\
+                  Application & Condition Tested           & S_IFREG        & S_IFDIR        & S_IFCHR     & S_IFBLK    & S_FIFO      & S_IFLNK    & S_IFSOCK\\
+                  Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+                  Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+                  gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+                  vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
+                  nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
+                  sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+                  df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
+                  wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+                  du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+                  install     & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
+                  fmt         & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+                  od          & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+                  ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+                  comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+                  pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
                 \bottomrule{}
                 \end{tabular}
             \end{table*}
 
+    \subsection{Dealing with False Positives}
+
+    A the primary source of false positives for CrashSimulator is an application using a different sequence of system
+    calls than a checker was anticipating to implement a given operation.  Fortuantely, CrashSimulator's approach allows
+    these situations to be easily corrected once identified.
+
+    In many cases a given operation can performed in several ways.  This means that a given operation may be correctly
+    implemented by a set of system call sequences that differ from each other on a variety of dimensions.  In order to
+    correctly classify applications that make use of alternative methods for a given operation the compuational models
+    CrashSimulator relies on must accept the associated alternative system call sequences.
+
+    As an example consider GNOME's glib file handling facilties.  When an application makes use of these facilities to move
+    a file across storage devices the library itself correctly handles the above behaviors we definied earlier as making up
+    a "correct" file move operation.  When we used CrashSimulator to analyze a minimal application using glib to perform
+    this operation we initially received failing results.  We found through manual examination of a the system call trace
+    used in this analysis that, while glib correctly performs the required behaviors, it does so using alternative system
+    call sequences.  For example, the typical way to move the actual contents of a file from one file to another is to {\tt
+      read()} the data from the source file and {\tt write()} the data back out to the destination file.  Glib instead
+    creates a pipe and uses the {\tt splice()} system call to copy the contents out of the source file, through the pipe,
+    and into the destination file.
+
+    This approach is viable because there are a finite number of system calls, and a given operation can be mapped to a
+    managable subset of system calls.  Given the above example around moving files, consider the following mapping from
+    high level ``operation'' to the set of system calls that can implement it.
+
+        \begin{table*}[t]
+            \scriptsize{}
+            \begin{tabular}{l | l }
+            \toprule{}
+              Operation                                               & Potential System calls\\
+              Examine source file                                     & stat64(), lstat64(), fstat64()\\
+              Examine destination file                                & stat64(), lstat64(), fstat64()\\
+              Open source file                                        & open()\\
+              Read contents of source file                            & read(), splice() with a pipe\\
+              List source file's extended file attributes             & listxattr(), llistxattr(), flistxattr()\\
+              Read contents of source file's extended file attributes & getxattr(), lgetxattr(), fgetxattr()\\
+              Open destination file                                   & open(), optionally unlink() the file first\\
+              Write contents to destination file                      & write(), splice() with a pipe\\
+              Apply extended file attributes to destination file      & setxattr(), lsetxattr(), fsetxattr()\\
+              Apply proper timestamps to destination file             & utimens(), futimens()\\
+              Apply proper permissions to destination file            & chmod()\\
+              Close the source file                                   & close()\\
+              Close the destination file                              & close()\\
+
+              
+            \bottomrule{}
+            \end{tabular}
+        \end{table*}
+
+    
+   In situations where two system call sequences can correctly implement the same operation CrashSimulator simply runs
+   two computational models in parallel and accepts the execution if either model ends in an accepting condition. 
 
     \subsection{Limitations}
 
@@ -180,3 +281,18 @@
         passed into a system call and all data returned from the system call either as a return value or as some block
         of memory written into the calling process's memory.  It is possible that some system call tracing tools do not
         support this level of detail.
+
+        \paragraph{Bugs Outside the View of CrashSimulator}
+
+        CrashSimulator is not able to detect bugs that do not result from or have a visible effect on the system calls
+        an application makes.  An example of this situation exposed during work on this evaluation is applications
+        mishandling a situation around file moves where the where, due to a strange volume mounting arrangement, the
+        source directory is moved into itself.  In order to detect this situation the application must make an effort to
+        gather the full path of both the source and destination and compare them.  While CrashSimulator is able to
+        observe some aspects of the ``gathering'' process (i.e. the stat() or lstat() calls) it is not able to observe
+        whether a proper comparison takes place.  As a result, the best a CrashSimulator checker could do in this
+        situation is observe a lack of gathering-related system calls and issue a warning that the issue might be
+        present.  \emph{CrashSimulator could detect this issue during a specially crafted execution which replays a
+          trace recorded where the issue was present.  I'm not sure how useful this would be as presumably the while
+          recording the trace the user would be able to directly observe whether things happened correctly or not}
+        % Maybe discuss this as related work
