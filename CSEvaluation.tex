@@ -135,8 +135,50 @@
             issue in replayed executions of python applications that make use of these functions by identifying the
             applications failure to use {\tt fstat()} to verify that a file has not changed between the time the file was
             first checked with {\tt stat()} and when it was open()'d at the start of the copy process.
-        
 
+            \paragraph{Slowloris-Style Attacks on wget}
+
+            CrashSimulator is not limited to detecting filesystem-based bugs.  Another area in which CrashSimulator has
+            shown promising results is identifying bugs around network communications.  At the system call level, most
+            applications follow a similar pattern for dealing with network communications.  Specifically, they use some
+            sort of a looping construct repeat two actions: they wait for data to be available from the network with
+            either a call to {\tt poll()} or a call to {\tt select()} and then they read the data into a userspace
+            buffer using a system call.  A key aspect of this approach is detecting when the user should be notified of
+            an issue because too much time has passed during the ``waiting'' step.  To this end, both poll() and
+            select() allow developers to specify a timeout value after which the system calls return an error code with
+            the expectation that developers will supply a reasonable wait period for the application.
+
+            This approach falls apart in situations where developers specify timeout values that are much longer than is
+            reasonable.  This is an issue that CrashSimulator can expose.  As an example, consider {\tt wget}.  Its
+            primary data reception loop relies on a select() call to identify when data is available to be read.  This
+            {\tt select()} call is given a timeout value of 899 seconds -- a value one second short of Linux's default
+            maximum TCP connection timeout value.  It can be argued that if something close to this timeout value
+            occurrs during even one iteration of {\tt wget's} reception loop the user has experienced an adverse
+            execution.  Taking this to the extreme, CrashSimulator is able to inject conditions where \emph{every}
+            iteration of the loop takes just under the maximum timeout value -- a secnario that, should it occur in the
+            real world, would clearly be perceieved by the user as a bad execution.
+
+            As in other instances, CrashSimulator can make claims about whether an application is vulnerable to this
+            sort of situation by injecting these large timeout values and observing whether or not the application takes
+            any action.  Addionally, by properly manipulating all time-returning calls, CrashSimulator can simulate an
+            execution where close to the maximum timeout value occurred in each iteration nearly instantly.
+
+            This situation has effectively exploited in the wild.  The {\tt slowloris} tool allowed a single attacking
+            host to successfully denial of service a vulnerable web server with minimal bandwidth usage.  This attack
+            worked by introducing delays between the time headers were sent to the victim by an attacking HTTP client.
+            Because many web servers at the time allowed large, monitored timeouts between messages from the clients
+            they were communicating with, one web client could effectively tie up the resources of a web server for a
+            long period of time.
+
+            As discussed above, the version of wget we examined is vulnerable to this sort of attack from the other
+            direction.  Consider a malicious web server that monitors connecting clients with the goal of specifically
+            targeting {\tt wget}.  When it sees a connection from {\tt wget} it begins a reply process where messages
+            are only sent every 800 seconds (remember that {\tt wget's} default timeout value is 899 seconds.  If {\tt
+              wget} is not being actively monitored its transaction would take hours to complete.  This is particularly
+            dangerous in situations where {\tt wget} is being run as a scheduled job.  It is very likely that future
+            iterations of the job could be kicked off before the intitial job completes.  At best there are now multiple
+            iterations of the job conflicting with one another.  At worst, there could be a slow buildup of unending or
+            long lived jobs consuming resources and causing deterimental system behavior.
 
     \subsection{Execution Performance - Is CrashSimulator Performant}
 
