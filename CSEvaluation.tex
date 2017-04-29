@@ -4,9 +4,13 @@
 To evaluate CrashSimulator, we implemented a prototype in XXX LOC of Python 2 
 and XXX LOC of C \cappos{fix, using SLOCCOUNT}.  For a test
 environment, we chose Ubuntu Linux 15.04 with a 32 bit kernel on i686 hardware.
-We ran the tests on a XXX system with 8GB of RAM and ...? \cappos{fix}  
+We ran the tests on a XXX system with 8GB of RAM and ...? \cappos{fix}  Our
+implementation used {\tt ptrace} to interpose on the running program and
+interject anomalies into traces.
 We did not handle threaded programs and disabled ASLR and vDSO to make replay 
-easier.  As far as we are aware, none of these choices influenced our findings.
+easier.  As far as we are aware, none of these choices influenced the bugs
+that CrashSimulator would find.  The only major difference we are aware of 
+is its performance.
 Given appropriate anomaly information, our implementation of CrashSimulator can
 test for anomalies that exist in other platforms and environments.  
 
@@ -14,12 +18,11 @@ test for anomalies that exist in other platforms and environments.
 Using this prototype, we answer the following questions about CrashSimulator:
 
 \begin{enumerate}
-   \item{Can CrashSimulator identify flaws in applications?}
-%   \item{Can CrashSimulator's efficacy be shown through identifying known bugs in existing applications?}
+   \item{Do environmental bugs exist in widely used applications?}
+   \item{Can CrashSimulator identify complex anomalies?}
+   \item{What types of bugs could not be found using CrashSimulator?}
+   \item{How can CrashSimulator deal with false positives?}
    \item{Is CrashSimulator able to execute tests in a performant manner?}
-   \item{What type of bugs is CrashSimulator able to identify?}
-   \item{Are there types of bugs that CrashSimulator is not able to identify?}
-   \item{How can CrashSimulator deal with false positives}
 \end{enumerate}
 
 
@@ -71,12 +74,151 @@ Using this prototype, we answer the following questions about CrashSimulator:
 
 
 
+\subsection{Do environmental bugs \cappos{Is "environmental bugs" the right
+term?} exist in widely used applications?}
 
-\subsection{Bugs Identified in Major Applications}
+Our first question focuses on whether there are any bugs of the sort that
+CrashSimulator can find in popular applications.  To do this, we 
+chose several simple anomalies that could be tested in a large
+array of programs.  We chose two simple anomalies (one file system
+related and one network related) that had the potential to appear in
+many programs.  CrashSiulator was run on the XXX most popular Debian
+packages (ignoring multi-threaded programs and libraries that could not be 
+directly run), according to popularity contest \cappos{fix}.
+The purpose is to see whether CrashSimulator can be useful
+for finding at least some environmental bugs in widely used software.
 
-\subsubsection{Identification of Unknown Bugs - Can CrashSimulator Identify Unknown Bugs}
 
-        \paragraph{Cross-Device Move Bugs}
+\paragraph{Unexpected File Type}
+These bugs involve changing an application's execution trace to emulate it 
+being provided a file type it does not expect.  For example, the {\tt du} 
+command, which displays the disk space taken to store files in a directory, 
+could be provided somethine else such as a symbolic link, a regular file, or 
+a character device instead.
+
+To inject this anomaly, CrashSimulator
+modifies the executions of applications that work with regular files such that a call to
+{\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well
+behaved applications should verify that the files they are accessing are regular files before processing them.
+Many applications make the assumption that they will only be used to process regular files.  Encountering
+special files tends to induce a denial of service condition that in certain circumstances, such as an automated
+environment, can halt a scripted process or workflow.  The applications below were chosen either because of
+their widespread use (as is the case with vim, nano, sed, and gnu-gpg) or their presence in the GNU Coreutils
+package.  When selecting applications for this work applications with non-trivial file manipulation and data
+processing were chosen.  Applications that acted only as a dumb wrapper around 
+some operating system functionality were not examined.  \cappos{Perhaps
+just do the examination and then mention that since the OS handles these
+calls, they are not as buggy.  You can either list the names in the table
+or break this out, perhaps underneath.}
+
+    \begin{table*}[t]
+        \scriptsize{}
+        \begin{tabular}{l  l  l  l  l  l  l  l  l}
+        \toprule{}
+          Application & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
+          Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+          vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
+          nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
+          sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
+          wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          install     & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
+          fmt         & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+          od          & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+          ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+        \bottomrule{}
+        \end{tabular}
+    \end{table*}
+
+\paragraph{Slowloris attack}
+\cappos{The network checking either goes here, or after the next set of
+text.  Where it goes depends on whether the conclusions are common or not.}
+
+CrashSimulator is not limited to detecting filesystem-based bugs.  Another area in which CrashSimulator has
+shown promising results is identifying bugs around network communications.  At the system call level, most
+applications follow a similar pattern for dealing with network communications.  Specifically, they use some
+sort of a looping construct repeat two actions: they wait for data to be available from the network with
+either a call to {\tt poll()} or a call to {\tt select()} and then they read the data into a userspace
+buffer using a system call.  A key aspect of this approach is detecting when the user should be notified of
+an issue because too much time has passed during the ``waiting'' step.  To this end, both poll() and
+select() allow developers to specify a timeout value after which the system calls return an error code with
+the expectation that developers will supply a reasonable wait period for the application.
+
+This approach falls apart in situations where developers specify timeout values that are much longer than is
+reasonable.  This is an issue that CrashSimulator can expose.  As an example, consider {\tt wget}.  Its
+primary data reception loop relies on a select() call to identify when data is available to be read.  This
+{\tt select()} call is given a timeout value of 899 seconds -- a value one second short of Linux's default
+maximum TCP connection timeout value.  It can be argued that if something close to this timeout value
+occurs during even one iteration of {\tt wget's} reception loop the user has experienced an adverse
+execution.  Taking this to the extreme, CrashSimulator is able to inject conditions where \emph{every}
+iteration of the loop takes just under the maximum timeout value -- a secnario that, should it occur in the
+real world, would clearly be perceieved by the user as a bad execution.
+
+As in other instances, CrashSimulator can make claims about whether an application is vulnerable to this
+sort of situation by injecting these large timeout values and observing whether or not the application takes
+any action.  Addionally, by properly manipulating all time-returning calls, CrashSimulator can simulate an
+execution where close to the maximum timeout value occurred in each iteration nearly instantly.
+
+This situation has effectively exploited in the wild.  The {\tt slowloris} tool allowed a single attacking
+host to successfully denial of service a vulnerable web server with minimal bandwidth usage.  This attack
+worked by introducing delays between the time headers were sent to the victim by an attacking HTTP client.
+Because many web servers at the time allowed large, monitored timeouts between messages from the clients
+they were communicating with, one web client could effectively tie up the resources of a web server for a
+long period of time.
+
+As discussed above, the version of wget we examined is vulnerable to this sort of attack from the other
+direction.  Consider a malicious web server that monitors connecting clients with the goal of specifically
+targeting {\tt wget}.  When it sees a connection from {\tt wget} it begins a reply process where messages
+are only sent every 800 seconds (remember that {\tt wget's} default timeout value is 899 seconds.  If {\tt
+  wget} is not being actively monitored its transaction would take hours to complete.  This is particularly
+dangerous in situations where {\tt wget} is being run as a scheduled job.  It is very likely that future
+iterations of the job could be kicked off before the intitial job completes.  At best there are now multiple
+iterations of the job conflicting with one another.  At worst, there could be a slow buildup of unending or
+long lived jobs consuming resources and causing deterimental system behavior.
+\cappos{Many more apps need to be tested.  This needs to be more general.
+It is fine if not all apps are vulnerable...}
+
+
+
+\cappos{There needs to be text here mentioning what fail means and how it
+impacts the applications.  There also needs to be some conclusions drawn
+about the apps.  Some example text follows...} Thus we see that even very 
+widely used applications are subject to failures due to unexpected file 
+types.  The only major exception is those applications like {\tt mkdir}, 
+{\tt ls}, and {\tt chown}, that are thin wrappers on system calls.  This 
+is because the operating system kernel handles error handling for those 
+calls instead of the application.
+
+
+
+
+
+
+
+
+
+
+\subsection{Can CrashSimulator identify complex anomalies?}
+
+Giventhat now we see that many applications have simple environmental bugs,
+we wanted to understand if CrashSimulator can identify more complex types
+of misbehavior that crosses many system calls.  To do this, we examined the
+way in which applications move a file.  While this can be done via the {\tt
+rename()} system call in some cases, moving files is far more complex in
+many cases.  For example, the file must be copied if moved across file
+systems, which adds additional complexity.  To come up with the correct
+system call trace, we examined the system calls made by the {\tt mv}
+command and compared the behavior of other tools.  We found that other
+tools made many errors when trying to move files.
+
+
+
+%        \paragraph{Cross-Device Move Bugs}
 
         In Linux, the rename() system call will only move a file if the source and destination are on the same device.
         This means that moving a file from a directory structure location on one storage device to a directory structure location on
@@ -128,233 +270,169 @@ Using this prototype, we answer the following questions about CrashSimulator:
         of an effectively infinite-sized file.
         %\emph{Detect actively by injecting st_mode=S\_IFCHR, or passively by monitoring trace where an actual /dev/urandom copy is attempted -Preston}
 
-        \begin{figure*}[t]
+\cappos{Please transpose the items in the table.  You'll need
+shorter namesfor the issues.  You can use the short name used in the text
+and/or refer to a number / keyword there.}
+\begin{figure*}[t]
  %           \begin{table}%[t]
-                \scriptsize{}
-                \begin{tabular}{l l l l l l | l}
-                \toprule{}
-                  Condition & mv & mmv & shutils & rust & boost::copyfile & Mode\\
-                  Verify Destination is not Target of Source & Yes & Yes & No & ??? & No & Passive\\
-                  Preserve Extended File Attributes & Yes & No & No & No & No & Passive\\
-                  File Replaced Between Check and Copy & Yes & No & No & Yes & No & Passive\\
-                  Preserve Timestamp and Mode & Yes & No & Yes & Yes & No & Passive\\
-                  Move Directory Into Itself & Yes & Yes & Yes & N/A, won't move directories & N/A, won't move directories & Passive\\
-                  Move Block Device Across Disks & Yes & Yes & Yes & No & No & Injected\\
-                \bottomrule{}
-                \end{tabular}
+        \scriptsize{}
+        \begin{tabular}{l l l l l l | l}
+        \toprule{}
+          Condition & mv & mmv & shutils & rust & boost::copyfile & Mode\\
+          Verify Destination is not Target of Source & Yes & Yes & No & ??? & No & Passive\\
+          Preserve Extended File Attributes & Yes & No & No & No & No & Passive\\
+          File Replaced Between Check and Copy & Yes & No & No & Yes & No & Passive\\
+          Preserve Timestamp and Mode & Yes & No & Yes & Yes & No & Passive\\
+          Move Directory Into Itself & Yes & Yes & Yes & N/A, won't move directories & N/A, won't move directories & Passive\\
+          Move Block Device Across Disks & Yes & Yes & Yes & No & No & Injected\\
+        \bottomrule{}
+        \end{tabular}
  %           \end{table}
-        \end{figure*}
+\end{figure*}
 
-        \subsubsection{Non-Regular File Bugs}
 
-        These bugs involve modifying the executions of applications that work with regular files such that a call to
-        {\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well
-        behaved applications should verify that the files they are accessing are regular files before processing them.
-        Many applications make the assumption that they will only be used to process regular files.  Encountering
-        special files tends to induce a denial of service condition that in certain circumstances, such as an automated
-        environment, can halt a scripted process or workflow.  The applications below were chosen either because of
-        their widespread use (as is the case with vim, nano, sed, and gnu-gpg) or their presence in the GNU Coreutils
-        package.  When selecting applications for this work applications with non-trivial file manipulation and data
-        processing were chosen.  Applications that acted only as a dumb wrapper around some operating system
-        functionality were not examined.
 
-            \begin{table*}[t]
-                \scriptsize{}
-                \begin{tabular}{l  l  l  l  l  l  l  l  l}
-                \toprule{}
-                  Application & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
-                  Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-                  Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-                  gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-                  vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
-                  nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
-                  sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-                  df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
-                  wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-                  du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-                  install     & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
-                  fmt         & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-                  od          & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-                  ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-                  comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-                  pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-                \bottomrule{}
-                \end{tabular}
-            \end{table*}
 
-        \subsubsection{Identification of Known Bugs - Can CrashSimulator Find Known Bugs}
 
-        Another way we evaluated the efficacy of CrashSimulator was on its ability to detect known bugs as recorded in
-        the bug trackers of major open source software projects.
 
-            \paragraph{Race Condition in shutil.copy, shutil.copy2, shutil.copyfile - Bug ID\# 15100}
-              
-            This bug describes a situation where the described functions in the shutil package do not perform the checks
-            necessary to prevent a race condition around the process of copying a file from one filesystem to another --
-            a situation that prevents the use of the safer {\tt rename()} system call.  CrashSimulator is able to detect this
-            issue in replayed executions of python applications that make use of these functions by identifying the
+
+\cappos{I think this should be called out in the concluding paragraph for
+this part.  }
+    \paragraph{Race Condition in shutil.copy, shutil.copy2, shutil.copyfile - Bug ID\# 15100}
+      
+    This bug describes a situation where the described functions in the shutil package do not perform the checks
+    necessary to prevent a race condition around the process of copying a file from one filesystem to another --
+    a situation that prevents the use of the safer {\tt rename()} system call.  CrashSimulator is able to detect this
+    issue in replayed executions of python applications that make use of these functions by identifying the
             applications failure to use {\tt fstat()} to verify that a file has not changed between the time the file was
             first checked with {\tt stat()} and when it was open()'d at the start of the copy process.
 
-            \paragraph{Slowloris-Style Attacks on wget}
 
-            CrashSimulator is not limited to detecting filesystem-based bugs.  Another area in which CrashSimulator has
-            shown promising results is identifying bugs around network communications.  At the system call level, most
-            applications follow a similar pattern for dealing with network communications.  Specifically, they use some
-            sort of a looping construct repeat two actions: they wait for data to be available from the network with
-            either a call to {\tt poll()} or a call to {\tt select()} and then they read the data into a userspace
-            buffer using a system call.  A key aspect of this approach is detecting when the user should be notified of
-            an issue because too much time has passed during the ``waiting'' step.  To this end, both poll() and
-            select() allow developers to specify a timeout value after which the system calls return an error code with
-            the expectation that developers will supply a reasonable wait period for the application.
 
-            This approach falls apart in situations where developers specify timeout values that are much longer than is
-            reasonable.  This is an issue that CrashSimulator can expose.  As an example, consider {\tt wget}.  Its
-            primary data reception loop relies on a select() call to identify when data is available to be read.  This
-            {\tt select()} call is given a timeout value of 899 seconds -- a value one second short of Linux's default
-            maximum TCP connection timeout value.  It can be argued that if something close to this timeout value
-            occurrs during even one iteration of {\tt wget's} reception loop the user has experienced an adverse
-            execution.  Taking this to the extreme, CrashSimulator is able to inject conditions where \emph{every}
-            iteration of the loop takes just under the maximum timeout value -- a secnario that, should it occur in the
-            real world, would clearly be perceieved by the user as a bad execution.
 
-            As in other instances, CrashSimulator can make claims about whether an application is vulnerable to this
-            sort of situation by injecting these large timeout values and observing whether or not the application takes
-            any action.  Addionally, by properly manipulating all time-returning calls, CrashSimulator can simulate an
-            execution where close to the maximum timeout value occurred in each iteration nearly instantly.
+\subsection{What types of bugs could not be found using CrashSimulator?}
 
-            This situation has effectively exploited in the wild.  The {\tt slowloris} tool allowed a single attacking
-            host to successfully denial of service a vulnerable web server with minimal bandwidth usage.  This attack
-            worked by introducing delays between the time headers were sent to the victim by an attacking HTTP client.
-            Because many web servers at the time allowed large, monitored timeouts between messages from the clients
-            they were communicating with, one web client could effectively tie up the resources of a web server for a
-            long period of time.
-
-            As discussed above, the version of wget we examined is vulnerable to this sort of attack from the other
-            direction.  Consider a malicious web server that monitors connecting clients with the goal of specifically
-            targeting {\tt wget}.  When it sees a connection from {\tt wget} it begins a reply process where messages
-            are only sent every 800 seconds (remember that {\tt wget's} default timeout value is 899 seconds.  If {\tt
-              wget} is not being actively monitored its transaction would take hours to complete.  This is particularly
-            dangerous in situations where {\tt wget} is being run as a scheduled job.  It is very likely that future
-            iterations of the job could be kicked off before the intitial job completes.  At best there are now multiple
-            iterations of the job conflicting with one another.  At worst, there could be a slow buildup of unending or
-            long lived jobs consuming resources and causing deterimental system behavior.
-
-    \subsection{Execution Performance - Is CrashSimulator Performant}
-
-        One key attribute of successful testing tools is that they be able to complete their tests in a timely manner.
-        If a tool takes too long to complete its tests users will be less likely to run it frequently, or at all,
-        reducing the tools overall usefulness dramatically. To this end, the performance of CrashSimulator was evaluated
-        in order to determine whether or not it was able to complete its test executions in an acceptable time frame.
-
-        \subsubsection{Evaluation Against Sample Programs}
-
-        Each of the following evaluations eamines the completion times for 20 consecutive executions of the specified
-        application in both native and replay execution modes.  Multiple conseuritve executions were used for two
-        reasons.  First, a single execution in either mode completes so quickly for the applications in question as to
-        be nearly indistinguishable from the other mode.  Second, multiple executions somewhat contros for varying
-        conditions like filesystem activity or network latency that can vary between individual executions.
-
-            \begin{table}[H]
-                \scriptsize{}
-                \begin{tabular}{l  l  l  l}
-                    \toprule{}
-                        Execution Description & Native Eecution & Replay Execution\\
-                        network\_speedtest & 0.024 & 2.407 \\
-                        filesystem\_speedtest & 0.038 & 2.604 \\
-                        mv (cross-disk file move) & 0.016 & 2.995 \\
-                    \bottomrule{}
-                \end{tabular}
-            \end{table}
-
-        \paragraph{Discussion on network\_speedtest}
-
-        Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
-        exits. For simple applications like this, native execution is significantly faster than replay execution...
-
-        \paragraph{Discussion on filesystem\_speedtest}
-
-        This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
-        exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
-        all sorts of applications in Linux...
-
-        \paragraph{Discussion on mv}
-
-        In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
-          mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
-        replay this operation in a similar time period to the time in which it is able to replay the dramatically
-        simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
-        increase replay time.
-
-    \subsection{What Kind of Bugs Can CrashSimulator Find}
-
-    \emph{I feel like this needs subsection needs to be here but I am not sure how to state things so that it isn't just
-      the exact opposite of what I say in the next section}
-
-    \subsection{Bugs Outside the View of CrashSimulator - What kinds of bugs can CrashSimulator not Find}
-
-    CrashSimulator is not able to detect bugs that do not result from or have a visible effect on the system calls
-    an application makes.  An example of this situation exposed during work on this evaluation is applications
-    mishandling a situation around file moves where the where, due to a strange volume mounting arrangement, the
-    source directory is moved into itself.  In order to detect this situation the application must make an effort to
-    gather the full path of both the source and destination and compare them.  While CrashSimulator is able to
-    observe some aspects of the ``gathering'' process (i.e. the stat() or lstat() calls) it is not able to observe
-    whether a proper comparison takes place.  As a result, the best a CrashSimulator checker could do in this
-    situation is observe a lack of gathering-related system calls and issue a warning that the issue might be
-    present.  \emph{CrashSimulator could detect this issue during a specially crafted execution which replays a
-        trace recorded where the issue was present.  I'm not sure how useful this would be as presumably the while
-        recording the trace the user would be able to directly observe whether things happened correctly or not}
+Due to the level at which CrashSimultaor works (the system call level), it
+is not possible to find certain types of bugs.
+CrashSimulator is not able to detect bugs that do not result from or have a visible effect on the system calls
+an application makes.  An example of this situation exposed during work on this evaluation is applications
+mishandling a situation around file moves where the where, due to a strange volume mounting arrangement, the
+source directory is moved into itself.  In order to detect this situation the application must make an effort to
+gather the full path of both the source and destination and compare them.  While CrashSimulator is able to
+observe some aspects of the ``gathering'' process (i.e. the stat() or lstat() calls) it is not able to observe
+whether a proper comparison takes place.  As a result, the best a CrashSimulator checker could do in this
+situation is observe a lack of gathering-related system calls and issue a warning that the issue might be
+present.  \emph{CrashSimulator could detect this issue during a specially crafted execution which replays a
+trace recorded where the issue was present.  I'm not sure how useful this would be as presumably the while
+recording the trace the user would be able to directly observe whether things happened correctly or not}
     % Maybe discuss this as related work
         
-    \subsection{Dealing with False Positives}
+\subsection{How can CrashSimulator deal with false positives?}
 
-    A the primary source of false positives for CrashSimulator is an application using a different sequence of system
-    calls than a checker was anticipating to implement a given operation.  Fortuantely, CrashSimulator's approach allows
-    these situations to be easily corrected once identified.
+The primary source of false positives for CrashSimulator is an application using a different sequence of system
+calls than a checker was anticipating to implement a given operation.  Fortuantely, CrashSimulator's approach allows
+these situations to be easily corrected once identified.
 
-    In many cases a given operation can performed in several ways.  This means that a given operation may be correctly
-    implemented by a set of system call sequences that differ from each other on a variety of dimensions.  In order to
-    correctly classify applications that make use of alternative methods for a given operation the compuational models
-    CrashSimulator relies on must accept the associated alternative system call sequences.
+In many cases a given operation can performed in several ways.  This means that a given operation may be correctly
+implemented by a set of system call sequences that differ from each other on a variety of dimensions.  In order to
+correctly classify applications that make use of alternative methods for a given operation the compuational models
+CrashSimulator relies on must accept the associated alternative system call sequences.
 
-    As an example consider GNOME's glib file handling facilties.  When an application makes use of these facilities to move
-    a file across storage devices the library itself correctly handles the above behaviors we definied earlier as making up
-    a "correct" file move operation.  When we used CrashSimulator to analyze a minimal application using glib to perform
-    this operation we initially received failing results.  We found through manual examination of a the system call trace
-    used in this analysis that, while glib correctly performs the required behaviors, it does so using alternative system
-    call sequences.  For example, the typical way to move the actual contents of a file from one file to another is to {\tt
-      read()} the data from the source file and {\tt write()} the data back out to the destination file.  Glib instead
-    creates a pipe and uses the {\tt splice()} system call to copy the contents out of the source file, through the pipe,
-    and into the destination file.
+As an example consider GNOME's glib file handling facilties.  When an application makes use of these facilities to move
+a file across storage devices the library itself correctly handles the above behaviors we definied earlier as making up
+a "correct" file move operation.  When we used CrashSimulator to analyze a minimal application using glib to perform
+this operation we initially received failing results.  We found through manual examination of a the system call trace
+used in this analysis that, while glib correctly performs the required behaviors, it does so using alternative system
+call sequences.  For example, the typical way to move the actual contents of a file from one file to another is to {\tt
+read()} the data from the source file and {\tt write()} the data back out to the destination file.  Glib instead
+creates a pipe and uses the {\tt splice()} system call to copy the contents out of the source file, through the pipe,
+and into the destination file.
 
-    This approach is viable because there are a finite number of system calls, and a given operation can be mapped to a
-    managable subset of system calls.  Given the above example around moving files, consider the following mapping from
-    high level ``operation'' to the set of system calls that can implement it.
+This approach is viable because there are a finite number of system calls, and a given operation can be mapped to a
+managable subset of system calls.  Given the above example around moving files, consider the following mapping from
+high level ``operation'' to the set of system calls that can implement it.
 
-        \begin{table*}[t]
-            \scriptsize{}
-            \begin{tabular}{l | l }
-            \toprule{}
-              Operation                                               & Potential System calls\\
-              Examine source file                                     & stat64(), lstat64(), fstat64()\\
-              Examine destination file                                & stat64(), lstat64(), fstat64()\\
-              Open source file                                        & open()\\
-              Read contents of source file                            & read(), splice() with a pipe\\
-              List source file's extended file attributes             & listxattr(), llistxattr(), flistxattr()\\
-              Read contents of source file's extended file attributes & getxattr(), lgetxattr(), fgetxattr()\\
-              Open destination file                                   & open(), optionally unlink() the file first\\
-              Write contents to destination file                      & write(), splice() with a pipe\\
-              Apply extended file attributes to destination file      & setxattr(), lsetxattr(), fsetxattr()\\
-              Apply proper timestamps to destination file             & utimens(), futimens()\\
-              Apply proper permissions to destination file            & chmod()\\
-              Close the source file                                   & close()\\
-              Close the destination file                              & close()\\
+\begin{table*}[t]
+    \scriptsize{}
+    \begin{tabular}{l | l }
+    \toprule{}
+      Operation                                               & Potential System calls\\
+      Examine source file                                     & stat64(), lstat64(), fstat64()\\
+      Examine destination file                                & stat64(), lstat64(), fstat64()\\
+      Open source file                                        & open()\\
+      Read contents of source file                            & read(), splice() with a pipe\\
+      List source file's extended file attributes             & listxattr(), llistxattr(), flistxattr()\\
+      Read contents of source file's extended file attributes & getxattr(), lgetxattr(), fgetxattr()\\
+      Open destination file                                   & open(), optionally unlink() the file first\\
+      Write contents to destination file                      & write(), splice() with a pipe\\
+      Apply extended file attributes to destination file      & setxattr(), lsetxattr(), fsetxattr()\\
+      Apply proper timestamps to destination file             & utimens(), futimens()\\
+      Apply proper permissions to destination file            & chmod()\\
+      Close the source file                                   & close()\\
+      Close the destination file                              & close()\\
 
               
-            \bottomrule{}
-            \end{tabular}
-        \end{table*}
+    \bottomrule{}
+    \end{tabular}
+\end{table*}
     
-   In situations where two system call sequences can correctly implement the same operation CrashSimulator simply runs
-   two computational models in parallel and accepts the execution if either model ends in an accepting condition. 
+In situations where two system call sequences can correctly implement the same operation CrashSimulator simply runs
+two computational models in parallel and accepts the execution if either model ends in an accepting condition. 
 
+
+
+\subsection{Is CrashSimulator able to execute tests in a performant manner?}
+
+One key attribute of successful testing tools is that they be able to complete their tests in a timely manner.
+If a tool takes too long to complete its tests users will be less likely to run it frequently, or at all,
+reducing the tools overall usefulness dramatically. To this end, the performance of CrashSimulator was evaluated
+in order to determine whether or not it was able to complete its test executions in an acceptable time frame.
+
+Each of the following evaluations examines the completion times for 20 consecutive executions of the specified
+application in both native and replay execution modes.  Multiple consecutive executions were used for two
+reasons.  First, a single execution in either mode completes so quickly for the applications in question as to
+be nearly indistinguishable from the other mode.  Second, multiple executions somewhat contros for varying
+conditions like filesystem activity or network latency that can vary between individual executions.
+
+    \begin{table}[H]
+        \scriptsize{}
+        \begin{tabular}{l  l  l  l}
+            \toprule{}
+                Execution Description & Native Eecution & Replay Execution\\
+                network\_speedtest & 0.024 & 2.407 \\
+                filesystem\_speedtest & 0.038 & 2.604 \\
+                mv (cross-disk file move) & 0.016 & 2.995 \\
+            \bottomrule{}
+        \end{tabular}
+        \caption{This demonstrates the average? median? \cappos{fix}
+runtime amongst 20 runs.}
+    \end{table}
+
+\paragraph{Discussion on network\_speedtest}
+
+Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
+exits. For simple applications like this, native execution is significantly faster than replay execution...
+
+\paragraph{Discussion on filesystem\_speedtest}
+
+This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
+exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
+all sorts of applications in Linux...
+
+\paragraph{Discussion on mv}
+
+In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
+  mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
+replay this operation in a similar time period to the time in which it is able to replay the dramatically
+simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
+increase replay time.
+
+
+Overall, the performance of our CrashSimulator simulator is about two orders of
+magnitude slower than executing the original program natively.  This is 
+largely due to performance problems in our (unoptimized) prototype, such as
+our utilization of {\tt ptrace} instead of more efficient mechanisms like
+{\tt eBPF} or a loadable kernel module.  With a more optimized
+implementation, we likely could be even more efficient than executing the
+commands since we only replay the command system calls and do not need to
+do other related operations such as I/O.
