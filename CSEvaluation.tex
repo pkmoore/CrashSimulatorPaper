@@ -1,20 +1,80 @@
 \section{Evaluation}
 
-    This work hopes to answer the following questions about CrashSimulator's operation:
 
-        \begin{enumerate}
-            \item{Is CrashSimulator successful in identifying previously-unknown flaws in existing applications?}
-            \item{Can CrashSimulator's efficacy be shown through identifying known bugs in existing applications?}
-            \item{Is CrashSimulator able to execute tests in a performant manner?}
-            \item{What type of bugs is CrashSimulator able to identify?}
-            \item{Are there types of bugs that CrashSimulator is not able to identify?}
-            \item{How can CrashSimulator deal with false positives}
-            \item{What technical limitations are present in this implementation of CrashSimulator}
-        \end{enumerate}
+To evaluate CrashSimulator, we implemented a prototype in XXX LOC of Python 2 
+and XXX LOC of C \cappos{fix, using SLOCCOUNT}.  For a test
+environment, we chose Ubuntu Linux 15.04 with a 32 bit kernel on i686 hardware.
+We ran the tests on a XXX system with 8GB of RAM and ...? \cappos{fix}  
+We did not handle threaded programs and disabled ASLR and vDSO to make replay 
+easier.  As far as we are aware, none of these choices influenced our findings.
+Given appropriate anomaly information, our implementation of CrashSimulator can
+test for anomalies that exist in other platforms and environments.  
 
-    \subsection{Bugs Identified in Major Applications}
 
-        \subsubsection{Identification of Unknown Bugs - Can CrashSimulator Identify Unknown Bugs}
+Using this prototype, we answer the following questions about CrashSimulator:
+
+\begin{enumerate}
+   \item{Can CrashSimulator identify flaws in applications?}
+%   \item{Can CrashSimulator's efficacy be shown through identifying known bugs in existing applications?}
+   \item{Is CrashSimulator able to execute tests in a performant manner?}
+   \item{What type of bugs is CrashSimulator able to identify?}
+   \item{Are there types of bugs that CrashSimulator is not able to identify?}
+   \item{How can CrashSimulator deal with false positives}
+\end{enumerate}
+
+
+
+%15.04 with several modifications put in place to allow CrashSimulator to operate correctly. First, because
+%CrashSimulator relies on an application's memory layout being the same across repeated executions, address space
+%layout randomization must be disabled.  Second, the kernel's virtual dynamic shared object feature must be
+%disabled.  This feature allows certain kernel data items (timestamps, kernel version information, etc.) to be stored
+%in user space.  When the system calls that retrieve this information are made by an application they are instead
+%intercepted and handled in user space -- a behavior that would preclude CrashSimulator from being able to interact
+%with these calls.  Finally, a 32-bit Linux kernel and supporting environment were chosen.  While CrashSimulator
+%could have been implemented on either a 32-bit kernel or a 64-bit kernel such a goal would have resulted in a great
+%deal of duplicated effort around dealing with the low level differences between these two kernel versions.
+%\emph{I've got a lot more I could talk about here but I'm not sure what info normally goes into this section}
+
+
+%    \subsection{Limitations - What are CrashSimulator's Technical Limitations}
+
+%The current implementation of CrashSimulator has the following limitations that could be addressed by future work.
+%
+%\paragraph{Coupling to Architecture}
+
+%As some faults injected by CrashSimulator require low level access to the test system's hardware or operating
+%system data structures there exists some degree of coupling between CrashSimulator and these components. One
+%area of expansion for CrashSimulator is support for more processor architectures and more operating systems.
+%CrashSimulator's test launcher as been designed in such a way that these improvements should be trivial to plug
+%in once they have been implemented.
+%
+%\paragraph{Multi-threaded or Multi-process Applications}
+%
+%The current implementation cannot correctly replay applications that rely on multi-threading or
+%multi-processing.  Is due to two factors.  First, the replay tool must be able to force some pre-determined
+%order onto the threads or processes in order to prevent situations where the execution portion of a replay ends
+%up requesting system calls in a different order than was recorded in the system call trace the system is
+%attempting to replay.  Second, the tool needs to be able to correctly monitor multiple processes. {\tt Ptrace}
+%may have appropriate facilities for this task but they were not explored for this version of the tool.
+%
+%\paragraph{Multi-Platform Tracing Tool}
+%
+%While there are system call tracing tools available for most of the major operating systems available today
+%there is not one tool that works across all of them.  This means that if CrashSimulator is going to be able to
+%to work with traces from a given operating system, it will require specific parsing logic for the output of the
+%tool used to record the traces.  Additionally, CrashSimulator requires that the tracing tools record all data
+%passed into a system call and all data returned from the system call either as a return value or as some block
+%of memory written into the calling process's memory.  It is possible that some system call tracing tools do not
+%support this level of detail.
+
+
+
+
+
+
+\subsection{Bugs Identified in Major Applications}
+
+\subsubsection{Identification of Unknown Bugs - Can CrashSimulator Identify Unknown Bugs}
 
         \paragraph{Cross-Device Move Bugs}
 
@@ -298,48 +358,3 @@
    In situations where two system call sequences can correctly implement the same operation CrashSimulator simply runs
    two computational models in parallel and accepts the execution if either model ends in an accepting condition. 
 
-    \subsection{Experimental Setup}
-
-    CrashSimulator was implemented in a combination of Python 2 and C.  Evaluations were performed using Ubuntu Linux
-    15.04 with several modifications put in place to allow CrashSimulator to operate correctly. First, because
-    CrashSimulator relies on an application's memory layout being the same across repeated executions, address space
-    layout randomization must be disabled.  Second, the kernel's virtual dynamic shared object feature must be
-    disabled.  This feature allows certain kernel data items (timestamps, kernel version information, etc.) to be stored
-    in user space.  When the system calls that retrieve this information are made by an application they are instead
-    intercepted and handled in user space -- a behavior that would preclude CrashSimulator from being able to interact
-    with these calls.  Finally, a 32-bit Linux kernel and supporting environment were chosen.  While CrashSimulator
-    could have been implemented on either a 32-bit kernel or a 64-bit kernel such a goal would have resulted in a great
-    deal of duplicated effort around dealing with the low level differences between these two kernel versions.
-    \emph{I've got a lot more I could talk about here but I'm not sure what info normally goes into this section}
-
-
-    \subsection{Limitations - What are CrashSimulator's Technical Limitations}
-
-        The current implementation of CrashSimulator has the following limitations that could be addressed by future work.
-
-        \paragraph{Coupling to Architecture}
-
-        As some faults injected by CrashSimulator require low level access to the test system's hardware or operating
-        system data structures there exists some degree of coupling between CrashSimulator and these components. One
-        area of expansion for CrashSimulator is support for more processor architectures and more operating systems.
-        CrashSimulator's test launcher as been designed in such a way that these improvements should be trivial to plug
-        in once they have been implemented.
-
-        \paragraph{Multi-threaded or Multi-process Applications}
-
-        The current implementation cannot correctly replay applications that rely on multi-threading or
-        multi-processing.  Is due to two factors.  First, the replay tool must be able to force some pre-determined
-        order onto the threads or processes in order to prevent situations where the execution portion of a replay ends
-        up requesting system calls in a different order than was recorded in the system call trace the system is
-        attempting to replay.  Second, the tool needs to be able to correctly monitor multiple processes. {\tt Ptrace}
-        may have appropriate facilities for this task but they were not explored for this version of the tool.
-
-        \paragraph{Multi-Platform Tracing Tool}
-
-        While there are system call tracing tools available for most of the major operating systems available today
-        there is not one tool that works across all of them.  This means that if CrashSimulator is going to be able to
-        to work with traces from a given operating system, it will require specific parsing logic for the output of the
-        tool used to record the traces.  Additionally, CrashSimulator requires that the tracing tools record all data
-        passed into a system call and all data returned from the system call either as a return value or as some block
-        of memory written into the calling process's memory.  It is possible that some system call tracing tools do not
-        support this level of detail.
