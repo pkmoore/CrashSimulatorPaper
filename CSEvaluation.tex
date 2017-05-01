@@ -1,13 +1,13 @@
 \section{Evaluation}
 
 
-To evaluate CrashSimulator, we implemented a prototype in XXX LOC of Python 2 
-and XXX LOC of C \cappos{fix, using SLOCCOUNT}.  For a test
-environment, we chose Ubuntu Linux 15.04 with a 32 bit kernel on i686 hardware.
-We ran the tests on a XXX system with 8GB of RAM and ...? \cappos{fix}  Our
+To evaluate CrashSimulator, we implemented a prototype in 5000 LOC of Python 2
+and 2600 LOC of C.  For a test
+environment, we chose a virtual install of Ubuntu Linux 15.04 with a 32 bit kernel on i686 hardware.
+We ran the tests on a core i7 system with 8GB of RAM. Our
 implementation used {\tt ptrace} to interpose on the running program and
-interject anomalies into traces.
-We did not handle threaded programs and disabled ASLR and vDSO to make replay 
+interject anomalous behavior into its execution.
+We did not handle threaded programs and disabled ASLR and the kernel's vDSO to make replay
 easier.  As far as we are aware, none of these choices influenced the bugs
 that CrashSimulator would find.  The only major difference we are aware of 
 is its performance.
@@ -74,17 +74,16 @@ Using this prototype, we answer the following questions about CrashSimulator:
 
 
 
-\subsection{Do environmental bugs \cappos{Is "environmental bugs" the right
-term?} exist in widely used applications?}
+\subsection{Do environmental bugs  exist in widely used applications?}
 
 Our first question focuses on whether there are any bugs of the sort that
 CrashSimulator can find in popular applications.  To do this, we 
 chose several simple anomalies that could be tested in a large
 array of programs.  We chose two simple anomalies (one file system
 related and one network related) that had the potential to appear in
-many programs.  CrashSiulator was run on the XXX most popular Debian
-packages (ignoring multi-threaded programs and libraries that could not be 
-directly run), according to popularity contest \cappos{fix}.
+many programs. CrashSiulator was run on 10 popular applications provided by GNU Coreutils.
+Additionally, we selected 4 popular applications based on their widespread useage
+as reported by the Debian's project's popularity contest results.
 The purpose is to see whether CrashSimulator can be useful
 for finding at least some environmental bugs in widely used software.
 
@@ -93,51 +92,72 @@ for finding at least some environmental bugs in widely used software.
 These bugs involve changing an application's execution trace to emulate it 
 being provided a file type it does not expect.  For example, the {\tt du} 
 command, which displays the disk space taken to store files in a directory, 
-could be provided somethine else such as a symbolic link, a regular file, or 
+could be provided something else such as a symbolic link, a regular file, or
 a character device instead.
 
 To inject this anomaly, CrashSimulator
 modifies the executions of applications that work with regular files such that a call to
-{\tt stat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.  Well
-behaved applications should verify that the files they are accessing are regular files before processing them.
+{\tt stat()}, {\tt fstat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.
+Well behaved applications should verify that the files they are accessing are regular files before processing them.
 Many applications make the assumption that they will only be used to process regular files.  Encountering
 special files tends to induce a denial of service condition that in certain circumstances, such as an automated
-environment, can halt a scripted process or workflow.  The applications below were chosen either because of
-their widespread use (as is the case with vim, nano, sed, and gnu-gpg) or their presence in the GNU Coreutils
-package.  When selecting applications for this work applications with non-trivial file manipulation and data
+environment, can halt a scripted process or workflow.
+When selecting applications for this work applications with non-trivial file manipulation and data
 processing were chosen.  Applications that acted only as a dumb wrapper around 
-some operating system functionality were not examined.  \cappos{Perhaps
-just do the examination and then mention that since the OS handles these
-calls, they are not as buggy.  You can either list the names in the table
-or break this out, perhaps underneath.}
+some operating system functionality were not examined.
 
     \begin{table*}[t]
         \scriptsize{}
         \begin{tabular}{l  l  l  l  l  l  l  l  l}
         \toprule{}
-          Application & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
-          Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-          Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-          gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-          vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
-          nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
-          sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-          df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
-          wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-          du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-          install     & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
-          fmt         & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-          od          & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-          ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-          comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-          pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+          Application & Longest Execution Time (Seconds) & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
+          Aspell      & .328                             & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          Aspell      & .364                             & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          gnu-gpg     & .218                             & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+          vim         & .258                             & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
+          nano        & .279                             & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
+          sed         & .567                             & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          df          & .222                             & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
+          wc          & .167                             & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          du          & 6.135                            & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          install     & .730                             & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
+          fmt         & .168                             & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+          od          & .162                             & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+          ptx         & .387                             & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+          comm        & .183                             & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+          pr          & .209                             & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
         \bottomrule{}
         \end{tabular}
     \end{table*}
 
+
+\paragraph{``Dumb'' Wrapper Applications}
+
+These applications are a class of applications provided by Coreutils with the single purpose of marshalling
+command line parameters and passing them to the system call they share a name with.  They contain only minimal startup
+code and perform no checking of their inputs instead relying on the kernel to detect the issues and return an error code
+through errno.  A result of this error checking pattern is that the {\\tt stat()}, {\tt fstat()}, and {\tt lstat()}
+calls that CrashSimulator used in the above work are missing.  Additionally, no recovery is attempted.  Instead the
+application simply detects the error and prints the corresponding localized error message.
+
+\preston{Should I talk about injecting error codes into these calls specifically?  The appliations simply detect the
+  error and print a localized error message}
+
+\begin{table*}[t]
+  \scriptsize{}
+  \begin{tabular}{l | l}
+    Application  & system call being wrapped\\
+    readlink     & readlink()\\
+    mkdir        & mkdir()\\
+    link         & link()\\
+    mknod        & mknod()\\
+    truncate     & truncate()\\
+    unlink       & unlink()\\
+  \bottomrule{}
+  \end{tabular}
+\end{table*}
+
 \paragraph{Slowloris attack}
-\cappos{The network checking either goes here, or after the next set of
-text.  Where it goes depends on whether the conclusions are common or not.}
 
 CrashSimulator is not limited to detecting filesystem-based bugs.  Another area in which CrashSimulator has
 shown promising results is identifying bugs around network communications.  At the system call level, most
@@ -164,6 +184,14 @@ sort of situation by injecting these large timeout values and observing whether 
 any action.  Addionally, by properly manipulating all time-returning calls, CrashSimulator can simulate an
 execution where close to the maximum timeout value occurred in each iteration nearly instantly.
 
+Additionally, CrashSimulator can passively analyze a replay execution of an application performing network communication
+in order to determine whether it is vulnerable to this sort of attack.  In this approach CrashSimulator determines
+whether or not the application makes any effort to configure its network communication with some sort of timeout
+value. This is done by examining the presence or absence of {\\tt setsockopt()}, {\tt poll()} and {\tt select()} calls
+as well as the timeout values that may or may not have been passed to them. Applications that do not do so are
+vulnerable to this attack by default as the operating system defined protocol timeout
+value is used as a fallback.
+
 This situation has effectively exploited in the wild.  The {\tt slowloris} tool allowed a single attacking
 host to successfully denial of service a vulnerable web server with minimal bandwidth usage.  This attack
 worked by introducing delays between the time headers were sent to the victim by an attacking HTTP client.
@@ -180,20 +208,42 @@ dangerous in situations where {\tt wget} is being run as a scheduled job.  It is
 iterations of the job could be kicked off before the intitial job completes.  At best there are now multiple
 iterations of the job conflicting with one another.  At worst, there could be a slow buildup of unending or
 long lived jobs consuming resources and causing deterimental system behavior.
-\cappos{Many more apps need to be tested.  This needs to be more general.
-It is fine if not all apps are vulnerable...}
 
+In the below table we see the results of CrashSimulator's analysis of 3 major network applications and 7
+of the most popular python modules that implement interfaces for http, ftp and websockets.
 
+\begin{table*}[t]
+  \scriptsize{}
+  \begin{tabular}{l | l}
+    Application              & Analysis Result
+    wget                     & Overly long timeout supplied to {\tt select()}, vulnerable\\
+    ftp                      & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    telnet                   & select specifies no timeout, vulnerable\\
+    urllib http              & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    urllib ftp               & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    ftplib                   & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    httplib                  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    requests                 & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    urllib3                  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    python-websocket-client  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+  \bottomrule{}
+  \end{tabular}
+\end{table*}
 
 \cappos{There needs to be text here mentioning what fail means and how it
 impacts the applications.  There also needs to be some conclusions drawn
-about the apps.  Some example text follows...} Thus we see that even very 
+about the apps.  Some example text follows...}
+
+
+Thus we see that even very 
 widely used applications are subject to failures due to unexpected file 
 types.  The only major exception is those applications like {\tt mkdir}, 
 {\tt ls}, and {\tt chown}, that are thin wrappers on system calls.  This 
 is because the operating system kernel handles error handling for those 
 calls instead of the application.
 
+
+Concluding paragraphs
 
 
 
@@ -289,10 +339,6 @@ and/or refer to a number / keyword there.}
         \end{tabular}
  %           \end{table}
 \end{figure*}
-
-
-
-
 
 
 
@@ -404,8 +450,7 @@ conditions like filesystem activity or network latency that can vary between ind
                 mv (cross-disk file move) & 0.016 & 2.995 \\
             \bottomrule{}
         \end{tabular}
-        \caption{This demonstrates the average? median? \cappos{fix}
-runtime amongst 20 runs.}
+        \caption{This sum total runtime of 20 runs of the listed application.}
     \end{table}
 
 \paragraph{Discussion on network\_speedtest}
