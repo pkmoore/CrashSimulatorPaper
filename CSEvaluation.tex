@@ -108,7 +108,7 @@ some operating system functionality were not examined.
 
     \begin{table*}[t]
         \scriptsize{}
-        \begin{tabular}{l  l  l  l  l  l  l  l  l}
+        \begin{tabular}{l  l  l  l  l  l  l  l  l  l}
         \toprule{}
           Application & Longest Execution Time (Seconds) & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
           Aspell      & .328                             & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
@@ -140,7 +140,7 @@ through errno.  A result of this error checking pattern is that the {\\tt stat()
 calls that CrashSimulator used in the above work are missing.  Additionally, no recovery is attempted.  Instead the
 application simply detects the error and prints the corresponding localized error message.
 
-\preston{Should I talk about injecting error codes into these calls specifically?  The appliations simply detect the
+\emph{Should I talk about injecting error codes into these calls specifically?  The appliations simply detect the
   error and print a localized error message}
 
 \begin{table*}[t]
@@ -215,7 +215,7 @@ of the most popular python modules that implement interfaces for http, ftp and w
 \begin{table*}[t]
   \scriptsize{}
   \begin{tabular}{l | l}
-    Application              & Analysis Result
+    Application              & Analysis Result\\
     wget                     & Overly long timeout supplied to {\tt select()}, vulnerable\\
     ftp                      & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
     telnet                   & select specifies no timeout, vulnerable\\
