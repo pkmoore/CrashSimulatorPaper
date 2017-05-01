@@ -1,6 +1,275 @@
-% TODO: Flesh this out a __LOT__ MORE
-\section{Related Work}
+\section{Related Work} \label{sec:related}
 
+While there is a vast literature on test
+generation~\cite{ammann2008introduction, mcminn2004search,
+  puasuareanu2009survey, dias2007survey}, relatively little prior work
+has focused on issues of portability and testing whether software
+behaves consistently in different environments.  Prior work on
+CheckAPI~\cite{rasley2015detecting} and
+NetCheck~\cite{Zhuang_NSDI_2014} begins to fill this gap and this paper
+builds upon those results.
+%
+%\paragraph{Detecting Environmental Bugs.}
+%
+%NetCheck; CheckAPI; stub injection; detecting machine specific bugs
+%(e.g. numeric/memory limitations); testing error handlers; \dots
+
+\noindent
+{\bf Static analysis. }
+The Explode system uses model checking to check properties 
+of file systems~\cite{Yang:2006:ELG:1298455.1298469}.
+MC enables writing checkers that are compiled into
+static checks for violations of system rules and security 
+properties~\cite{Engler:2000:CSR:1251229.1251230, Ashcraft02usingprogrammer-written}.
+SLAM~\cite{Ball_adecade, Ball:2002:SLP:503272.503274} 
+uses model checking to check if an implementation
+conforms to rules characterizing correct API usage;
+it has been very successful in finding bugs
+in Windows device drivers.
+%By contrast, verification techniques like CheckAPI
+%typically scale better and are less prone to false-positives,
+%but they provide less strong guarantees of correctness.
+Static analysis can integrate static API call verification into an API
+implementation~\cite{spinellis2007framework}. This requires formally specifying each API call, whereas
+a PSI specifies API behavior with a direct implementation. Silakov et
+al.~\cite{silakov2010improving} statically detect portability problems
+in Linux applications, while the Java API Compliance
+Checker~\cite{javacompliance-www}
+checks binary- and source-level compatibility of an application against
+a Java library API. 
+%These tools check static properties, while CheckAPI
+%validates an API's runtime behavior.
+Like Crash Simulator, these address the application's
+interactions with the operating system and environment,
+but the proposed work focuses on testing the application's
+response to anomalies, rather than on proving that the
+environments behave as expected.
+
+\noindent
+{\bf Portability.}
+System call interposition can monitor executions of binaries to automatically
+assemble packages of code needed to run applications on other
+platforms~\cite{Guo:2011:CUS:2002181.2002202}.
+%
+Inferred behavioral models of
+software component interactions can automatically generate compatibility test
+suites~\cite{mariani2007compatibility}. Compliance-validated wrappers can be
+used for principled migration of APIs across
+platforms~\cite{bartolomeicompliance}.
+In C, feature test macros can explicitly specify compatibility
+with a specific OS.
+These approaches are complementary to 
+%CheckAPI,
+CrashSimulator
+whose goal is to 
+%detect portability issues so that they can be fixed.
+exploit anomalies discovered in testing or analyzing one
+application to generate and execute tests for another application.
+%
+Skoll addresses portability bugs arising from configuration problems by
+sampling the configuration space using distributed and diverse
+machines~\cite{skoll:icse:2004}. Skoll, together with combinatorial
+techniques, can systematically discover combinations of configuration options
+(selected from a large but well-defined space) that cause a given test suite
+to fail~\cite{Yilmaz:issta:2004, Fouche:issta:2009}. 
+Recently, several tools have addressed the issue of cross-browser
+incompatibilities for web applications~\cite{DBLP:conf/icse/Choudhary11,
+DBLP:conf/icsm/ChoudharyVO10,
+Mesbah:2011:ACC:1985793.1985870,silakov2010improving}.
+%These involve computer vision algorithms to detect differences
+%in page rendering, along with dynamic web crawling. Choudhary et
+%al.~\cite{silakov2010improving}
+% additionally compare web applications'
+%possible states across browsers.
+%Cross-browser
+Incompatibilities detected by
+these techniques can arise from differences in JavaScript
+interpreters, along with other root causes.
+%Integrating CheckAPI for JavaScript into such tools could
+%improve their accuracy and help in fault diagnosis.
+CrashSimulator helps developers to test 
+whether applications deal with  such incompatibilities robustly.
+
+\noindent
+{\bf POSIX conformance testing.}
+The Ballista system generates parameter values for POSIX functions aimed at
+detecting implementation problems. In fifteen popular OS implementations,
+Ballista revealed many bugs through crashes and abnormal task
+termination~\cite{Koopman00theexception}.
+%By contrast, CheckAPI detects violations that are the result of more
+%subtle differences in OS behavior.
+%
+Model-based test and oracle
+generation~\cite{Pretschner:2005:MT:1062455.1062636, JVCS07} can aid
+conformance, and has been applied to POSIX file
+systems~\cite{Dadeau:2008:CSM:1433121.1433137} and to other POSIX
+aspects~\cite{Farchi02}.
+%This work generates tests to validate library
+%behavior and is complementary to CheckAPI, which finds violations at run-time.
+Executing test suites across multiple configurations of a product or system,
+known as variability execution~\cite{Nguyen14, Kastner12}, may reveal
+differences between the configurations.
+%By contrast, CheckAPI focuses on
+%executing multiple implementations that share no or little code.
+Such testing techniques can help identify
+anomalies that can be added to our repository.
+
+%\noindent
+%{\bf Reliability via redundancy:}
+%Developing and running multiple implementations of an application in
+%parallel, comparing them at checkpoints, can achieve high reliability
+%under the assumption that the implementations fail
+%independently~\cite{DBLP:journals/tse/KnightL86}. Such reliability can
+%be made optimal, in terms of the number of necessary
+%implementations~\cite{Brun11icdcs}.
+%CheckAPI's use of a PSI differs because a PSI represents an idealized execution 
+%of the system, avoiding OS behavior to the greatest extent possible. For 
+%example, the file system metadata in a CheckAPI PSI is likely to be entirely
+%in memory. Thus, while n-version testing would have all implementations 
+%heavily dependent on the same underlying OS behavior, a PSI is independent
+%of the OS implementation and can discover violations caused by the OS. 
+%
+%\noindent
+%{\bf Runtime verification:}
+%Runtime verification (RV) 
+%techniques~\cite{DBLP:conf/rv/2010, Liu:2007:WCC:1973430.1973449, Lu_ASPLOS_2006,
+%Archer:2007:ICT:1236360.1236382, Verbowski_OSDI_2006, Tucek_SOSP_2007,
+%Park_ASPLOS_2009,DBLP:journals/jlp/LeuckerS09}
+%can detect violations of properties on specific executions
+%but do not show that the software satisfies the specification for every
+%possible input or on every possible execution.
+%Many of these techniques find general violations of 
+%properties, such as atomicity~\cite{Park_ASPLOS_2009, Verbowski_OSDI_2006}.
+%Other RV techniques enable checking program-specific requirements 
+%usually specified with formal languages, such as automata or logic
+%formalisms~\cite{DBLP:conf/vmcai/BarringerGHS04, DBLP:conf/kbse/GiannakopoulouH01}.
+%
+%Many RV approaches instrument code to capture relevant
+%events or application state and insert executable 
+%assertions~\cite{Orso:2002:GSC:566172.566182, DBLP:conf/icse/ClauseO11,
+%DBLP:books/sp/Liblit2007, Jin:2010:ISS:1932682.1869481, Barnett01spyingon, 
+%DBLP:journals/jss/BarnettS03}.
+%However, inserting pre- and post-conditions obscures the fact that the
+%specification can be treated as a parallel construct to the
+%implementation~\cite{Barnett01spyingon, DBLP:journals/jss/BarnettS03}.
+%Instead, an architecture can be used for runtime verification of .NET
+%components by running the model and the implementation side-by-side,
+%comparing results at method boundaries~\cite{Barnett01spyingon,
+%DBLP:journals/jss/BarnettS03}.
+%CheckAPI does not require application instrumentation, assuming a tracing
+%mechanism exists in the API~\cite{strace, Cappos_CCS_10}.
+
+%Like CheckAPI, 
+%several other (runtime and static) checking techniques
+%allow the use of languages more familiar to 
+%programmers. 
+%The WiDS checker allows using a scripting language to specify properties of a
+%distributed system~\cite{Liu:2007:WCC:1973430.1973449}.
+%Contracts written in a C-like language can specify components for use
+%in TinyOS applications~\cite{Archer:2007:ICT:1236360.1236382}.
+%CheckAPI allows
+%programmers to choose the language for PSI construction or simply to
+%use an existing implementation. Lastly, work on deterministic 
+%replay~\cite{Viennot13} enables record-replay techniques on multi-core
+%systems and could help improve CheckAPI-MT performance.
+
+
+%\noindent
+%{\bf Blackbox diagnosis.}  Aguilera et al.\ introduced an important
+%blackbox approach to debugging distributed
+%systems~\cite{aguilera-sosp03}. In this approach,
+%observations of a distributed executions are used to infer causality,
+%dependencies, and other characteristics of the system. This approach
+%was relaxed in later work to produce more informative and
+%application-specific results in Magpie~\cite{magpie}
+%and X-Trace~\cite{fonseca2007x}. 
+%This prior work focuses on tracking request flows through a distributed
+%system. BorderPatrol~\cite{koskinen_borderpatrol_eurosys_2008} is another
+%approach that traces requests among binary modules.
+%In contrast, ours is a blackbox approach to diagnosing
+%network issues in applications.
+%
+%
+%
+%\noindent
+%{\bf Ordering events in a distributed setting.}
+%The happens-before relation logically
+%orders events in a distributed
+%system~\cite{lamport_clocks_cacm_1978}. This relation can be realized
+%with vector time, which produces a partial ordering of events in the
+%system~\cite{fidge_vector_clocks_1988,
+%  mattern_vector_clocks_1989}. Vector time requires non-trivial
+%instrumentation of the application. We will reconstruct a
+%plausible order of the captured syscalls through heuristics, without
+%modifying the application.
+%
+%Globally synchronized clocks can order events across
+%hosts. However, over 90\% of syscall invocations we observed completed
+%in less than 0.1~ms. Achieving synchronization at a granularity that
+%is sufficient to order syscalls at hosts on a LAN is expensive and
+%difficult. 
+
+\noindent
+{\bf Tracing and Log mining.}  Prior work that uses dynamically captured logs
+of a program's execution is extensive and includes work on detecting
+anomalies~\cite{pinpoint, jiang_abnormal_trace_detection_icac_2005,
+  xu2009detecting, lou2010mining2}, linking logs and source
+code~\cite{yuan2010sherlog}, identifying performance
+bugs~\cite{sambasivan_req_flow_nsdi_2011, perf_skeletons_ipdps_2008},
+and generating models to support system
+understanding~\cite{beschastnikh_synoptic_fse_2011, csight_icse_2014}.
+%In contrast to
+%this work, our focus is on diagnosing network issues from logs
+%of syscalls, though prior work on log mining can be used to
+%expand our scope.
+Khadke et al.~\cite{khadketransparent} introduced a performance
+debugging approach that relies on system call tracing. Unlike this
+prior work, our proposed system does not assume synchronized clocks and
+reconstructs a plausible global ordering.
+In contrast to this work, CrashSimulator uses system call traces
+for a different purpose: mutating and replaying traces to test
+applications' responses to environmental anomalies.
+
+%\noindent
+%{\bf  Debugging distributed systems.} Techniques for debugging
+%distributed systems are relevant to our proposed tool.
+%Many tools exist for run-time checking
+%of distributed systems. These tools monitor a system's execution and
+%check for specific property violations~\cite{reynolds2006pip,
+%  geels_friday_nsdi_2007, liu_d3s_nsdi_2008, yabandeh2009crystalball, 
+%  dao_live_dist_sys_debugging_cc_2009}. Ours is a more
+%light-weight approach to diagnose issue observed through the
+%syscall interface. 
+
+\noindent
+{\bf Specification and run-time verification.}  Substantial work has
+been done in validating API and protocol behaviors, e.g., finding
+faults in Linux TCP implementation~\cite{Musuvathi04modelchecking},
+SSH2 and RCP~\cite{Udrea:2008}, BGP
+configuration~\cite{Feamster:2005}, and identifying network
+vulnerabilities~\cite{ritchey-sp00}. 
+
+\noindent
+{\bf Application-specific fault detection.}
+Pip~\cite{reynolds2006pip} and
+Coctail~\cite{xue2012using} are distributed frameworks that enable developers to
+construct application-specific models, which have proven effective at finding
+detailed application flaws. However, to utilize these methods,
+a knowledge of the nature of the failures needs to be acquired, and the
+specific system properties must be specified. NetCheck
+diagnoses application failures without application-specific models.
+Khanna~\cite{khanna2007automated} identifies the source of failures using 
+a rule base of allowed state transition paths.
+%However, it requires specialized human-generated rules for each application. 
+CrashSimulator leverages NetCheck's approach to simulate identified
+anomalies in network behavior, file system behavior, etc. to test
+applications other than the ones on which the anomalies were originally discovered.
+
+
+
+%% The following is old stuff -- not sure how much should be integrated
+%% into the above.
+\begin{comment}
     \subsection{Existing Techniques}
 
     Existing tools can be roughly divided into two categories, black-box and white-box, based on the techniques they
@@ -91,3 +360,4 @@
             % TODO: Expand this
             \textbf{\emph{This needs to be expanded}}
             CheckAPI attempts to identify
+\end{comment}
