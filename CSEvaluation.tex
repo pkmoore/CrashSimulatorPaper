@@ -1,8 +1,9 @@
 \section{Evaluation}
 
 
-To evaluate CrashSimulator, we implemented a prototype in 5000 LOC of Python 2
-and 2600 LOC of C.  For a test
+To evaluate CrashSimulator we did the following.
+We implemented a prototype in 5000 LOC of Python 2 and 2600 LOC of C\footnote{
+Line count numbers are according to SLOCCOUNT\cappos{check}}.  For a test
 environment, we chose a virtual install of Ubuntu Linux 15.04 with a 32 bit kernel on i686 hardware.
 We ran the tests on a core i7 system with 8GB of RAM. Our
 implementation used {\tt ptrace} to interpose on the running program and
@@ -87,6 +88,11 @@ as reported by the Debian's project's popularity contest results.
 The purpose is to see whether CrashSimulator can be useful
 for finding at least some environmental bugs in widely used software.
 
+\cappos{So I see two possible organizations from here on.  One is to clearly
+and concisely explain each type of anomaly and then to collectively do the 
+conclusions for both.  The second is to explain each and then do its 
+conclusion.  We need to decide.  Right now it is a mess.  Without more
+analysis of the results, I can't see what would work best.}
 
 \paragraph{Unexpected File Type}
 These bugs involve changing an application's execution trace to emulate it 
@@ -96,7 +102,8 @@ could be provided something else such as a symbolic link, a regular file, or
 a character device instead.
 
 To inject this anomaly, CrashSimulator
-modifies the executions of applications that work with regular files such that a call to
+modifies the executions of applications that work with regular files such that
+a call to
 {\tt stat()}, {\tt fstat()} or {\tt lstat()} indicates that the file in question is instead some sort of special file.
 Well behaved applications should verify that the files they are accessing are regular files before processing them.
 Many applications make the assumption that they will only be used to process regular files.  Encountering
@@ -133,10 +140,14 @@ some operating system functionality were not examined.
 
 \paragraph{``Dumb'' Wrapper Applications}
 
+\cappos{I think you are not organizing this in the best way.  It doesn't make
+sense to me to separate this out in this way.  It should only be separated
+out when you talk about the results. }
 These applications are a class of applications provided by Coreutils with the single purpose of marshalling
 command line parameters and passing them to the system call they share a name with.  They contain only minimal startup
 code and perform no checking of their inputs instead relying on the kernel to detect the issues and return an error code
-through errno.  A result of this error checking pattern is that the {\\tt stat()}, {\tt fstat()}, and {\tt lstat()}
+through errno.  A result of this error checking pattern is that the 
+{\tt stat()}, {\tt fstat()}, and {\tt lstat()}
 calls that CrashSimulator used in the above work are missing.  Additionally, no recovery is attempted.  Instead the
 application simply detects the error and prints the corresponding localized error message.
 
@@ -155,6 +166,8 @@ application simply detects the error and prints the corresponding localized erro
     unlink       & unlink()\\
   \bottomrule{}
   \end{tabular}
+  \caption{What is this table for?  Why aren't there captions on the
+tables?}
 \end{table*}
 
 \paragraph{Slowloris attack}
@@ -427,7 +440,13 @@ two computational models in parallel and accepts the execution if either model e
 
 
 
+
 \subsection{Is CrashSimulator able to execute tests in a performant manner?}
+
+\cappos{All of the performance numbers should be here.  I recommend having
+a graph with the normal run time on the x-axis and the replay speed on the
+y-axis.  It will be a scatter plot.  Each point will be one of the
+experiments you ran.}
 
 One key attribute of successful testing tools is that they be able to complete their tests in a timely manner.
 If a tool takes too long to complete its tests users will be less likely to run it frequently, or at all,
