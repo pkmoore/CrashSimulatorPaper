@@ -9,8 +9,8 @@ implementation used {\tt ptrace} to interpose on the running program and
 interject anomalous behavior into its execution.
 We did not handle threaded programs and disabled ASLR and the kernel's vDSO to make replay
 easier.  As far as we are aware, none of these choices influenced the bugs
-that CrashSimulator would find.  The only major difference we are aware of 
-is its performance.
+that CrashSimulator can find.  The only major difference we are aware of 
+is its performance (which will be discussed later).
 Given appropriate anomaly information, our implementation of CrashSimulator can
 test for anomalies that exist in other platforms and environments.  
 
@@ -20,7 +20,7 @@ Using this prototype, we answer the following questions about CrashSimulator:
    \item{Do environmental bugs exist in widely used applications?}
    \item{Can CrashSimulator identify complex anomalies?}
    \item{What types of bugs could not be found using CrashSimulator?}
-   \item{How can CrashSimulator deal with false positives?}
+   \item{What sorts of errors does CrashSimulator make?}
    \item{Is CrashSimulator able to execute tests in a performant manner?}
 \end{enumerate}
 
@@ -78,24 +78,20 @@ Using this prototype, we answer the following questions about CrashSimulator:
 % Discuss  What should people think about it
 
 Our first question focuses on whether there are any bugs of the sort that
-CrashSimulator can find in popular applications.  To do this, we 
-chose several simple anomalies that could be tested in a large
-array of programs.  We chose two simple anomalies (one file system
-related and one network related) that had the potential to appear in
-many programs. CrashSiulator was run on 10 popular applications provided by GNU Coreutils.
-Additionally, we selected 4 popular applications based on their widespread useage
-as reported by the Debian's project's popularity contest results.
-The purpose is to see whether CrashSimulator can be useful
-for finding at least some environmental bugs in widely used software.
+CrashSimulator can find in popular applications.  After all, if such bugs
+do not exist in practice, then there is no need for CrashSimulator.
+To test whether such bugs exist in real programs, we 
+chose two simple anomalies that could be tested in a large
+array of programs.  We chose one file system anomaly and one network anomaly 
+that used common API calls and thus had the potential to appear in
+many programs.  We ran CrashSimulator on applications from GNU Coreutils and
+on popular projects as is indicated by Debian's Popularity Contest\cappos{add
+cite}.
 
-\cappos{So I see two possible organizations from here on.  One is to clearly
-and concisely explain each type of anomaly and then to collectively do the 
-conclusions for both.  The second is to explain each and then do its 
-conclusion.  We need to decide.  Right now it is a mess.  Without more
-analysis of the results, I can't see what would work best.}
+\subsubsection{Unexpected File Types} Providing unexpected types of files to
+applications.
 
-\subsubsection{Unexpected File Types}
-
+{\bf Method.}
 The first anomaly configured CrashSimulator to identify occurs when an
 application has to retrieve and process data from a file.  Linux supports
 several ``special'' file types apart from the standard ``regular'' file type.
@@ -123,11 +119,11 @@ then there is the possibility that the special file is being handled correctly.
 If the application does not alter its behavior then the anomalous condition is
 not being handled correctly.
 
-The results of this work are shown in \ref{table:unexpectedtypes}.  The
+{\bf Findings.}
+The results of this work are shown in Table~\ref{table:unexpectedtypes}.  The
 condition tested describes for which file type information was modified.
 Multiple executions were used to examine the applications response to each of
-the listed file types. Execution Time lists the longest execution time of the
-recorded executions in seconds. The ``I...'' column headings denote which file
+the listed file types. The ``I...'' column headings denote which file
 type was being tested for a given execution.  A result of ``Initial Value''
 indicates that this type is the file type the application was provided when the
 execution trace being replayed was recorded -- that is, a file of the type the
@@ -141,30 +137,30 @@ file type because its execution did not diverge from the trace being replayed.
 
 \begin{table*}[t]
     \scriptsize{}
-    \begin{tabular}{l  l  l  |  l  l  l  l  l  l  l}
+    \begin{tabular}{l  l  |  l  l  l  l  l  l  l}
     \toprule{}
-        Application &  Execution Time & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
-        Aspell      & .328            & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        Aspell      & .364            & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        gnu-gpg     & .218            & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-        vim         & .258            & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
-        nano        & .279            & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
-        sed         & .567            & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        df          & .222            & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
-        wc          & .167            & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        du          & 6.135           & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        install     & .730            & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
-        fmt         & .168            & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-        od          & .162            & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
-        ptx         & .387            & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        comm        & .183            & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        pr          & .209            & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-        readlink    & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        mkdir       & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        link        & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        mknod       & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        truncate    & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        unlink      & .XXX            & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        Application & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
+        Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+        vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
+        nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
+        sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
+        wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        install     & File being installed       & Initial Value  & Recognizes     & Fails       & Fails      & Fails       & Recognizes & Fails\\
+        fmt         & File being formatted       & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+        od          & File being dumped          & Initial Value  & Fails          & Recognizes  & Fails      & Fails       & Fails      & Fails\\
+        ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+        readlink    & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        mkdir       & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        link        & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        mknod       & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        truncate    & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+        unlink      & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
     \bottomrule{}
     \end{tabular}
     \caption{Applications tested for their handling of unexpected file types.}
@@ -197,7 +193,8 @@ of an error, use {\\tt perror()} to print the correct localized error
 message.  In short, these applications pass their error handling
 responsibilities to the kernel.
 
-\subsubsection{Slowloris attack}
+\subsubsection{Slowloris attack} Delaying network applications for extended
+periods.
 
 % Motivation - mentioned and addressed in other areas.  Effort in place to make package managers resiliant to this
 % so that you can't be tricked into using old software
@@ -205,8 +202,10 @@ responsibilities to the kernel.
 % to test several prominiant network programs because our tool cannot replay multi-threaded or multi-process programs
 
 
+\cappos{I need to trim this *a lot*}
 % Sentence at the end that says "now that we've seen that these issues are prevalent across major applications...
 
+{\bf Method.}
 CrashSimulator is not limited to detecting filesystem-based bugs.  Another area
 in which CrashSimulator has shown promising results is identifying bugs around
 network communications.  The second anomaly we examined using CrashSimulator
@@ -267,7 +266,7 @@ system defined protocol timeout value is used as a fallback.
 
 We use CrashSimulator to analyze 10 network applications and libraries in
 widespread useage (based on Debian's popularity contest ratings).  The results
-of this analysis can be found in \ref{table:slowloris}.  The analysis results in
+of this analysis can be found in Table~\ref{table:slowloris}.  The analysis results in
 this table indicate whether or not the applications where vulnerable and, in the
 case of vulnerablilty, a brief description of the cause.
 
@@ -295,6 +294,7 @@ case of vulnerablilty, a brief description of the cause.
 \end{table*}
 
 
+{\bf Findings.}
 As can be seen from the above results, all of the applications we examined were
 vulnerable to this sort of anomalous condition.  What's more, in the vast
 majority of cases it is because the application makes no effort to specify a
@@ -323,6 +323,7 @@ that future iterations of the job could be kicked off before the intitial job
 completes.  At best there are now multiple iterations of the job conflicting
 with one another.  At worst, there could be a slow buildup of unending or long
 lived jobs consuming resources and causing deterimental system behavior.
+ \cappos{cite SlowLoris}
 
 Because this attack has been seen in the wild, the developers of major projects
 have taken steps to ensure their applications are resiliant against it.  The
@@ -333,7 +334,7 @@ We expect that CrashSimulator would find these major applications sufficiently
 protected.
 
 
-\paragraph{Concluding Thoughts}
+{\bf Concluding Thoughts}
 The results of the above analysis show that CrashSimulator is readily able to
 identify novel bugs in existing applications with mature code bases.  This is
 because CrashSimulator focuses on identifing bugs that result from anomalous
@@ -378,15 +379,21 @@ In Linux, the rename() system call will only move a file if the source and
 destination are on the same device.  This means that moving a file from a
 directory structure location on one storage device to a directory structure
 location on another device must be handled on a case-by-case basis by any
-application that relies on this operation.  With this in mined, we examined the
-process by which the coreutils {\tt mv} application handles this task and
-constructed computational models that can determine whether or not a replayed
+application that relies on this operation.  
+
+{\bf Method.}  We created anomalies for the move operation as follows.
+We examined several different move libraries and found that {\tt mv} seemed
+to handle cases that other tools failed to consider.  Following this, we 
+used the steps of {\tt mv} as a template and
+constructed computational models \cappos{What is this?  I'm confused by what
+you are saying here.} that can determine whether or not a replayed
 execution of an application has performed all the necessary steps to
 successfully carry out a cross device move.  This analysis included manual
 review of system call traces of {\tt mv} moving a file across devices as well as
 analysis of its source code for interesting checks and edge conditions.  Each of
 the following are a ``step'' in the process of moving a file across devices that
 a well behaved application should carry out.
+
 
 % Removed based on discussion
 %\paragraph{Verify Destination is not Target of Source}
@@ -475,7 +482,7 @@ special files and identifying whether the application executes a series of {\tt
   open()}s, {\tt read()}s and {\tt writes()} that indicate it is incorrectly
 attempting to exhaustively read the file.
 
-\ref{table:crossdevice} lists the result of our analysis of several applications
+Table~\ref{table:crossdevice} lists the result of our analysis of several applications
 and libraries that purport to correctly move files within a filesystem.  The
 column headings correspond to the short names listed for each of the previous
 paragraphs. A result of ``Correct'' indicates that the application or library
@@ -502,7 +509,8 @@ make an effort to perform it at all.
     \label{table:crossdevice}
 \end{table}
 
-As can be seen from the results in \ref{table:crossdevice} each of the
+{\bf Findings.}
+As can be seen from the results in Table~\ref{table:crossdevice} each of the
 applications tested fails to perform one or more of the steps required to
 successfully complete a cross-device move.  This is an unfortunate situation
 because a failure to perform any one of these steps can result in negative
@@ -556,13 +564,18 @@ calls and issue a warning that the issue might be present.
 %  as presumably the while recording the trace the user would be able to directly
 %  observe whether things happened correctly or not}
         
-\subsection{How can CrashSimulator deal with false positives and false negatives?}
+\subsection{What sorts of errors does CrashSimulator make?}
 % Talk about both false positives and false negatives
 % When and how they occur
 % False negative would be checkers that aren't specific enough, or a given test case/checker is not included
 % OR the system call trace does not include all of the information you need to know if something has happened
 % Keep this short
+There are two types of errors that CrashSimulator makes. First, it can 
+incorrectly flag a situation as being an error (a false positive).  Second,
+it can fail to correctly detect an issue that actually occurs (a false 
+negative).  We discuss each situation in turn.
 
+{\bf False Positives.}
 The primary source of false positives (that is, CrashSimulator reports a failure
 in a situation where the execution should be accepted) for CrashSimulator is an
 application using a different sequence of system calls than a checker was
@@ -593,7 +606,7 @@ This approach is viable because there are a finite number of system calls, and a
 given operation can be mapped to a managable subset of system calls.  Given the
 above example around moving files, consider the mapping from high level
 ``operation'' to the set of system calls that can implement it in
-\ref{table:stepsandcalls}.  Each of the steps in the operation map to a small
+Table~\ref{table:stepsandcalls}.  Each of the steps in the operation map to a small
 number of system calls and, in most cases, only one of the system calls is
 necessary.  In situations where two system call sequences can correctly
 implement the same operation CrashSimulator simply runs two computational models
@@ -625,15 +638,20 @@ condition.
     \label{table:stepsandcalls}
 \end{table*}
     
+{\bf False Negatives.}
 CrashSimulator can encounter false negatives (that is, CrashSimulator accepts an
-execution that it shouldn't) in two situations.  The first is that is hasn't
+execution that it shouldn't) in three situations.  The first is that is hasn't
 been provided with the configuration necessary to test for the issue it missed.
 This is essentially the same as a ``missing testcase'' sort of situation that is
 common throughout testing methodologies.  CrashSimulator cannot identify issues
 it doesn't know how to look for.  The second situation is when a computational
 model is not constructed correctly and, as a result, misses an issue it should
-identify.  This situation maps onto the situation where a test case has been
-written incorrectly -- a situation that is also common.
+identify.  The third case, which relates to the first two, involves a situation
+where the trace level is inadequate to get enough semantic information to 
+make a correct judgment.  For example, system call tracing does not provide
+insight into computational actions that may be performed, such as an 
+application deciding to cache information in memory when it fails to open a 
+file.
 
 \subsection{Is CrashSimulator able to execute tests in a performant manner?}
 
@@ -653,6 +671,16 @@ reasons.  First, a single execution in either mode completes so quickly for the 
 be nearly indistinguishable from the other mode.  Second, multiple executions somewhat contros for varying
 conditions like filesystem activity or network latency that can vary between individual executions.
 
+
+    \begin{figure}[t]
+        \center{}
+        \includegraphics[scale=.5]{FakeTimeEval}
+        \caption{\emph{Fake data that shows the runtime differences with
+CrashSimulator vs the native application.}}
+
+    \end{figure}
+
+
     \begin{table}[H]
         \scriptsize{}
         \begin{tabular}{l  l  l  l}
@@ -666,6 +694,8 @@ conditions like filesystem activity or network latency that can vary between ind
         \caption{This sum total runtime of 20 runs of the listed application.}
     \end{table}
 
+
+\cappos{I think these likely all get removed...  I don't understand the purpose}
 \paragraph{Discussion on network\_speedtest}
 
 Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
@@ -685,7 +715,7 @@ replay this operation in a similar time period to the time in which it is able t
 simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
 increase replay time.
 
-
+{\bf Findings.}
 Overall, the performance of our CrashSimulator simulator is about two orders of
 magnitude slower than executing the original program natively.  This is 
 largely due to performance problems in our (unoptimized) prototype, such as
