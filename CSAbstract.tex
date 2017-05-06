@@ -1,16 +1,23 @@
 \begin{abstract}
 
-  One of the challenges of software development is anticipating and dealing with the variety of environments in which an
-  application may run.  This work introduces CrashSimulator, a technique and tool that identifies incorrect application
-  behavior which has arisen as a result of unhandled anomalous environmental conditions.  CrashSimulator replays system
-  call traces recorded from the application under test as a means to monitor and control execution.  During these replay
-  executions, CrashSimulator classifies application behavior as either correct or incorrect based on ``checkers'' that
-  encode system call sequences indicative of bad behavior. This process allows CrashSimulator to use incorrect behavior
-  identified in one application running in one environment as a ``test case'' that determines whether another
-  application in a different environment is making the same mistake.  By testing an application against a series of
-  these ``test cases'', CrashSimulator is able to give an application's developers an idea of how the application will
-  respond were it to be deployed and executed in the environment from which the ``test cases'' were generated.''
-  CrashSimulator was able to identify bugs resultant from anomalous filesystem and network condtions in 30 popular Linux
-  applications.
+  This work introduces CrashSimulator, a technique and tool that identifies
+  incorrect application behavior caused by unhandled anomalous environmental
+  conditions. CrashSimulator replays system call traces recorded from the
+  application under test as a means to monitor and control execution. During
+  replay CrashSimulator modifies system call return values and program state to
+  simulate an anomalous environment. Next, a checker determines whether the
+  application is responding to the anomaly appropriately. This process allows
+  CrashSimulator to use incorrect behavior identified in one application running
+  in one environment as a test case that determines whether another application
+  in a different environment is making the same mistake. By testing an
+  application against a series of these test cases, CrashSimulator provides an
+  applications developers with an idea of how the application will respond were
+  it executed in the environment from which the test cases were
+  generated. CrashSimulator was able to identify bugs resultant from anomalous
+  filesystem and network conditions in 30 popular applications. The damage
+  caused by these bugs ranges from application hangs to data loss and remote
+  denial of service conditions. While one of the bugs we found was independently
+  identified and reported to Pythons bug tracker, the rest had not yet been
+  discovered.
 
 \end{abstract}
