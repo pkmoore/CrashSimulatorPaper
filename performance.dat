@@ -1,0 +1,25 @@
+#Replay  Native  Strace
+.120    .004     .017        #network_speedtest
+.130    .006     .015        #filesystem_speedtest
+.149    .011     .017        # mv cross-disk
+.328    .020     .022        #aspell Dictionary File
+.364    .020     .022        #aspell File being checked
+.218    .021     .029        #gnu-gpg secring.gpg
+.258    2.020    2.020       #vim
+.279    .017     .027        #nano
+.567    .032     .016        #sed
+.222    .004     .019        #df
+.167    .005     .013        #wc
+6.135   2.610    3.525       #du
+.730    .009     .016        #install
+.168    .007     .013        #fmt
+.162    .007     .014        #od
+.387    .005     .016        #ptx
+.183    .008     .017        #comm
+.209    .010     .016        #pr
+.160    .003     .010        #readlink
+.533    .004     .016        #mkdir
+#NO LINK HANDLER XXX      .001     .006 REMOVE  #link
+#NO MKNOD HANDLER REMOVE XXX        .003     .008  #mknod
+#XXX    .003     .013 no replay REMOVE #truncate
+.164    .004     .015   unlink`
