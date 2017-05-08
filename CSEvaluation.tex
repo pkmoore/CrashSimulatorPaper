@@ -719,40 +719,6 @@ CrashSimulator vs the native application.}}
     \end{figure}
 
 
-    \begin{table}[H]
-        \scriptsize{}
-        \begin{tabular}{l  l  l  l}
-            \toprule{}
-                Execution Description & Native Eecution & Replay Execution\\
-                network\_speedtest & 0.024 & 2.407 \\
-                filesystem\_speedtest & 0.038 & 2.604 \\
-                mv (cross-disk file move) & 0.016 & 2.995 \\
-            \bottomrule{}
-        \end{tabular}
-        \caption{This sum total runtime of 20 runs of the listed application.}
-    \end{table}
-
-
-\cappos{I think these likely all get removed...  I don't understand the purpose}
-\paragraph{Discussion on network\_speedtest}
-
-Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
-exits. For simple applications like this, native execution is significantly faster than replay execution...
-
-\paragraph{Discussion on filesystem\_speedtest}
-
-This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
-exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
-all sorts of applications in Linux...
-
-\paragraph{Discussion on mv}
-
-In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
-  mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
-replay this operation in a similar time period to the time in which it is able to replay the dramatically
-simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
-increase replay time.
-
 {\bf Findings.}
 Overall, the performance of our CrashSimulator simulator is about two orders of
 magnitude slower than executing the original program natively.  This is 
@@ -762,3 +728,41 @@ our utilization of {\tt ptrace} instead of more efficient mechanisms like
 implementation, we likely could be even more efficient than executing the
 commands since we only replay the command system calls and do not need to
 do other related operations such as I/O.
+
+Applications that use network are faster... \cappos{need results to write.}
+
+
+%\cappos{I think the following should all get removed...  I don't understand the
+%purpose}
+%\paragraph{Discussion on network\_speedtest}
+%    \begin{table}[H]
+%        \scriptsize{}
+%        \begin{tabular}{l  l  l  l}
+%            \toprule{}
+%                Execution Description & Native Eecution & Replay Execution\\
+%                network\_speedtest & 0.024 & 2.407 \\
+%                filesystem\_speedtest & 0.038 & 2.604 \\
+%                mv (cross-disk file move) & 0.016 & 2.995 \\
+%            \bottomrule{}
+%        \end{tabular}
+%        \caption{This sum total runtime of 20 runs of the listed application.}
+%    \end{table}
+%
+%
+%Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
+%exits. For simple applications like this, native execution is significantly faster than replay execution...
+%
+%\paragraph{Discussion on filesystem\_speedtest}
+%
+%This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
+%exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
+%all sorts of applications in Linux...
+%
+%\paragraph{Discussion on mv}
+%
+%In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
+%  mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
+%replay this operation in a similar time period to the time in which it is able to replay the dramatically
+%simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
+%increase replay time.
+%
