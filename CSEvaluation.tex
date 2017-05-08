@@ -712,24 +712,38 @@ network latency that can vary between individual executions.
 
     \begin{figure}[t]
         \center{}
-        \includegraphics[scale=.5]{FakeTimeEval}
-        \caption{\emph{Fake data that shows the runtime differences with
-CrashSimulator vs the native application.}}
+        \includegraphics[scale=.5]{performance.png}
+        \caption{\emph{This shows the run time difference between the
+native program and CrashSimulator. The dashed line indicates equal
+performance. }}
 
     \end{figure}
 
 
 {\bf Findings.}
-Overall, the performance of our CrashSimulator simulator is about two orders of
+Overall, the performance of our CrashSimulator is usually about an order of
 magnitude slower than executing the original program natively.  This is 
-largely due to performance problems in our (unoptimized) prototype, such as
-our utilization of {\tt ptrace} instead of more efficient mechanisms like
-{\tt eBPF} or a loadable kernel module.  With a more optimized
-implementation, we likely could be even more efficient than executing the
-commands since we only replay the command system calls and do not need to
-do other related operations such as I/O.
+largely due to performance problems in our (unoptimized) prototype, 
+primarily our utilization of {\tt ptrace}.  Tracing the program
+with {\tt ptrace} adds up to a factor of 5x in overhead.  (This could
+be removed with more efficient mechanisms like {\tt eBPF} or a loadable 
+kernel module.)  Also the start up time of our prototype is high, due
+to \cappos{what?}.
 
-Applications that use network are faster... \cappos{need results to write.}
+
+With a more optimized implementation, CrashSimulator could be much more 
+efficient.  In fact, CrashSimulator will be more efficient than actually
+running the program natively in many cases, since CrashSimulator only
+replays the system calls.  This means that CrashSimulator does not need to
+actually perform the calls which avoids the system call overheads, such as 
+I/O.  Note that this already occurs for the {\tt du} program, because 
+CrashSimulator need not actual perform any disk I/O.
+
+Note also that natively testing the timeout of networked applications (not
+shown) would take an extended period of time (at least as long as the allowed
+timeout value).  CrashSimulator avoids this cost by simulating the fact that
+time has progressed for future system calls.
+%\cappos{Can we say something about the network timeout apps?}
 
 
 %\cappos{I think the following should all get removed...  I don't understand the
