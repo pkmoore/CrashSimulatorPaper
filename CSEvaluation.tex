@@ -41,6 +41,7 @@ Using this prototype, we answer the following questions about CrashSimulator:
    \item{[\ref{sec-not-found}] What types of bugs could not be found using CrashSimulator?}
    \item{[\ref{sec-sorts-errors}] What sorts of errors does CrashSimulator make?}
    \item{[\ref{sec-perf}] Is CrashSimulator able to execute tests in a performant manner?}
+   \item{[\ref{sec-response}] What was the response to disclosing bugs found in CrashSimulator?}
 \end{enumerate}
 
 
@@ -779,4 +780,14 @@ time has progressed for future system calls.
 %replay this operation in a similar time period to the time in which it is able to replay the dramatically
 %simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
 %increase replay time.
-%
+\subsection{What was the response to disclosing bugs found in CrashSimulator?}
+\label{sec-response}
+
+After discovering the bugs in CrashSimulator, we filed bug reports with 
+different projects.  (To avoid unblinding our work, we do not link to the 
+bug reports here.)  The maintainers' response to these filings has been 
+positive.  Several projects have already applied patches to fix the bugs
+we reported.  For updated information about the number of bugs filed / fixed,
+we provide a blinded document~\cappos{refer to a webpage or google doc 
+that we will update}.
+
