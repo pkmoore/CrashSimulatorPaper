@@ -35,7 +35,7 @@ length of time the call was blocked, while in other environments this variable i
 applications that depend on one behavior or another may fail when the call acts differently. Similarly, consider an
 application that has been developed with the assumption that the socket returned by {\tt accept()} will inherit the
 settings configured on the parent socket.  This is how {\tt accept()} behaves in the canonical BSD sockets
-implementation so this is a reasonable assumption for developers to make.  Unfortunately, this is not the case in Linux
+implementation so this is a reasonable assumption.  Unfortunately, this is not the case in Linux
 where the returned socket does is not inherit these options.  This implementation difference resulted in a portability
 bug in Python~\cite{Zhuang_NSDI_2014}.
 
@@ -43,9 +43,9 @@ Interactions with file systems are also prone to small differences in environmen
 In testing GnuPG we discovered that developers implicitly assumed that that a file being provided as input to the key
 import process was a regular file; when this assumption was violated, the application failed.
 
-In each of these cases, when problems nature are discovered in one application, not only should that application be fixed, but
-a huge group of other applications that use similar constructs and that may run in the problematic environment should also
-be tested to see whether they have the same problems. CrashSimulator facilitates that task.
+In each of these cases, when problems of this nature are discovered in one application, not only should that application
+be fixed, but a huge group of other applications that use similar constructs and that may run in the problematic
+environment should also be tested to see whether they have the same problems. CrashSimulator facilitates that task.
 
 Since an application's interactions with its environment are mediated by system calls,
 it is possible to represent the difference between the environment in which testing is performed (referred to here
@@ -136,7 +136,7 @@ devices, crash simulator can test other applications $A'$ as follows:
 		Check that this trace satisfies some of the requirements for handling the anomolous environment correctly. In this case, the trace must include a call to {\tt stat()} or a related system call to check the status of the file being moved. If it does not, the application almost certainly will not work correctly in the anomolous environment.
 	\item Execute the application under the control of CrashSimulator, replaying the trace up to the point of the {\tt stat()} call. Here, each time the application makes a system call, CrashSimulator intervenes, supplying return values and causing side effects as the actual call would, without executing the actual call.
 	\item
-		Modify the return value of the {\tt stat()} call so that it returns values indicating that the file is a special file, i.e. so it simulates execution in the anomolous environment.
+		Modify the structure returned by the {\tt stat()} call so that it returns values indicating that the file is a special file, i.e. so it simulates execution in the anomolous environment.
 	\item
 		Continue execution of $A'$ under the control of CrashSimulator. Here the series of system calls made by
                 the application may diverge from the orignial trace, as $A'$ responds to the modified return value from

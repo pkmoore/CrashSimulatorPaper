@@ -30,7 +30,7 @@ running.
     Moving files around in a filesystem is an extremely common operation that, on face value, seems to fairly simplistic
     to carry out.  In reality, things become complex quickly once a few implementation details are taken into account:
     namely limitations in Linux's {\tt rename()} system call and the way Linux's directory heirarchy can abstract away
-    complicated device configurations -- a feature is usually a boon for developers.
+    complicated device configurations.
 
     In this example, consider a Linux directory structure with two folders, {\tt /mnt/a/} and {\tt /mnt/b/}, with each
     being a mount point for a different storage device.  Moving a file around anywhere inside either of these
