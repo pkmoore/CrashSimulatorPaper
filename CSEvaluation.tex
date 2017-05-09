@@ -15,11 +15,11 @@
 
 CrashSimulator was evaluated as follows.
 We implemented a prototype in a mix of Python 2 (5060 LOC) and C (2585 
-LOC)\footnote{ Line count numbers are according to SLOCCOUNT\cappos{cite}}.  
+LOC)\footnote{ Line count numbers are according to SLOCCOUNT\cite{SLOCCOUNT}}.  
 For a test
 environment, we chose a virtual install of Ubuntu Linux 15.04 with a 32 bit 
 kernel on i686 hardware.
-We ran the tests on a core i7 system with 8GB of RAM \cappos{add Ghz}. Our
+We ran the tests on a 1.7 gHz core i7 system with 8GB of RAM. Our
 implementation used {\tt ptrace} to interpose on the running program and
 interject anomalous behavior into its execution.
 We did not handle threaded programs and disabled ASLR and the kernel's vDSO 
@@ -29,8 +29,7 @@ for threaded programs obviously influences the programs we can test.  The
 only major impact these design choices had, was our use of {\tt ptrace} 
 slowed our prototype's performance (which will be discussed later) but made
 constructing CrashSimulator easier.  Given appropriate anomaly information, 
-\cappos{Term?} our 
-implementation of CrashSimulator can
+our implementation of CrashSimulator can
 test for anomalies that exist in other platforms and environments.  
 
 Using this prototype, we answer the following questions about CrashSimulator:
@@ -106,8 +105,7 @@ chose two simple anomalies that could be tested in a large
 array of programs.  We chose one file system anomaly and one network anomaly 
 that used common API calls and thus had the potential to appear in
 many programs.  We ran CrashSimulator on applications from GNU Coreutils and
-on popular projects as is indicated by Debian's Popularity Contest\cappos{add
-cite}.
+on popular projects as is indicated by Debian's Popularity Contest\cite{DebPopCon}.
 
 \subsubsection{Unexpected File Types} Providing unexpected types of files to
 applications.
@@ -123,32 +121,39 @@ ways.  For example, {\tt /dev/urandom} is a character device that produces
 an infinite amount of pseudo-random data when read.
 If an application that reads the full contents of a file
 before processing it is provided {\tt /dev/urandom}, it will fill memory
-or disk and may crash the system \cappos{cite apt / yum endless data attacks}.
+or disk and may crash the system\cite{YumAptEndless}.
 In order to execute correctly, it is often required for applications to 
 examine the files in order to ensure they are of an appropriate type.
 
-{\bf Method.}
-Identifying these bugs involve changing an application's execution trace to
-emulate the application being provided a file type that is unexpected.  For 
-example, the 
-{\tt sed} application, which modifies the contents of a text file according 
-to a provided command string, could be provided something else such as a 
-symbolic link, a directory, or a character device instead.  CrashSimulator
-accomplishes this by identifying the calls to {\tt stat()}, {\tt fstat()}, or
-{\tt lstat()} that an application makes to examine the file 
-and then changes to trace to simulate that the regular file
-{\tt sed} is expecting is actually one of the
-special filetypes.  If the application responds to this injected information
-then there is the possibility that the special file is being handled correctly.
-If the application does not alter its behavior then the anomalous condition is
-not being handled correctly. \cappos{Is this true in all cases?}
+{\bf Method.}  Identifying these bugs involves changing an application's
+execution trace to emulate the application being provided a file type that is
+unexpected.  For example, the {\tt sed} application, which modifies the contents
+of a text file according to a provided command string, could be provided
+a symbolic link, a directory, or a character device
+instead.  CrashSimulator accomplishes this by identifying the calls to {\tt
+  stat()}, {\tt fstat()}, or {\tt lstat()} that an application makes to examine
+the file and then changes to trace to simulate that the regular file {\tt sed}
+is expecting is actually one of the special filetypes.  If the application
+responds to this injected information then there is the possibility that the
+special file is being handled correctly.  If the application does not alter its
+behavior then the anomalous condition is not being handled correctly.
+
+% \cappos{Is this true in all cases?}
+% Its true in the cases we have see so far.  This statement is based on our
+% definition of what a "test" does as discussed in the approach details section.
 
 {\bf Findings.}
 Simulating these anomalies for each type of file
 gave the results shown in Table~\ref{table:unexpectedtypes}. 
-\cappos{Is this true: We manually examined each application behavior
-simulated by CrashSimulator and verified it is consistent with the actual 
-behavior on the given file type.}
+We manually examined a subset of the listed application behaviors simulated by
+CrashSimulator and verifed they were consistent with the actual behavior on the
+given file type.
+
+%\cappos{Is this true: We manually examined each application behavior
+%simulated by CrashSimulator and verified it is consistent with the actual 
+%behavior on the given file type.}
+% I verified a subset of the results by providing actual "weird files"
+
 Multiple executions were used to examine the applications response to each of
 the listed file types.  A result of ``Initial Value''
 indicates that this type is the file type the application was provided when the
@@ -186,9 +191,6 @@ Fail\\
         pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
         readlink    & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
         mkdir       & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        link        & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        mknod       & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        truncate    & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
         unlink      & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
     \bottomrule{}
     \end{tabular}
@@ -208,22 +210,20 @@ as the case where an application blocks forever waiting for a {\tt read()}
 call to retrieve non-existant data from an empty FIFO, or harmfully, as
 happens in the case where an attempts to read in and process an
 ``infinitely large'' file eventually filling available memory or disk
-space\cappos{Please label the bugs w/ the impact.} 
-\cappos{cite apt / yum bugs}  
+space\cite{AptYumEndless}\cappos{Please label the bugs w/ the impact.} 
 
 \cappos{there will need to be more discussion here.  I need more info about
 the results though, such as which bug does what...}
 
-\preston{I need to collect these results}
-An interesting behavior we recognized when analyzing these results can be
-seen in the bottom 6 applications listed in the above table.  Each of these
+An interesting behavior we recognized when analyzing these results can be seen
+in the bottom applications listed in the above table.  Each of these
 applications correctly recognized when any filetype other than its expected
-filetype.  This is because these applications are simply ``dump'' wrappers
-around they system calls they share a name with.  Essentially, they just
-hand the specified file to their corresponding system call and, in the case
-of an error, use {\\tt perror()} to print the correct localized error
-message.  In short, these applications pass their error handling
-responsibilities to the kernel.
+filetype.  This is because these applications are simply ``dumb'' wrappers
+around they system calls they share a name with.  Essentially, they just hand
+the specified file to their corresponding system call and, in the case of an
+error, use {\\tt perror()} to print the correct localized error message.  In
+short, these applications pass their error handling responsibilities to the
+kernel.
 
 \subsubsection{Slowloris attack} Delaying network applications for extended
 periods.
@@ -264,9 +264,9 @@ the maximum timeout value occurred without actually spending any time
 waiting.
 
 
-We use CrashSimulator to analyze 10 network applications and libraries
+We use CrashSimulator to analyze  network applications and libraries
 that are amongst the most popular based on Debian's popularity contest 
-ratings~\cappos{cite}. 
+ratings\cite{DebPopCon}. 
 
 \begin{table*}[t]
   % Try apt-get, they have reported this as a bug
@@ -330,7 +330,7 @@ time.
 %with one another.  At worst, there could be 
 This can cause a slow buildup of unending or long
 lived jobs consuming resources and causing deterimental system behavior.
- \cappos{cite SlowLoris}  Similar attacks can be used to indefinitely 
+ \cite{Slowloris}  Similar attacks can be used to indefinitely 
 delay security updates to clients, leaving them vulnerable to compromise
 \cappos{cite slow retrieval for Yum, Apt, etc.}.
 
@@ -384,7 +384,7 @@ way in which applications move a file.  While this can be done via the {\tt
 rename()} system call in some cases, moving files is far more complex in
 many cases.  For example, the file must be copied if moved across file
 systems, which adds additional complexity that libraries and applications
-frequently get wrong \cappos{cite bug reports related to mv}.  
+frequently get wrong.\cite{PHPRenameBug} \cite{PythonShutilBug} \cite{NodejsCopyBug}
 %To come up with the
 %instructions for how to simulate the anomaly, we examined the system 
 %calls made by the {\tt mv} command and compared the behavior of other 
@@ -529,21 +529,20 @@ applications tested fails to perform one or more of the steps required to
 successfully complete a cross-device move.  This is an unfortunate situation
 because a failure to perform any one of these steps can result in negative
 outcomes for the system as a whole.  If the ``Source Replaced'' step isn't
-performed, it often results in corruption of the file. \cappos{ Cite Python
-bug 15100} 
+performed, it often results in corruption of the file\cite{PythonShutilBug}.
 
 Failure to preserve timestamps has obvious
 implications in records-keeping and archival situations as well as any situation
 where a chronological record of file maniuplations is important.  This can 
 cause odd behavior in Makefiles, archival programs, and similar
-software~\cappos{cites}.
+software\cite{NautilusTimestamps} \cite{SudoTimestamp}.
 
 It is more important to ``Preserve Xattrs''.  Real world systems rely on the
 information contained in extended file attributes to reason about the safety
 around a given file, so a failure to preserve these can result in a
 security flaw.  For example, Apple's Gatekeeper relies on extended file
 attributes to prevent applications downloaded untrusted developers from being
-executed without explicit user action. \cappos{cite} 
+executed without explicit user action. \cite{AppleCodesigning}
 
 
 
@@ -688,10 +687,10 @@ condition.
 \subsection{Is CrashSimulator able to execute tests in a performant manner?}
 \label{sec-perf}
 
-\cappos{All of the performance numbers should be here.  I recommend having
-a graph with the normal run time on the x-axis and the replay speed on the
-y-axis.  It will be a scatter plot.  Each point will be one of the
-experiments you ran.}
+%\cappos{All of the performance numbers should be here.  I recommend having
+%a graph with the normal run time on the x-axis and the replay speed on the
+%y-axis.  It will be a scatter plot.  Each point will be one of the
+%experiments you ran.}
 
 One key attribute of successful testing tools is that they be able to
 complete their tests in a timely manner.  If a tool takes too long to
@@ -729,7 +728,7 @@ primarily our utilization of {\tt ptrace}.  Tracing the program
 with {\tt ptrace} adds up to a factor of 5x in overhead.  (This could
 be removed with more efficient mechanisms like {\tt eBPF} or a loadable 
 kernel module.)  Also the start up time of our prototype is high, due
-to \cappos{what?}.
+to starting up the Python interpreter.
 
 
 With a more optimized implementation, CrashSimulator could be much more 
