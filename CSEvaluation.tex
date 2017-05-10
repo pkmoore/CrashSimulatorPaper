@@ -15,7 +15,7 @@
 
 CrashSimulator was evaluated as follows.
 We implemented a prototype in a mix of Python 2 (5060 LOC) and C (2585 
-LOC)\footnote{ Line count numbers are according to SLOCCOUNT\cite{SLOCCOUNT}}.  
+LOC)\footnote{ Line count numbers are according to SLOCCOUNT~\cite{SLOCCOUNT}}.  
 For a test
 environment, we chose a virtual install of Ubuntu Linux 15.04 with a 32 bit 
 kernel on i686 hardware.
@@ -105,7 +105,7 @@ chose two simple anomalies that could be tested in a large
 array of programs.  We chose one file system anomaly and one network anomaly 
 that used common API calls and thus had the potential to appear in
 many programs.  We ran CrashSimulator on applications from GNU Coreutils and
-on popular projects as is indicated by Debian's Popularity Contest\cite{DebPopCon}.
+on popular projects as is indicated by Debian's Popularity Contest~\cite{DebPopCon}.
 
 \subsubsection{Unexpected File Types} Providing unexpected types of files to
 applications.
@@ -121,7 +121,7 @@ ways.  For example, {\tt /dev/urandom} is a character device that produces
 an infinite amount of pseudo-random data when read.
 If an application that reads the full contents of a file
 before processing it is provided {\tt /dev/urandom}, it will fill memory
-or disk and may crash the system\cite{YumAptEndless}.
+or disk and may crash the system~\cite{YumAptEndless}.
 In order to execute correctly, it is often required for applications to 
 examine the files in order to ensure they are of an appropriate type.
 
@@ -210,7 +210,7 @@ as the case where an application blocks forever waiting for a {\tt read()}
 call to retrieve non-existant data from an empty FIFO, or harmfully, as
 happens in the case where an attempts to read in and process an
 ``infinitely large'' file eventually filling available memory or disk
-space\cite{AptYumEndless}\cappos{Please label the bugs w/ the impact.} 
+space~\cite{Cappos_CCS_08}. \cappos{Please label the bugs w/ the impact.} 
 
 \cappos{there will need to be more discussion here.  I need more info about
 the results though, such as which bug does what...}
@@ -266,7 +266,7 @@ waiting.
 
 We use CrashSimulator to analyze  network applications and libraries
 that are amongst the most popular based on Debian's popularity contest 
-ratings\cite{DebPopCon}. 
+ratings~\cite{DebPopCon}. 
 
 \begin{table*}[t]
   % Try apt-get, they have reported this as a bug
@@ -329,10 +329,10 @@ time.
 %completes.  At best there are now multiple iterations of the job conflicting
 %with one another.  At worst, there could be 
 This can cause a slow buildup of unending or long
-lived jobs consuming resources and causing deterimental system behavior.
- \cite{Slowloris}  Similar attacks can be used to indefinitely 
-delay security updates to clients, leaving them vulnerable to compromise
-\cappos{cite slow retrieval for Yum, Apt, etc.}.
+lived jobs consuming resources and causing deterimental system 
+behavior~\cite{Slowloris}.  Similar attacks can be used to indefinitely 
+delay security updates to clients, leaving them vulnerable to 
+compromise~\cite{Cappos_TR_08}.
 
 %Because this attack has been seen in the wild, the developers of major projects
 %have taken steps to ensure their applications are resiliant against it.  The
@@ -384,7 +384,7 @@ way in which applications move a file.  While this can be done via the {\tt
 rename()} system call in some cases, moving files is far more complex in
 many cases.  For example, the file must be copied if moved across file
 systems, which adds additional complexity that libraries and applications
-frequently get wrong.\cite{PHPRenameBug} \cite{PythonShutilBug} \cite{NodejsCopyBug}
+frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
 %To come up with the
 %instructions for how to simulate the anomaly, we examined the system 
 %calls made by the {\tt mv} command and compared the behavior of other 
@@ -529,20 +529,20 @@ applications tested fails to perform one or more of the steps required to
 successfully complete a cross-device move.  This is an unfortunate situation
 because a failure to perform any one of these steps can result in negative
 outcomes for the system as a whole.  If the ``Source Replaced'' step isn't
-performed, it often results in corruption of the file\cite{PythonShutilBug}.
+performed, it often results in corruption of the file~\cite{PythonShutilBug}.
 
 Failure to preserve timestamps has obvious
 implications in records-keeping and archival situations as well as any situation
 where a chronological record of file maniuplations is important.  This can 
 cause odd behavior in Makefiles, archival programs, and similar
-software\cite{NautilusTimestamps} \cite{SudoTimestamp}.
+software~\cite{NautilusTimestamps, SudoTimestamp}.
 
 It is more important to ``Preserve Xattrs''.  Real world systems rely on the
 information contained in extended file attributes to reason about the safety
 around a given file, so a failure to preserve these can result in a
 security flaw.  For example, Apple's Gatekeeper relies on extended file
 attributes to prevent applications downloaded untrusted developers from being
-executed without explicit user action. \cite{AppleCodesigning}
+executed without explicit user action~\cite{AppleCodesigning}.
 
 
 
