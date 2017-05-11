@@ -199,9 +199,9 @@ Fail\\
         ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
         comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
         pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-        readlink    & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        mkdir       & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
-        unlink      & XXXXXXXXXXXXXXXX           & XXXXXXXX       & XXXXXXX        & XXXXXXXXXX  & XXXXX      & XXXXXXXXX   & XXXXXXXXX  & XXXXXX\\
+\hline
+        readlink    & Link being evaluated       & \textbf{No file checks performed} & & & & & & \\
+        unlink      & File being unlinked        & \textbf{No file checks performed} & & & & & & \\
     \bottomrule{}
     \end{tabular}
     \caption{Applications tested for their handling of unexpected file types.
@@ -742,13 +742,8 @@ or not it was able to complete its test executions in an acceptable time
 frame.  
 
 {\bf Method.} Each of the following evaluations examines the completion
-times for 20 consecutive executions of the specified application in both
-native and replay execution modes.  Multiple consecutive executions were
-used for two reasons.  First, a single execution in either mode completes
-so quickly for the applications in question as to be nearly
-indistinguishable from the other mode.  Second, multiple executions
-somewhat controls for varying conditions like filesystem activity or
-network latency that can vary between individual executions.  
+times for executions of the specified application in both
+native and replay execution modes.
 
 
     \begin{figure}[t]
