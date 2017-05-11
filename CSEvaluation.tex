@@ -110,7 +110,7 @@ on popular projects as is indicated by Debian's Popularity Contest~\cite{DebPopC
 \subsubsection{Unexpected File Types} Providing unexpected types of files to
 applications.
 
-The first anomaly CrashSimulator identifies occurs when an
+The first anomaly investigated occurs when an
 application has to retrieve and process data from a file.  Linux supports
 several ``special'' file types apart from the standard ``regular'' file type.
 These include directories, symbolic links, character devices, block devices,
@@ -122,7 +122,8 @@ an infinite amount of pseudo-random data when read.
 If an application that reads the full contents of a file
 before processing it is provided {\tt /dev/urandom}, it will fill memory
 or disk and may crash the system~\cite{YumAptEndless}.
-In order to execute correctly, it is often required for applications to 
+Correct execution in these situations
+often requires that applications 
 examine the files in order to ensure they are of an appropriate type.
 
 {\bf Method.}  Identifying these bugs involves changing an application's
@@ -154,8 +155,17 @@ given file type.
 %behavior on the given file type.}
 % I verified a subset of the results by providing actual "weird files"
 
-Multiple executions were used to examine the applications response to each of
-the listed file types.  A result of ``Initial Value''
+For each application, CrashSimulator was invoked multiple times,
+modifying the trace to simulate each of the non-standard file type anomalies.
+Some of the applications opened multiple files; in these cases each
+anomaly was simulated for each of the file arguments to the application.
+%were used to examine the applications response to each of
+%the listed file types. 
+The columns of Table~\ref{table:unexpectedtypes} 
+are labeled by the values that CrashSimulator inserts into
+the return value of the {\tt stat()}-like call, corresponding to
+different file type anomalies.
+A result of ``Initial Value''
 indicates that this type is the file type the application was provided when the
 execution trace being replayed was recorded -- that is, a file of the type the
 application was expecting.  A result of ``Recognizes'' indicates that the
@@ -202,7 +212,7 @@ for different file opens tested.  Does another app have this?}}
 
 The frequency of failed executions in our results indicate that many
 applications make the assumption that they will only be used to process
-regular files.  When this assumption does not hold the results off the
+regular files.  When this assumption does not hold the results of the
 application's execution are hard to predict.  In many cases a denial of
 service condition occurs in the form of the application ``hanging'' as it
 attempts to incorrectly process the file.  This may happen harmlessly (such
@@ -216,10 +226,10 @@ space~\cite{Cappos_CCS_08}. \cappos{Please label the bugs w/ the impact.}
 the results though, such as which bug does what...}
 
 An interesting behavior we recognized when analyzing these results can be seen
-in the bottom applications listed in the above table.  Each of these
+in the last three applications listed in table~\ref{table:unexpectedtype}.  Each of these
 applications correctly recognized when any filetype other than its expected
-filetype.  This is because these applications are simply ``dumb'' wrappers
-around they system calls they share a name with.  Essentially, they just hand
+filetype was encountered.  This is because these applications are simply ``dumb'' wrappers
+around the system calls they share a name with.  Essentially, they just hand
 the specified file to their corresponding system call and, in the case of an
 error, use {\\tt perror()} to print the correct localized error message.  In
 short, these applications pass their error handling responsibilities to the
