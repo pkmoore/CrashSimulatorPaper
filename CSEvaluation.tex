@@ -226,12 +226,12 @@ space~\cite{Cappos_CCS_08}. \cappos{Please label the bugs w/ the impact.}
 the results though, such as which bug does what...}
 
 An interesting behavior we recognized when analyzing these results can be seen
-in the last three applications listed in table~\ref{table:unexpectedtype}.  Each of these
+in the last three applications \phyllis{Is this correct?} listed in Table~\ref{table:unexpectedtypes}.  Each of these
 applications correctly recognized when any filetype other than its expected
 filetype was encountered.  This is because these applications are simply ``dumb'' wrappers
 around the system calls they share a name with.  Essentially, they just hand
 the specified file to their corresponding system call and, in the case of an
-error, use {\\tt perror()} to print the correct localized error message.  In
+error, use {\tt perror()} to print the correct localized error message.  In
 short, these applications pass their error handling responsibilities to the
 kernel.
 
@@ -247,7 +247,7 @@ periods.
 % Sentence at the end that says "now that we've seen that these issues are prevalent across major applications...
 
 The second anomaly we examined using CrashSimulator
-involves an applications behavior when it attempts to communicate over a network
+involves an application's behavior when it attempts to communicate over a network
 with extremely long (on the order of minutes) response times.  At a low level,
 applications retrieve data from a network socket by waiting for data to be
 available and then reading it.  A key aspect of this approach is handling the 
@@ -268,7 +268,7 @@ absence of {\tt setsockopt()}, {\tt poll()} and {\tt select()} calls as well as
 the timeout values that may or may not have been passed to them. Applications
 that do not set the timeout are subject to the operating
 system defined protocol timeout value (19 minutes on Linux).
-Note, by properly manipulating the results of all
+Note that by properly manipulating the results of all
 time-returning calls, CrashSimulator can simulate an execution where close to
 the maximum timeout value occurred without actually spending any time
 waiting.
@@ -278,12 +278,13 @@ We use CrashSimulator to analyze  network applications and libraries
 that are amongst the most popular based on Debian's popularity contest 
 ratings~\cite{DebPopCon}. 
 
-\begin{table*}[t]
+%\begin{table*}[t]
+\begin{table}[t]
   % Try apt-get, they have reported this as a bug
   \scriptsize{}
   \begin{tabular}{l | l}
     \toprule{}
-    Application              & Analysis Result\\
+	  {\bf Application}              & {\bf Analysis Result}\\
     wget                     & Overly long timeout supplied to {\tt select()}, vulnerable\\
     ftp                      & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
     telnet                   & {\tt select()} specifies no timeout, vulnerable\\
@@ -297,20 +298,21 @@ ratings~\cite{DebPopCon}.
     \bottomrule{}
   \end{tabular}
   \caption{Applications tested for their handling of extremely slow response
-    times from the host they are communicating with}
+    times from the host with which they are communicating }
   \label{table:slowloris}
-\end{table*}
+\end{table}
+%\end{table*}
 
 
 {\bf Findings.}
-As can be seen from the above results, all of the applications we examined were
-vulnerable to this sort of anomalous condition.  
+%As can be seen from the above results, all of the applications we examined were
+%vulnerable to this sort of anomalous condition.  
  As Table~\ref{table:slowloris} shows, all of these
 applications \cappos{include elapsed time needed to do a basic
-session.} were vulnerable, with timeouts taking hours or
+session.} were vulnerable to this sort of anomaly, with timeouts taking hours or
 even days in some cases.
 What's more, in the vast
-majority of cases it is because the application makes no effort to specify a
+majority of cases, the problem occurs because the application makes no effort to specify a
 timeout value.  This means that the application is effectively falling back on
 the operating system's maximum timeout value as defined for the protocol in
 use.  This value is \emph{19 minutes} for the above applications as defined by
@@ -320,7 +322,7 @@ application alive.
 
 This attack technique has been effectively exploited in the wild.  The {\tt 
 slowloris} tool
-allowed a single attacking host to successfully denial of service a vulnerable
+allowed a single attacking host to successfully deny service to a vulnerable
 web server with minimal bandwidth usage.  This attack worked by introducing
 delays between the time headers were sent to the victim by an attacking HTTP
 client.  Because many web servers at the time allowed large timeouts between
@@ -356,7 +358,7 @@ compromise~\cite{Cappos_TR_08}.
 {\bf Concluding Thoughts}
 The results of the above analysis show that CrashSimulator is readily able to
 identify novel bugs in widely used applications.  This includes
-widely used toos, security-focused applications like {\tt gnu-gpg}, and 
+widely used tools, security-focused applications like {\tt gnu-gpg}, and 
 host of popular network applications.  This is
 because CrashSimulator focuses on identifing bugs that result from anomalous
 conditions present in an applications environment.  CrashSimulator provides
@@ -383,15 +385,17 @@ repeatable, principled manner.
 
 \subsection{Can CrashSimulator identify complex anomalies?}
 \label{sec-complex}
+\phyllis{Re-word this question?}
 
 % Re-organize this to the same format as the above two sections
 % Talk about doing manual source code analysis to identify interesting edge conditions
 
-Given that now we see that many applications have simple environmental bugs,
-we wanted to understand if CrashSimulator can identify more complex types
+Having seen that CrashSimulator can detect many bugs with fairly 
+simple anomaly injections and checks,
+we wanted to understand whether CrashSimulator can identify more complex types
 of misbehavior that crosses many system calls.  To do this, we examined the
-way in which applications move a file.  While this can be done via the {\tt
-rename()} system call in some cases, moving files is far more complex in
+way in which applications move a file.  In some cases this can be done via the {\tt
+rename()} system call, but moving files is far more complex in
 many cases.  For example, the file must be copied if moved across file
 systems, which adds additional complexity that libraries and applications
 frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
@@ -434,10 +438,11 @@ The resulting anomalies that could be detected were as follows:
 %    detecting based only on system call behavior}
 \paragraph{Source Replaced}
 
-An application must make an effort to ensure that the file being copied is not 
+An application should make an effort to ensure that the file being copied is not 
 replaced between the time it is initially examined and the time it is opened 
 for copying.  Otherwise it could have been replaced by a file of a different
 type, such as a character device.
+%
 %{\tt
 %  mv} handles this situation by storing the inode number returned by an initial
 %{\tt stat()} call and compares it to the inode number returned by an {\tt
@@ -452,6 +457,9 @@ type, such as a character device.
 %replay execution of a system call trace of an application moving a file across
 %devices.  If the requisite system calls are not present then the application has
 %not performed the file move safely and the execution is rejected.
+To test whether applications are robust to anomalies involving source file replacement,
+we developed a checker that monitors whether a series of safety checks
+are performed and applied it to traces that simulated a cross-device move.
 
 \paragraph{Preserve Xattrs}
 
@@ -461,17 +469,22 @@ held by normal filesystem fields.  For example, an operating system can use
 extended file attributes to store whether or not a file was downloaded from the
 Internet -- important security information that used to warn
 users if they are about to open a potentially unsafe file.  
+When copying a file,
+an application should retrieve extended file attributes from the source
+file and later apply them to the destination file.
 %{\tt mv} handles
 %preservation of these attributes by making the appropriate system calls to read
 %all of the extended file attributes off of the source file and then applying
 %them to the destination file.  Once again, CrashSimulator is able to determine
 %whether or not an application has correctly preserved these attributes by
 %monitoring a replay execution of an application moving a file across devices.
-%Specifically, CrashSimulator watches for the application to make system calls
-%that read the extended file attributes from the source file (i.e. {\tt
-%  getxattr()}, {\tt lgetxattr()}, or {\tt fgetxattr()}) followed by system calls
-%that re-apply the attributes to the destination file (i.e. {\tt setxattr()},
-%{\tt lsetxattr()}, or {\tt fsetxattr()}).
+In this case, CrashSimulator used a checker
+that watches for the application to make system calls
+that read the extended file attributes from the source file (i.e. {\tt
+  getxattr()}, {\tt lgetxattr()}, or {\tt fgetxattr()}) followed by system calls
+that re-apply the attributes to the destination file (i.e. {\tt setxattr()},
+{\tt lsetxattr()}, or {\tt fsetxattr()}) and applies them
+to traces that simulate a cross-device move.
 
 \paragraph{Preserve Timestamps}
 
@@ -482,12 +495,15 @@ file.
 %{\tt mv} ensures that this
 %occurs by making system calls that retrieve the POSIX timestamps associated with
 %a file (content modification time, file status change time, and last access
-%time) and apply them to the destination file.  CrashSimulator is able to monitor
+%time) and apply them to the destination file.  
+In this case, the checker monitors
 %a replay execution in order to ascertain whether or not an application applies
-%the appropriate timestamps to the destination file as part of moving a file
-%across devices by monitoring for a system call from the {\tt stat()} family to
-%retrieve the timestamps and system call from the {\tt utime()} family to apply
-%the retrieved timestamps to the destination file.
+whether when replaying a trace modified to simulate cross-device move,
+the application applies
+the appropriate timestamps to the destination file as part of moving a file
+across devices by monitoring for a system call from the {\tt stat()} family to
+retrieve the timestamps and system call from the {\tt utime()} family to apply
+the retrieved timestamps to the destination file.
 
 \paragraph{Copying Devices}
 
@@ -534,19 +550,23 @@ Incorrect entries are either missing the needed check or were ineffective.
 \end{table}
 
 {\bf Findings.}
-As can be seen from the results in Table~\ref{table:crossdevice} each of the
+As can be seen from the results in Table~\ref{table:crossdevice}, each of the
 applications tested fails to perform one or more of the steps required to
 successfully complete a cross-device move.  This is an unfortunate situation
 because a failure to perform any one of these steps can result in negative
 outcomes for the system as a whole.  If the ``Source Replaced'' step isn't
 performed, it often results in corruption of the file~\cite{PythonShutilBug}.
+%
+\phyllis{I think these paragraphs about why it's important to deal with all
+of these issues should be merged into the corresponding paragraphs 
+a, b, c, d, above.}
 
 Failure to preserve timestamps has obvious
 implications in records-keeping and archival situations as well as any situation
 where a chronological record of file maniuplations is important.  This can 
 cause odd behavior in Makefiles, archival programs, and similar
 software~\cite{NautilusTimestamps, SudoTimestamp}.
-
+%
 It is more important to ``Preserve Xattrs''.  Real world systems rely on the
 information contained in extended file attributes to reason about the safety
 around a given file, so a failure to preserve these can result in a
@@ -562,7 +582,8 @@ from an infinite character device filled either disk or memory, sometimes
 causing the system to become unresponsive.
 
 Our results indicate that CrashSimulator is able to identify whether complex
-operations are performed correctly in an array of popular programs.  
+operations are performed correctly in anomolous situations in
+an array of popular programs.  
 This includes the standard libraries for the programming languages Python,
 Perl, and Rust, along with other widely used software.  This is true even
 when many libraries have correct behavior in some cases, but not others.
@@ -623,26 +644,34 @@ application using a different sequence of system calls than a checker was
 anticipating to implement a given operation.  Fortuantely, CrashSimulator's
 approach allows these situations to be easily corrected once identified.
 
-In many cases a given operation can performed in several ways.  This means that
-a given operation may be correctly implemented by a set of system call sequences
-that differ from each other on a variety of dimensions.  In order to correctly
-classify applications that make use of alternative methods for a given operation
-the compuational models CrashSimulator relies on must accept the assoc
+%In many cases a given operation can performed in several ways.  This means that
+%a given operation may be correctly implemented by a set of system call sequences
+%that differ from each other on a variety of dimensions.  
+%In order to correctly
+%classify applications that make use of alternative methods for a given operation
+%the checkers must be able to check for several alternatives.
 
-As an example consider GNOME's {\tt glib} file handling facilties.  When an
+For example, consider GNOME's {\tt glib} file handling facilties.  When an
 application makes use of these facilities to move a file across storage devices
-the library itself correctly handles the above behaviors we definied earlier as
-making up a "correct" file move operation.  When we used CrashSimulator to
-analyze a minimal application using {\tt glib} to perform this operation we
-initially received failing results.  We found through manual examination of a
-the system call trace used in this analysis that, while {\tt glib} correctly performs
-the required behaviors, it does so using alternative system call sequences.  For
-example, the typical way to move the actual contents of a file from one file to
-another is to {\tt read()} the data from the source file and {\tt write()} the
-data back out to the destination file.  Glib instead creates a pipe and uses the
+the library itself correctly handles the behaviors described above as
+making up a "correct" file move operation.  When we used CrashSimulator 
+with the checkers described above to
+analyze a minimal application that used {\tt glib} for a cross-device move,
+we got erroneous reports stating that the application {\em did not} respond
+correctly to the anomaly.
+We found through manual examination of a
+the system call trace that, while {\tt glib} correctly performs
+the required behaviors, it does so using alternative system call sequences. 
+Rather than using a sequence of
+{\tt read()} and {\tt write()} calls, 
+as our checker expected,
+Glib creates a pipe and uses the
 {\tt splice()} system call to copy the contents out of the source file, through
 the pipe, and into the destination file.
 
+Fortunately, as soon as false positives like this are discovered,
+CrashSimulator's checkers can be modified to deal with alternative
+approaches to handling an anomaly.
 This approach is viable because there are a finite number of system calls, and a
 given operation can be mapped to a managable subset of system calls.  Given the
 above example around moving files, consider the mapping from high level
@@ -650,26 +679,28 @@ above example around moving files, consider the mapping from high level
 Table~\ref{table:stepsandcalls}.  Each of the steps in the operation map to a small
 number of system calls and, in most cases, only one of the system calls is
 necessary.  In situations where two system call sequences can correctly
-implement the same operation CrashSimulator simply runs two computational models
-in parallel and accepts the execution if either model ends in an accepting
+implement the same operation CrashSimulator simply runs two checkers
+in parallel and accepts the execution if either one ends in an accepting
 condition.
 
-\begin{table*}[t]
+\begin{table}[t]
     \scriptsize{}
     \begin{tabular}{l | l }
     \toprule{}
-      Operation                                               & Potential System calls\\
+	    {\bf Operation}                                               & {\bf Potential System calls}\\
       Examine source file                                     & stat64(), lstat64(), fstat64()\\
       Examine destination file                                & stat64(), lstat64(), fstat64()\\
       Open source file                                        & open()\\
       Read contents of source file                            & read(), splice() with a pipe\\
-      List source file's extended file attributes             & listxattr(), llistxattr(), flistxattr()\\
-      Read contents of source file's extended file attributes & getxattr(), lgetxattr(), fgetxattr()\\
+	    List source file's & \\ ~~~~~extended file attributes             & listxattr(), llistxattr(), flistxattr()\\
+      %Read contents of source file's extended file attributes & getxattr(), lgetxattr(), fgetxattr()\\
+	    Read contents of source file's                    & \\
+	    ~~~~~~~extended file attributes & getxattr(), lgetxattr(), fgetxattr() \\
       Open destination file                                   & open(), optionally unlink() the file first\\
       Write contents to destination file                      & write(), splice() with a pipe\\
-      Apply extended file attributes to destination file      & setxattr(), lsetxattr(), fsetxattr()\\
-      Apply proper timestamps to destination file             & utimens(), futimens()\\
-      Apply proper permissions to destination file            & chmod(), open() with a modeline specified\\
+	    Apply extended file attributes to & \\ ~~~~~destination file      & setxattr(), lsetxattr(), fsetxattr()\\
+	    Apply proper timestamps to & \\ ~~~~~destination file             & utimens(), futimens()\\
+	    Apply proper permissions & \\ ~~~~~to destination file            & chmod(), open() with a modeline specified\\
       Close the source file                                   & close()\\
       Close the destination file                              & close()\\
     \bottomrule{}
@@ -677,7 +708,7 @@ condition.
     \caption{Each step of a successful cross-disk file move operation mapped to
       the system call or calls that can implement it}
     \label{table:stepsandcalls}
-\end{table*}
+\end{table}
     
 %{\bf False Negatives.}
 %CrashSimulator can encounter false negatives (that is, CrashSimulator accepts an
