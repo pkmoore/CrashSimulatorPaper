@@ -22,7 +22,7 @@
 
         Operating at the system call level allows this work to take advantage of
         two key pieces of tooling that already exist in mature form on Linux.
-        The first is ptrace. {\tt Ptrace} is a process manipulation interface provided
+        The first is {\tt ptrace}. {\tt Ptrace} is a process manipulation interface provided
         by the Linux kernel whose primary use case is debugger development.
         This work leverages {\tt ptrace} in order to start and stop execution of a
         process as well as read and write the contents of the processes
@@ -158,7 +158,7 @@
     Because CrashSimulator controls execution so that it faithfully
     follows the system call behavior described in the system call trace being
     replayed modifying this trace manually or programatically is enough to
-    introduce anomalous behavior.  For example, suppose an anomaly reqires a
+    introduce anomalous behavior.  For example, suppose an anomaly requires a
     call to {\tt read()} fail with return value of -1 and {\tt errno} set to
     {\tt EINVAL}.  Exposing an application to this situation only requires
     editing the system call trace such that the line describing this read call
@@ -245,7 +245,7 @@
     %a test can only tell us if
     %an application performs a specific bad behavior in a specific situation.  A
     %test cannot prove that an application is bug free in the same situation. 
-    as
+    As
     with traditional tests, CrashSimulator does not tell us that an application is
     bug free in a given situation; instead, it asserts that an application
     has incorrectly handled a given situation.
@@ -267,7 +267,7 @@
 
 
     \subsection{Anomaly Examples}
-
+    \label{subsec:anomalyexamples}
     Anomalies can be as subtle as a single configuration flag being set
     differently under specific circumstances.  In BSD and OS X sockets returned
     by the {\tt accept()} system call inherit the values of the {\tt
@@ -290,7 +290,6 @@
     limitations in Linux's {\tt rename()} system call and the way Linux's
     directory heirarchy can abstract away complicated device configurations.
 
-    \phyllis{similar text in Eval is redundant. Leave this here and refer back to it from eval}
     Trivial cases of moving a file (i.e. those where the source and destination
     are on the same device are accomplished using the {\tt rename()} system
     call.  In cases where the source and destination are not on the same device
