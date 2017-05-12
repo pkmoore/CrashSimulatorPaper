@@ -45,7 +45,15 @@ application for use in testing other new or existing application.
 In this way, an ever-expanding ``test suite'' can
 be created allowing lessons learned from a bug in one application to benefit others.
 
-\phyllis{Need short summary of results}
+Our evaluation of CrashSimulator has shown it to be both performant and
+effective.  CrashSimulator was able to identify bugs related to unusual file
+types in 15 applications and bugs related to slow network performance in 10
+network applications and libraries.  Additionally CrashSimulator found
+filesystem related bugs in 7 applications and libraries with facilities for
+moving files between areas of a system's filesystem.  The low overhead
+introduced by CrashSimulator's technique meant that it was able to
+find these bugs quickly in spite of its unoptomized implementation.
+
 We have shown CrashSimulator's approach to be successful by identifying bugs, both previously known and unknown, in
 existing popular applications.  These bugs were identified using knowledge gained from how one application correctly
 performs a particular operation (namely, copying a file across disks) by encoding that knowledge as computational models
