@@ -49,7 +49,6 @@ settings configured on the parent socket.  This is how {\tt accept()} behaves in
 implementation so this is a reasonable assumption.  Unfortunately, this is not the case in Linux
 where the returned socket does is not inherit these options.  This implementation difference resulted in a portability
 bug in Python~\cite{Zhuang_NSDI_2014}.
-
 Interactions with file systems are also prone to small differences in environments.
 In testing GnuPG we discovered that developers implicitly assumed that that a file being provided as input to the key
 import process was a regular file; when this assumption was violated, the application failed.
@@ -158,12 +157,12 @@ devices, crash simulator can test other applications $A'$ as follows:
 
 Overall, each of CrashSimulator's test patterns consists of rules for mutating traces to give the application the
 illusion that it is executing in an anomalous environment and a checker 
-that attempts to determine whether the responds appropriately to the anomaly.
+that attempts to determine whether the application responds appropriately to the anomaly.
 Once developed, these test patterns can be applied to many traces from many applications that may be prone to mishandling the environmental anomaly in question.
-In the remainder of this paper we describe CrashSimulator's operation more generally and in more detail.
-Manipulation and replay of traces (section~\ref{sec:approach}),
-Models for checking behavior in simulated environment (section~\ref{sec:approach})
-Evaluation (section~\ref{sec:evaluation})
+In the remainder of this paper we describe CrashSimulator's operation more generally and in more detail:
+Manipulation and replay of traces is described in (section~\ref{sec:approach}),
+Models for checking behavior in simulated environment in (section~\ref{sec:approach})
+and Evaluation in (section~\ref{sec:evaluation}).
 Related work is discussed in section~\ref{sec:relatedwork}.
 
 		This work makes the following contributions:
