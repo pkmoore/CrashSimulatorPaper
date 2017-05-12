@@ -26,7 +26,7 @@ We did not handle threaded programs and disabled ASLR and the kernel's vDSO
 to make replay easier.  As far as we are aware, none of these choices 
 influenced the bugs that CrashSimulator can find, however the lack of support
 for threaded programs obviously influences the programs we can test.  The 
-only major impact these design choices had, was our use of {\tt ptrace} 
+only major impact these design choices had, was that our use of {\tt ptrace} 
 slowed our prototype's performance (which will be discussed later) but made
 constructing CrashSimulator easier.  Given appropriate anomaly information, 
 our implementation of CrashSimulator can
@@ -134,7 +134,7 @@ of a text file according to a provided command string, could be provided
 a symbolic link, a directory, or a character device
 instead.  CrashSimulator accomplishes this by identifying the calls to {\tt
   stat()}, {\tt fstat()}, or {\tt lstat()} that an application makes to examine
-the file and then changes to trace to simulate that the regular file {\tt sed}
+the file and then changes to the trace to simulate that the regular file {\tt sed}
 is expecting is actually one of the special file types.  If the application
 responds to this injected information then there is the possibility that the
 special file is being handled correctly.  If the application does not alter its
@@ -147,9 +147,6 @@ behavior then the anomalous condition is not being handled correctly.
 {\bf Findings.}
 Simulating these anomalies for each type of file
 gave the results shown in Table~\ref{table:unexpectedtypes}. 
-We manually examined a subset of the listed application behaviors simulated by
-CrashSimulator and verified they were consistent with the actual behavior on the
-given file type.
 
 %\cappos{Is this true: We manually examined each application behavior
 %simulated by CrashSimulator and verified it is consistent with the actual 
@@ -175,7 +172,9 @@ and its execution diverged from the trace being replayed indicating that it was
 potentially handling the unexpected file type correctly.  A result of ``Fail''
 indicates that the application failed to recognize the presence of the unusual
 file type because its execution did not diverge from the trace being replayed.
-
+We manually examined a subset of the listed application behaviors simulated by
+CrashSimulator and verified they were consistent with the actual behavior on the
+given file type.
 
 \begin{table*}[t]
     \scriptsize{}
@@ -205,9 +204,9 @@ Fail\\
         unlink      & File being unlinked        & \textbf{No file checks performed} & & & & & & \\
     \bottomrule{}
     \end{tabular}
-    \caption{Applications tested for their handling of unexpected file types.
-\cappos{Aspell is much more interesting if there are different behaviors
-for different file opens tested.  Does another app have this?}}
+    \caption{Applications tested for their handling of unexpected file types.}
+%\cappos{Aspell is much more interesting if there are different behaviors
+%for different file opens tested.  Does another app have this?}
     \label{table:unexpectedtypes}
 \end{table*}
 
@@ -221,15 +220,15 @@ as the case where an application blocks forever waiting for a {\tt read()}
 call to retrieve non-existent data from an empty FIFO) or harmfully, as
 happens in the case where an application attempts to read in and process an
 ``infinitely large'' file eventually filling available memory or disk
-space~\cite{Cappos_CCS_08}. \cappos{Please label the bugs w/ the impact.} 
+space~\cite{Cappos_CCS_08}. %\cappos{Please label the bugs w/ the impact.} 
 
-\cappos{there will need to be more discussion here.  I need more info about
-the results though, such as which bug does what...}
+%\cappos{there will need to be more discussion here.  I need more info about
+%the results though, such as which bug does what...}
 
 An interesting behavior we recognized when analyzing these results can be seen
 in the last two applications listed in Table~\ref{table:unexpectedtypes}.  Each of these
-applications correctly recognized when any filetype other than its expected
-filetype was encountered.  This is because these applications are simply ``dumb'' wrappers
+applications correctly recognized when any file type other than its expected
+file type was encountered.  This is because these applications are simply ``dumb'' wrappers
 around the system calls they share a name with.  Essentially, they just hand
 the specified file to their corresponding system call and, in the case of an
 error, use {\tt perror()} to print the correct localized error message.  In
@@ -309,8 +308,8 @@ ratings~\cite{DebPopCon}.
 %As can be seen from the above results, all of the applications we examined were
 %vulnerable to this sort of anomalous condition.  
  As Table~\ref{table:slowloris} shows, all of these
-applications \cappos{include elapsed time needed to do a basic
-session.} were vulnerable to this sort of anomaly, with timeouts taking hours or
+ applications %\cappos{include elapsed time needed to do a basic session.}
+ were vulnerable to this sort of anomaly, with timeouts taking hours or
 even days in some cases.
 What's more, in the vast
 majority of cases, the problem occurs because the application makes no effort to specify a
@@ -386,7 +385,7 @@ repeatable, principled manner.
 
 \subsection{Anomalies That Require Complex Checkers}
 \label{sec-complex}
-\phyllis{Re-word this question?}
+%\phyllis{Re-word this question?}
 
 % Re-organize this to the same format as the above two sections
 % Talk about doing manual source code analysis to identify interesting edge conditions
@@ -410,7 +409,7 @@ frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
 %location on another device must be handled on a case-by-case basis by any
 %application that relies on this operation.  
 
-{\bf Method.}  To locate anomalies, 
+{\bf Method.}  To identify anomalies, 
 we examined several libraries and found that {\tt mv} seemed
 to handle cases that other tools failed to consider.  Following this, we 
 used the trace of {\tt mv} as a template and created instructions to modify
@@ -486,12 +485,11 @@ that watches for the application to make system calls
 that read the extended file attributes from the source file (i.e. {\tt
   getxattr()}, {\tt lgetxattr()}, or {\tt fgetxattr()}) followed by system calls
 that re-apply the attributes to the destination file (i.e. {\tt setxattr()},
-{\tt lsetxattr()}, or {\tt fsetxattr()}) and applies them
-to traces that simulate a cross-device move.
+{\tt lsetxattr()}, or {\tt fsetxattr()}).
 
 \paragraph{Preserve Timestamps}
 
-In order to truely copy a file from one device
+In order to truly copy a file from one device
 to another an application needs to ensure that its metadata (such as the 
 creation, modification, and access times) are preserved in the destination 
 file.  
@@ -554,8 +552,8 @@ Loss} & {\bf Fill Disk} \\
     \end{tabular}
     \caption{Applications and libraries analyzed to determine whether or not
       they are able to correctly move a file from one device to another.
-Incorrect entries are either missing the needed check or were ineffective.
-\cappos{can we label them differently?}}
+Incorrect entries are either missing the needed check or were ineffective.}
+%\cappos{can we label them differently?}}
     \label{table:crossdevice}
 \end{table}
 
@@ -626,7 +624,7 @@ The primary source of %false positives (that is, CrashSimulator reports a failur
 %in a situation where the execution should be accepted) for 
 errors in CrashSimulator is an
 application using a different sequence of system calls than a checker was
-anticipating to implement a given operation.  Fortunately, CrashSimulator's
+anticipating to implement a given operation.  CrashSimulator's
 approach allows these situations to be easily corrected once identified.
 
 %In many cases a given operation can performed in several ways.  This means that
