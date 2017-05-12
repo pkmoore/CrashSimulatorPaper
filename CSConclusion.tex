@@ -8,9 +8,9 @@ environments in which it will be deployed.
 problem, this work presented CrashSimulator, a testing
 approach that utilizes mutation, replay, and analysis of system call traces
 in order to test whether applications respond correctly to 
-anamolous environment conditions.
+anomalous environment conditions.
 A significant benefit of CrashSimulator is that failures observed
-in executing one application in an anomolous environment can
+in executing one application in an anomalous environment can
 easily be leveraged to test whether {\em other} applications
 suffer from the same underlying problem.
 
@@ -19,7 +19,7 @@ resulting from an application's interactions with its environment.
 %Performing its analysis on a replayed execution of an application allows
 %CrashSimulator to remove the filesystem and network dependancies of the application under test.  
 To test whether an application responds appropriately to a particular
-anomaly (such as an unexpected filetype, an unexpected device, an unexpected
+anomaly (such as an unexpected file type, an unexpected device, an unexpected
 network conditions, etc.)
 CrashSimulator records system call traces from the application under test,
 mutates return values and/or program state to simulate execution in 
@@ -52,6 +52,6 @@ network applications and libraries.  Additionally CrashSimulator found
 filesystem related bugs in 7 applications and libraries with facilities for
 moving files between areas of a system's filesystem.  The low overhead
 introduced by CrashSimulator's technique meant that it was able to
-find these bugs quickly in spite of its unoptomized implementation.
+find these bugs quickly in spite of its unoptimized implementation.
 
 Future work will include expanding the repository of anomalies and their checkers, as well as exploring opportunities to further automate the discovery of anomalies and checkers.

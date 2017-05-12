@@ -100,7 +100,7 @@
     well as manual analysis, to develop the set of anomalies used in our
     evaluation.  NetCheck is readily able to identify a wide variety of anomalous
     behaviors related to network communication between one or more
-    hosts.  CheckAPI peforms a similar function by comparing behavior of an API
+    hosts.  CheckAPI performs a similar function by comparing behavior of an API
     implementation to a reference model.
 
     Another source of anomalies is the public bug trackers of projects available
@@ -157,7 +157,7 @@
     into an execution.  
     Because CrashSimulator controls execution so that it faithfully
     follows the system call behavior described in the system call trace being
-    replayed modifying this trace manually or programatically is enough to
+    replayed modifying this trace manually or programmatically is enough to
     introduce anomalous behavior.  For example, suppose an anomaly requires a
     call to {\tt read()} fail with return value of -1 and {\tt errno} set to
     {\tt EINVAL}.  Exposing an application to this situation only requires
@@ -178,11 +178,11 @@
     %modified after the initial call to stat().
 
 
-    \subsection{Analysing an Execution}
+    \subsection{Analyzing an Execution}
 
     CrashSimulator's replay process consists of CrashSimulator launching the
     application under test as a child process and interceeding in its execution
-    at approprate times in order to simulate the results and side effects of any
+    at appropriate times in order to simulate the results and side effects of any
     system calls the application makes.  Because the system call trace being
     replayed has been mutated to reflect the chosen anomaly, this process
     exposes the application to that anomaly. After the replayed execution
@@ -224,21 +224,21 @@
     When CrashSimulator injects anomalous behavior into a replay execution it is
     done with the intention that the application under test deal with this
     anomaly in some way. For example, many applications
-    can be expected to behave diffently when
+    can be expected to behave differently when
     the structure returned by a call to {\tt stat()} indicates that the target file
     is a symlink rather than a regular file.
     When there are numerous very different ways an
     application could correctly handle a given anomaly, CrashSimulator 
     can use a generic ``default checker''.  The default checker
     is based on the assumption that an application's efforts to deal with the anomaly
-    will result in it executing different program paths (and threfore different
+    will result in it executing different program paths (and therefore different
     system calls) than were executed when the system call trace being replayed
     was recorded.  If the application being replayed does not
     alter its behavior to deal with the anomaly, the application has not
     correctly handled the anomaly -- a failing result.  Alternatively, if the
-    application deivates from the behavior recorded in the system call trace
+    application deviates from the behavior recorded in the system call trace
     driving the replay it is likely that the application is taking some action
-    to handle the injected condition -- an indiciation of possibly correct
+    to handle the injected condition -- an indication of possibly correct
     behavior.
 
     This approach is often sufficient. % because in reality, 
@@ -288,7 +288,7 @@
     seems to fairly simplistic to carry out.  In reality, things become complex
     quickly once a few implementation details are taken into account: namely
     limitations in Linux's {\tt rename()} system call and the way Linux's
-    directory heirarchy can abstract away complicated device configurations.
+    directory hierarchy can abstract away complicated device configurations.
 
     Trivial cases of moving a file (i.e. those where the source and destination
     are on the same device are accomplished using the {\tt rename()} system
@@ -296,7 +296,7 @@
     this system call fails and the application must handle the operation
     manually. This means that \emph{any} application that moves files around on
     a Linux system must be able to deal with the situation where some part of
-    the drirectory structure may physically reside on a different device.
+    the directory structure may physically reside on a different device.
     During our evaluation provided CrashSimulator with an understanding of what
     it takes to move a file correctly using the GNU Coreutils {\tt mv} command
     as our ``gold standard.''  We found many applications do not handle the

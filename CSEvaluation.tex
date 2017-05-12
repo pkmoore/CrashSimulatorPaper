@@ -135,7 +135,7 @@ a symbolic link, a directory, or a character device
 instead.  CrashSimulator accomplishes this by identifying the calls to {\tt
   stat()}, {\tt fstat()}, or {\tt lstat()} that an application makes to examine
 the file and then changes to trace to simulate that the regular file {\tt sed}
-is expecting is actually one of the special filetypes.  If the application
+is expecting is actually one of the special file types.  If the application
 responds to this injected information then there is the possibility that the
 special file is being handled correctly.  If the application does not alter its
 behavior then the anomalous condition is not being handled correctly.
@@ -148,7 +148,7 @@ behavior then the anomalous condition is not being handled correctly.
 Simulating these anomalies for each type of file
 gave the results shown in Table~\ref{table:unexpectedtypes}. 
 We manually examined a subset of the listed application behaviors simulated by
-CrashSimulator and verifed they were consistent with the actual behavior on the
+CrashSimulator and verified they were consistent with the actual behavior on the
 given file type.
 
 %\cappos{Is this true: We manually examined each application behavior
@@ -218,7 +218,7 @@ application's execution are hard to predict.  In many cases a denial of
 service condition occurs in the form of the application ``hanging'' as it
 attempts to incorrectly process the file.  This may happen harmlessly (such
 as the case where an application blocks forever waiting for a {\tt read()}
-call to retrieve non-existant data from an empty FIFO) or harmfully, as
+call to retrieve non-existent data from an empty FIFO) or harmfully, as
 happens in the case where an application attempts to read in and process an
 ``infinitely large'' file eventually filling available memory or disk
 space~\cite{Cappos_CCS_08}. \cappos{Please label the bugs w/ the impact.} 
@@ -342,7 +342,7 @@ time.
 %completes.  At best there are now multiple iterations of the job conflicting
 %with one another.  At worst, there could be 
 This can cause a slow buildup of unending or long
-lived jobs consuming resources and causing deterimental system 
+lived jobs consuming resources and causing detrimental system 
 behavior~\cite{Slowloris}.  Similar attacks can be used to indefinitely 
 delay security updates to clients, leaving them vulnerable to 
 compromise~\cite{Cappos_TR_08}.
@@ -361,7 +361,7 @@ The results of the above analysis show that CrashSimulator is readily able to
 identify novel bugs in widely used applications.  This includes
 widely used tools, security-focused applications like {\tt gnu-gpg}, and 
 host of popular network applications.  This is
-because CrashSimulator focuses on identifing bugs that result from anomalous
+because CrashSimulator focuses on identifying bugs that result from anomalous
 conditions present in an applications environment.  CrashSimulator provides
 a mechanism capable of testing a wide array of applications in a
 repeatable, principled manner.
@@ -470,7 +470,7 @@ held by normal filesystem fields.  For example, an operating system can use
 extended file attributes to store whether or not a file was downloaded from the
 Internet -- important security information that used to warn
 users if they are about to open a potentially unsafe file.  Apple's Gatekeeper
-relies on extended file attributes to preventa pplications downloaded from
+relies on extended file attributes to prevent applications downloaded from
 untrusted developers from being executed without explicit user action~\cite{AppleCodeSigning}.
 When copying a file,
 an application should retrieve extended file attributes from the source
@@ -509,7 +509,7 @@ retrieve the timestamps and system call from the {\tt utime()} family to apply
 the retrieved timestamps to the destination file.
 Failure to preserve timestamps has obvious
 implications in records-keeping and archival situations as well as any situation
-where a chronological record of file maniuplations is important.  This can 
+where a chronological record of file manipulations is important.  This can 
 cause odd behavior in Makefiles, archival programs, and similar
 software~\cite{NautilusTimestamps, SudoTimestamp}.
 
@@ -567,7 +567,7 @@ because a failure to perform any one of these steps can result in negative
 outcomes for the system as a whole.
 
 Our results indicate that CrashSimulator is able to identify whether complex
-operations are performed correctly in anomolous situations in
+operations are performed correctly in anomalous situations in
 an array of popular programs.  
 This includes the standard libraries for the programming languages Python,
 Perl, and Rust, along with other widely used software.  This is true even
@@ -589,7 +589,7 @@ cases.
 \subsection{What types of bugs cannot be found using CrashSimulator?}
 \label{sec-not-found}
 
-Due to the level at which CrashSimultaor works (the system call level), it is
+Due to the level at which CrashSimulator works (the system call level), it is
 not possible to find certain types of bugs.  CrashSimulator is not able to
 detect bugs that do not result from or have a visible effect on the system calls
 an application makes.  An example of this situation 
@@ -626,7 +626,7 @@ The primary source of %false positives (that is, CrashSimulator reports a failur
 %in a situation where the execution should be accepted) for 
 errors in CrashSimulator is an
 application using a different sequence of system calls than a checker was
-anticipating to implement a given operation.  Fortuantely, CrashSimulator's
+anticipating to implement a given operation.  Fortunately, CrashSimulator's
 approach allows these situations to be easily corrected once identified.
 
 %In many cases a given operation can performed in several ways.  This means that
@@ -636,7 +636,7 @@ approach allows these situations to be easily corrected once identified.
 %classify applications that make use of alternative methods for a given operation
 %the checkers must be able to check for several alternatives.
 
-For example, consider GNOME's {\tt glib} file handling facilties.  When an
+For example, consider GNOME's {\tt glib} file handling facilities.  When an
 application makes use of these facilities to move a file across storage devices
 the library itself correctly handles the behaviors described above as
 making up a ``correct'' file move operation.  When we used CrashSimulator 
@@ -658,7 +658,7 @@ Fortunately, as soon as false positives like this are discovered,
 CrashSimulator's checkers can be modified to deal with alternative
 approaches to handling an anomaly.
 This approach is viable because there are a finite number of system calls, and a
-given operation can be mapped to a managable subset of system calls.  Given the
+given operation can be mapped to a manageable subset of system calls.  Given the
 above example around moving files, consider the mapping from high level
 ``operation'' to the set of system calls that can implement it in
 Table~\ref{table:stepsandcalls}.  Each of the steps in the operation map to a small

@@ -14,7 +14,7 @@ anomalies, leaving their applications riddled with environment-dependent bugs th
 Existing tool support for automated testing of software against environment anomalies is very limited, making it
 extremely difficult for developers to tackle this problem systematically.  It is therefore not surprising that
 environment-related bugs are common in real world software. A recent survey conducted by
-ClusterHQ~\cite{ClusterHQSurvey} confirmed that app developers spend a significant portion of their time debugging
+ClusterHQ~\cite{ClusterHQSurvey} confirmed that application developers spend a significant portion of their time debugging
 errors discovered in production.  The survey participants cited the inability to recreate production environments for
 testing as the main reason why bugs are not discovered earlier in the development process.  What is needed is a way to
 execute an application in such a way that it experiences the environmental anomalies present in a deployment environment
@@ -60,7 +60,7 @@ environment should also be tested to see whether they have the same problems. Cr
 
 Since an application's interactions with its environment are mediated by system calls,
 it is possible to represent the difference between the environment in which testing is performed (referred to here
-as the {\em test environment}) and the environment under simulation (referred to here as the {\em anamolous environment})
+as the {\em test environment}) and the environment under simulation (referred to here as the {\em anomalous environment})
 as a set of differences in system call interaction results. 
 This means
 a given target environment can be simulated, from the application's perspective, by influencing the results and side
@@ -72,8 +72,8 @@ the environment using this technique and executing the application within it.
 The testing process using CrashSimulator is as follows:
 	run a traditional test in the application's testing environment, recording a trace of its system calls;
 	check some aspects of the trace for relevance to the particular test;
-		perturb the trace so that it appears as it would if it were running in the simulated anomolous environment;
-		attempt to replay the modified trace, i.e. allow the application to run under the control of CrashSimulator, substituting the system call return values (and side-effects) that would occur in the anomolous environment;
+		perturb the trace so that it appears as it would if it were running in the simulated anomalous environment;
+		attempt to replay the modified trace, i.e. allow the application to run under the control of CrashSimulator, substituting the system call return values (and side-effects) that would occur in the anomalous environment;
 		in parallel with the replay, run a checker under the control of CrashSimulator that decides whether the resulting behavior is indicative of a fault.
 
 Manual effort is needed to describe how traces are to be modified to characterize a particular environment and to describe checkers, but this effort can be amortized over testing a very large number of applications that may be vulnerable to a particular anomaly.
@@ -130,26 +130,26 @@ constructed in such a way that it handles the challenges of the target environme
 To illustrate CrashSimulator's operation, consider applications that
 at some point ``move'' a file from a source filename to a destination filename.
 Here, the relevant aspect of the environment is the state of the filesystem.
-In many environments, it is sufficent for the application to simply call the {\tt rename()} system call, so having tested
+In many environments, it is sufficient for the application to simply call the {\tt rename()} system call, so having tested
 the application only in such environments, developers might erroneously conclude that the application handles the ``move'' correctly.
 However, there are many situations (environments) in which this is not sufficient, including environments involving symbolic links to files,
 cross-device moves, and/or special files.
 In this paper, we will illustrate CrashSimulator's operation on an example in which a special file is being moved to a different device.
 This handled incorrectly by several widely used applications. Other similar anomalies that CrashSimulator can detect are discussed in section~\ref{sec:evaluation}.
 
-After discovering that some application $A$ fails in an environment where it tries to move a special file (such as /dev/urandom) across
+After discovering that some application $A$ fails in an environment where it tries to move a special file (such as {\tt /dev/urandom)} across
 devices, crash simulator can test other applications $A'$ as follows:
 \begin{enumerate}
 	\item
 		Run $A'$ in its normal testing environment (e.g. regular file is moved on the same device), recording a trace of $A's$ system calls, including their arguments and return values
 	\item
-		Check that this trace satisfies some of the requirements for handling the anomolous environment correctly. In this case, the trace must include a call to {\tt stat()} or a related system call to check the status of the file being moved. If it does not, the application almost certainly will not work correctly in the anomolous environment.
+		Check that this trace satisfies some of the requirements for handling the anomalous environment correctly. In this case, the trace must include a call to {\tt stat()} or a related system call to check the status of the file being moved. If it does not, the application almost certainly will not work correctly in the anomalous environment.
 	\item Execute the application under the control of CrashSimulator, replaying the trace up to the point of the {\tt stat()} call. Here, each time the application makes a system call, CrashSimulator intervenes, supplying return values and causing side effects as the actual call would, without executing the actual call.
 	\item
-		Modify the structure returned by the {\tt stat()} call so that it returns values indicating that the file is a special file, i.e. so it simulates execution in the anomolous environment.
+		Modify the structure returned by the {\tt stat()} call so that it returns values indicating that the file is a special file, i.e. so it simulates execution in the anomalous environment.
 	\item
 		Continue execution of $A'$ under the control of CrashSimulator. Here the series of system calls made by
-                the application may diverge from the orignial trace, as $A'$ responds to the modified return value from
+                the application may diverge from the original trace, as $A'$ responds to the modified return value from
                 the {\tt stat()} call. CrashSimulator feeds the series of system calls made into a {\em checker},
                 customized for this particular anomaly, that determines whether the application is attempting to respond
                 to the anomaly and either reports a bug (failure to respond to the anomaly) or success (the application
@@ -157,10 +157,10 @@ devices, crash simulator can test other applications $A'$ as follows:
 \end{enumerate}
 
 Overall, each of CrashSimulator's test patterns consists of rules for mutating traces to give the application the
-illusion that it is executing in an anomolous environment and a checker 
+illusion that it is executing in an anomalous environment and a checker 
 that attempts to determine whether the responds appropriately to the anomaly.
 Once developed, these test patterns can be applied to many traces from many applications that may be prone to mishandling the environmental anomaly in question.
-In the remainder of this paper we desribe CrashSimulator's operation more generally and in more detail.
+In the remainder of this paper we describe CrashSimulator's operation more generally and in more detail.
 Manipulation and replay of traces (section~\ref{sec:approach}),
 Models for checking behavior in simulated environment (section~\ref{sec:approach})
 Evaluation (section~\ref{sec:evaluation})
