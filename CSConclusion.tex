@@ -1,24 +1,54 @@
 \section{Conclusion}
 
-Minimizing the number of faults present in the applications they write is a key concern for software developers.  An
-under-represented source of faults are the interactions between an application and its environment.  To combat this
-problem, this work presented CrashSimulator, a tool that utilizes replay of system call traces in order to facilitate the
-injection of environment-based faults into the application for testing purposes.
+Many post-deployment failures result from
+unexpected interactions between an application and its environment.
+Although finding and eliminating faults in applications is a key concern for software developers, it is impractical for them to test an application in all of the
+environments in which it will be deployed.
+ To address this
+problem, this work presented CrashSimulator, a testing
+approach that utilizes mutation, replay, and analysis of system call traces
+in order to test whether applications respond correctly to 
+anamolous environment conditions.
+A significant benefit of CrashSimulator is that failures observed
+in executing one application in an anomolous environment can
+easily be leveraged to test whether {\em other} applications
+suffer from the same underlying problem.
 
 CrashSimulator's key features, operating on system calls and analysis of replayed executions allow it to identify bugs
-that fall outside of the application itself.  Performing its analysis on a replayed execution of an application allows
-CrashSimulator to remove the filesystem and network dependancies of the application under test.  This means
-CrashSimulator can execute and test an application on one system as if it were running on another system.  Additionally,
-it provides an interface for CrashSimulator to manipulate the execution in order to direct an application down
-testing-relevant code paths.  Finally, view of execution that can be consumed by computational models that can classify
-whether or not an application has behaved correctly in some situation.
+resulting from an application's interactions with its environment.
+%Performing its analysis on a replayed execution of an application allows
+%CrashSimulator to remove the filesystem and network dependancies of the application under test.  
+To test whether an application responds appropriately to a particular
+anomaly (such as an unexpected filetype, an unexpected device, an unexpected
+network conditions, etc.)
+CrashSimulator records system call traces from the application under test,
+mutates return values and/or program state to simulate execution in 
+the anomalous environment, and invokes a checker to see whether
+subsequent system calls indicate a correct or incorrect response.
+This allows
+CrashSimulator to test an application running in one environment
+as if it were running in another environment. 
+%Additionally,
+%it provides an interface for CrashSimulator to manipulate the execution in order to direct an application down
+%testing-relevant code paths.  
+%Finally, view of execution that can be consumed by computational models that can classify
 
-Encoding bad behavior as computational models provides a generic ``signature'' for that behavior.  This signature is
-portable across applications.  This means that a set, or suite, of signatures can be collected from any existing
-application for use in testing any other new or existing application.  In this way, an ever-expanding ``test suite'' can
-be created allowing learnings from one application to benefit others.
+%whether or not an application has behaved correctly in some situation.
 
+CrashSimulator evaluates application behavior in the (simulated) anomalous environment
+by analyzing system call traces using
+finite state models characterizing correct (or incorrect) behavior.
+This provides a generic ``signature'' for that behavior, which is
+portable across applications. 
+Consequently, a set, of mutations and checkers can be collected from any existing
+application for use in testing other new or existing application. 
+In this way, an ever-expanding ``test suite'' can
+be created allowing lessons learned from a bug in one application to benefit others.
+
+\phyllis{Need short summary of results}
 We have shown CrashSimulator's approach to be successful by identifying bugs, both previously known and unknown, in
 existing popular applications.  These bugs were identified using knowledge gained from how one application correctly
 performs a particular operation (namely, copying a file across disks) by encoding that knowledge as computational models
 and allowing these models to analyze replayed executions of the other listed applications.
+
+Future work will include expanding the repository of anomalies and their checkers, as well as exploring opportunities to further automate the discovery of anomalies and checkers.
