@@ -4,20 +4,20 @@
   incorrect application behavior caused by unhandled anomalous environmental
   conditions. CrashSimulator replays system call traces recorded from the
   application under test as a means to monitor and control execution. During
-  replay CrashSimulator modifies system call return values and program state to
+  replay, CrashSimulator modifies system call return values and program states to
   simulate an anomalous environment. Next, a checker determines whether the
   application is responding to the anomaly appropriately. This process allows
   CrashSimulator to use incorrect behavior identified in one application running
   in one environment as a test case that determines whether another application
   in a different environment is making the same mistake. By testing an
   application against a series of these test cases, CrashSimulator provides an
-  applications developers with an idea of how the application will respond were
+  application's developer with an idea of how the application would respond were
   it executed in the environment from which the test cases were
-  generated. CrashSimulator was able to identify bugs resultant from anomalous
+  generated. CrashSimulator was able to identify bugs resulting from anomalous
   filesystem and network conditions in 30 popular applications. The damage
   caused by these bugs ranges from application hangs to data loss and remote
   denial of service conditions. While one of the bugs we found was independently
-  identified and reported to Pythons bug tracker, the rest had not yet been
+  identified and reported to Python's bug tracker, the rest had not yet been
   discovered.
 
 \end{abstract}
