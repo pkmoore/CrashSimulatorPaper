@@ -1,4 +1,4 @@
-\section{CrashSimulator Approach Details}
+\section{CrashSimulator Approach }
     %%% This figure is definitely wrong. Will recreate %%%
     \begin{figure}[t]
         \center{}
@@ -40,17 +40,21 @@
 
         \paragraph{Removal of language dependence}
 
-        Operating at the system call level means that CrashSimulator is not
-        dependant on a particular programming language or runtime.  This means
-        that CrashSimulator does not require any complext language parsing and
-        analysis code while still allowing it to posess many of the benefits of
-        systems that perform such work.  Tools that perform language parsing do
-        so in order to craft inputs that specifically exercise target execution
-        paths in an application.  This work is concerned with issues that arise
-        at the ``interfaces'' between an application and its environment.
-        Manipulating system calls allows us to skip the process of generating
-        these crafted inputs in favor of directly effecting the behavior we are
-        interested in.
+        Operating at the system call level frees CrashSimulator from
+        dependence on a particular programming language, compiler, or runtime system.  
+	CrashSimulator does not require any complex language parsing and
+        analysis code %while still allowing it to posess many of the benefits of
+        %systems that perform such work and makes it much easier to use CrashSimulator 
+	can be used with applications written in a wide variety of languages.
+	%Testing tools that perform language parsing do
+	%so in order to craft inputs that specifically exercise target execution
+	%paths in an application.  
+	This is because CrashSimulator is concerned with issues that arise
+        at the ``interfaces'' between an application and its environment
+	and directly manipulates values at these interfaces to simulate
+        %Manipulating system calls allows us to skip the process of generating
+        %these crafted inputs in favor of directly effecting the
+	anomalous situations of interest.
 
         \paragraph{Identify Issues that Result from an Application's Environment}
 
@@ -58,7 +62,7 @@
         example, a black box fuzzer is able to identify faults that arise when
         an application begins processing data it has received from a network
         connection. CrashSimulator, on the other hand, is able to identify
-        issues that arisese from the network connection itself.
+        issues that arise from the network connection itself.
 
     \subsubsection{Why Replay Executions?}
 
@@ -83,52 +87,60 @@
 
      
 
-    \subsection{Acquiring Anomalies}
+    \subsection{Identifying Anomalies}
     
     Prior to beginning CrashSimulator's testing
-    process, a set of bad behaviors (which we refer to as anomalies) to test for
+    process, a set of unusual environment conditions (which we refer to as anomalies)
+    to test against
     must be identified.  This can be accomplished either manually or by
-    examining applications running in the target environment with existing
+    examining results of other applications running in the target environment with existing
     tools.  This work utilized the results of both
-    NetCheck\cite{Zhuang_NSDI_2014} and CheckAPI\cite{rasley2015detecting}, as
+    NetCheck~\cite{Zhuang_NSDI_2014} and CheckAPI~\cite{rasley2015detecting}, as
     well as manual analysis, to develop the set of anomalies used in our
-    evaluation.  NetCheck readily able to identify a wide variety of anomalous
+    evaluation.  NetCheck is readily able to identify a wide variety of anomalous
     behaviors related to network communication between one or more
-    hosts.  CheckAPI peforms a similar function by comparing ``behavior of an API
-    implementation to a reference model.''
+    hosts.  CheckAPI peforms a similar function by comparing behavior of an API
+    implementation to a reference model.
 
     Another source of anomalies is the public bug trackers of projects available
-    on the web.  If the presence of a bug can be defined as a series of system
-    calls then a model that identifies during execution can be constructed. This
+    on the web.  If the presence of a bug is indicated by a series of system
+    calls then a checker that identifies it during execution can be constructed. This
     is ideal when determining whether or not an application is vulnerable to a
     widely publicized bug.  Similarly, bugs can be taken from similar projects
     in order to expand a project's set of available anomalies.
+    In the long term, we envision a public repository of anomalies along with CrashSimulator test patterns that can be applied to new or existing applications.
 
     \subsection{Converting Anomalies to System Call Sequences}
 
-    Once an anomaly has been identified, it is distilled into the sequence of
-    system calls that ``implement'' the anomalous behavior.  This process
-    involves examining the system call traces containing anomalies in order to
-    identify a series of system calls indicative of the presence of the anomaly.
-    This analysis should identify two things: what mutations, if any, need to be
-    made to a system call trace to simulate the anomalous environment and what
-    system calls the application should make in order for the replay execution
-    to be accepted.
+    Once a new anomaly has been identified, it is distilled into the sequence of
+    system calls that respond to the anomaly.  This process
+    involves examining the system call traces %containing anomalies 
+    in order to
+    identify a series of system calls indicative of appropriate (or inappropriate)
+    response to the anomaly.
+    This analysis should identify two things: 1) what mutations, if any, need to be
+    made to a system call trace to simulate the anomalous environment and 2) a checker that examines the application's response to further trace operations in order to determine whether the application is responding appropriately. These checkers can often be 
+    described by finite automata, allowing CrashSimulator to simply check
+    whether replay results are accepted by the automaton.
 
-    CrashSimulator can use the outputs of this analysis either as mutations to
-    be applied to a system call trace of the application under test or as input
-    to a ``checker'' that determines whether an application has performed a
-    required set of actions. When a ``checker'' is required, the sequence of
-    system calls is encoded as a computational model that, when provided with as
-    input the system calls made during the course of a replay execution, can
-    decide whether or the series of system calls is present.  If the analysis
-    reveals that anomalous conditions need to be injected into a replay
-    execution this is facilitated by modifying the to-be-replayed system call
-    trace from the application under test.
+    %CrashSimulator can use the outputs of this analysis either as mutations to
+    %be applied to a system call trace of the application under test or as input
+    %to a ``checker'' that determines whether an application has performed a
+    %required set of actions. When a ``checker'' is required, the sequence of
+    %system calls is encoded as a finite automaton that, when provided with as
+    %input the system calls made during the course of a replay execution, can
+    %decide whether or the pattern of system calls is present.  If the analysis
+    %reveals that anomalous conditions need to be injected into a replay
+    %execution this is facilitated by modifying the to-be-replayed system call
+    %trace from the application under test.
 
-    In some cases, only one of these pieces is required for CrashSimulator to
-    perform its analysis.  If there is not a definite correct response system
-    call sequence, CrashSimulator's default checker can be employed to determine
+    In some cases, %only one of these pieces is required for CrashSimulator to
+   % perform its analysis. 
+    the checker is very simple and in others it is more complex.
+   % If there is not a definite correct response system
+   % call sequence,
+   In many situations
+    CrashSimulator's default checker can be employed to determine
     whether the application has noticed the anomaly and whether it may be making
     an effort to handle it.  As an example of this situation refer to the our
     evaluation section on ``unusual file type bugs.''  From the other direction,
@@ -171,11 +183,12 @@
     application under test as a child process and interceeding in its execution
     at approprate times in order to simulate the results and side effects of any
     system calls the application makes.  Because the system call trace being
-    replayed has been mutated to reflect the chosen anomalies, this process
-    exposes the application to those anomalies. After the replayed execution
-    concludes, CrashSimulator able to use the ending state of its checkers to
-    report whether or not anomalous behavior was present. CrashSimulator
-    provides two types of checkers that each serve slightly different purposes
+    replayed has been mutated to reflect the chosen anomaly, this process
+    exposes the application to that anomaly. After the replayed execution
+    concludes, CrashSimulator able to use the ending state of the checker to
+    report whether or not the anomalous situation was handled appropriately.
+    CrashSimulator
+    provides two types of checkers that each serve slightly different purposes.
 
     %The up front effort
     %in this process only needs to be done once. One of CrashSimulator's major
@@ -209,29 +222,32 @@
 
     When CrashSimulator injects anomalous behavior into a replay execution it is
     done with the intention that the application under test deal with this
-    anomaly in some way. For example, if CrashSimulator modifies the data
-    structure returned by a call to {\tt stat()} such that the target file
-    appears to be a symlink rather than a regular file, the application should
-    take some action to deal with this fact.  There are numerous ways an
-    application could correctly handle a given anomaly so CrashSimulator must
-    generically accept all of them.  The ``default checker'' handles this by
-    making the assumption that an application's efforts to deal with the anomaly
+    anomaly in some way. For example, many applications
+    can be expected to behave diffently when
+    the structure returned by a call to {\tt stat()} indicates that the target file
+    is a symlink rather than a regular file.
+    When there are numerous very different ways an
+    application could correctly handle a given anomaly, CrashSimulator 
+    can use a generic ``default checker''.  The default checker
+    is based on the assumption that an application's efforts to deal with the anomaly
     will result in it executing different program paths (and threfore different
     system calls) than were executed when the system call trace being replayed
-    was recorded.  Based on this, if the application being replayed does not
-    alter its behavior to deal with this the anomaly, the application has not
+    was recorded.  If the application being replayed does not
+    alter its behavior to deal with the anomaly, the application has not
     correctly handled the anomaly -- a failing result.  Alternatively, if the
     application deivates from the behavior recorded in the system call trace
     driving the replay it is likely that the application is taking some action
     to handle the injected condition -- an indiciation of possibly correct
     behavior.
 
-    This approach is sufficient because in reality, a test can only tell us if
-    an application performs a specific bad behavior in a specific situation.  A
-    test cannot prove that an application is bug free in the same situation.  As
-    with traditional tests, CrashSimulator cannot tell us that an applcation is
-    bug free in a given situation -- instead it can assert that an application
-    has incorrectly handled a given situation based.
+    This approach is often sufficient. % because in reality, 
+    %a test can only tell us if
+    %an application performs a specific bad behavior in a specific situation.  A
+    %test cannot prove that an application is bug free in the same situation. 
+    as
+    with traditional tests, CrashSimulator does not tell us that an application is
+    bug free in a given situation; instead, it asserts that an application
+    has incorrectly handled a given situation.
     
 
     \paragraph{More Specific Checkers}
@@ -240,10 +256,11 @@
     not an application has performed a required operation.  These checkers
     monitor a replay execution for a specific system call sequence (with the
     correct parameters, return values, and state modifications) that indicates
-    the application has carried out the operation in question.  To achieve this
-    these checkers contain a computational model (e.g. a deterministic finite
-    automaton, a push down automaton, etc.) that encodes and accepts the system
-    call sequence it has been constructed to watch for.  Whether CrashSimulator
+    the application has carried out the operation in question.  To achieve this,
+    these checkers use a model (e.g. a deterministic finite
+    automaton, a push down automaton, etc.) that accepts particular system
+    call sequences indicative of correct (or incorrect) response
+    to the anomaly.  Whether CrashSimulator
     ultimately accepts a given replay execution is determined by the ending
     states of the checkers monitoring the execution.
 
@@ -272,6 +289,7 @@
     limitations in Linux's {\tt rename()} system call and the way Linux's
     directory heirarchy can abstract away complicated device configurations.
 
+    \phyllis{similar text in Eval is redundant. Leave this here and refer back to it from eval}
     Trivial cases of moving a file (i.e. those where the source and destination
     are on the same device are accomplished using the {\tt rename()} system
     call.  In cases where the source and destination are not on the same device
