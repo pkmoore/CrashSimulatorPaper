@@ -143,13 +143,13 @@
    In many situations
     CrashSimulator's default checker can be employed to determine
     whether the application has noticed the anomaly and whether it may be making
-    an effort to handle it.  As an example of this situation refer to the our
-    evaluation section on ``unusual file type bugs.''  From the other direction,
+    an effort to handle it.  As an example of this situation refer to
+    \S~\ref{sec-file-type-bugs}.  From the other direction,
     CrashSimulator can employ more specific checkers in a replay execution of an
     application performing some task in order to determine whether it handled
     all the edge cases it should have.  We employed this technique in our
     evaluation of CrashSimulator in finding bugs related to moving files across
-    devices.
+    devices (\S~\ref{sec-complex}).
     
     \subsection{Anomaly Injection}
 
@@ -157,7 +157,7 @@
     into an execution.  
     Because CrashSimulator controls execution so that it faithfully
     follows the system call behavior described in the system call trace being
-    replayed modifying this trace manually or programmatically is enough to
+    replayed, modifying this trace manually or programmatically is enough to
     introduce anomalous behavior.  For example, suppose an anomaly causes a
     call to {\tt read()} fail with return value of -1 and {\tt errno} set to
     {\tt EINVAL}.  Exposing an application to this situation only requires
@@ -291,13 +291,13 @@
     directory hierarchy can abstract away complicated device configurations.
 
     Trivial cases of moving a file (i.e. those where the source and destination
-    are on the same device are accomplished using the {\tt rename()} system
+    are on the same device) are accomplished using the {\tt rename()} system
     call.  In cases where the source and destination are not on the same device
     this system call fails and the application must handle the operation
     manually. This means that \emph{any} application that moves files around on
     a Linux system must be able to deal with the situation where some part of
     the directory structure may physically reside on a different device.
-    During our evaluation, modeled what
+    During our evaluation, we modeled what
     it takes to move a file correctly using the GNU Coreutils {\tt mv} command
     as our ``gold standard.''  We found many applications do not handle the
     above situation correctly including the {\tt shutils} module from the Python
