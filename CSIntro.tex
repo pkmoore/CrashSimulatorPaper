@@ -10,8 +10,7 @@ to run in multiple environments falls victim to the differences
 between those environments.  These errors can easily go unnoticed
 during system testing due to the infeasibility of testing software
 across every combination of hardware and system software on which it
-is expected to run.  Manually testing an application in all production
-environments is impossible in practice. Developers are often unaware
+is expected to run. Moreover, developers are often unaware
 of particular types of environment anomalies, leaving their
 applications riddled with environment-dependent bugs that are only
 detected \emph{after deployment}. A recent survey conducted by
@@ -19,9 +18,10 @@ ClusterHQ~\cite{ClusterHQSurvey} confirmed that application developers
 spend a significant portion of their time debugging errors discovered
 in production.  The survey participants cited the inability to
 recreate production environments for testing as the main reason why
-bugs are not discovered earlier in the development process.  What is
-needed is a way to execute an application in such a way that it
-experiences the environmental anomalies present in a deployment
+bugs are not discovered earlier in the development process.  
+
+What is needed is a way to execute an application in such a way that
+it experiences the environmental anomalies present in a deployment
 environment without having to actually run it there.  This work
 introduces an approach to do just that.
 
