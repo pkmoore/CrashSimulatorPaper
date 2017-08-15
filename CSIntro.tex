@@ -7,7 +7,10 @@ uncommon for problematic differences to appear between these
 environments.  Whether it happens because of a lack of adherence to
 standards or developer error, the result is the same: software written
 to run in multiple environments falls victim to the differences
-between those environments.  These errors can easily go unnoticed
+between those environments.  These differences can include API behavior
+differences, variations in network performance, or peculiarities in
+filesystem state and
+can easily go unnoticed
 during system testing due to the infeasibility of testing software
 across every combination of hardware and system software on which it
 is expected to run. Moreover, developers are often unaware
@@ -18,8 +21,11 @@ ClusterHQ~\cite{ClusterHQSurvey} confirmed that application developers
 spend a significant portion of their time debugging errors discovered
 in production.  The survey participants cited the inability to
 recreate production environments for testing as the main reason why
-bugs are not discovered earlier in the development process.  
-
+bugs are not discovered earlier in the development process.
+Even specialized environments (such as the Java Runtime Environment) that
+attempt to abstract away these environmental differences are not perfect.
+In many cases they end up increasing the difficulty of debugging and
+increasing development cost.
 What is needed is a way to execute an application in such a way that
 it experiences the environmental anomalies present in a deployment
 environment without having to actually run it there.  This work
