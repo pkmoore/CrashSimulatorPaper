@@ -79,7 +79,10 @@ as NetCheck~\cite{Zhuang_NSDI_2014} and
 CheckAPI~\cite{rasley2015detecting} can analyze complex response
 patterns while the anomaly is observed in the deployment
 environment. However, they do not support systematic testing of
-applications before deployment.
+applications before deployment.  As a result, relying only on these
+capabilities results in applications being deployed
+with a significant number of bugs that are only discovered after the fact
+--- necessitating costly bug triage and application re-deployment.
 
 We introduce {\em CrashSimulator}, a testing approach based on the
 following observation: {\em Insight gleaned from a fault that is
