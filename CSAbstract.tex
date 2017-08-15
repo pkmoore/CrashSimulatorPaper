@@ -2,7 +2,9 @@
 
   This work introduces CrashSimulator, a technique and tool that identifies
   incorrect application behavior caused by unhandled anomalous environmental
-  conditions. CrashSimulator replays system call traces recorded from the
+  conditions such as differing API behavior, network performance,
+  or filesystem state.
+  CrashSimulator replays system call traces recorded from the
   application under test as a means to monitor and control execution. During
   replay, CrashSimulator modifies system call return values and program states to
   simulate an anomalous environment. Next, a checker determines whether the
