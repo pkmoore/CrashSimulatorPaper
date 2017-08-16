@@ -624,12 +624,14 @@ behavior.
 %negative).  We discuss each situation in turn.
 %
 %{\bf False Positives.}
-The primary source of %false positives (that is, CrashSimulator reports a failure
+The primary source of false positives %(that is, CrashSimulator reports a failure
 %in a situation where the execution should be accepted) for 
-errors in CrashSimulator is an
+in CrashSimulator is an
 application using a different sequence of system calls than a checker was
 anticipating to implement a given operation.  CrashSimulator's
-approach allows these situations to be easily corrected once identified.
+approach allows these situations to be easily corrected once identified.  This
+is similar to the circumstance where an application's test suite is missing a
+test, necessitating action by the developer to construct the missing test.
 
 %In many cases a given operation can performed in several ways.  This means that
 %a given operation may be correctly implemented by a set of system call sequences
@@ -644,7 +646,7 @@ the library itself correctly handles the behaviors described above as
 making up a ``correct'' file move operation.  When we used CrashSimulator 
 with the checkers described above to
 analyze a minimal application that used {\tt glib} for a cross-device move,
-we got erroneous reports stating that the application {\em did not} respond
+we got reports stating that the application {\em did not} respond
 correctly to the anomaly.
 We found through manual examination of a
 the system call trace that, while {\tt glib} correctly performs
