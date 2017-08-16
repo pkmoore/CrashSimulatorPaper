@@ -139,9 +139,14 @@ control of CrashSimulator that decides whether the resulting behavior
 is indicative of a fault.
 
 Manual effort is needed to describe how traces are to be modified to
-characterize a particular environment and to describe checkers, but
-this effort can be amortized over testing a very large number of
-applications that may be vulnerable to a particular anomaly.
+characterize a particular environment and to describe checkers.
+This effort consists of examining the system call trace in order to determine
+which system call are involved in the anomalous condition and what return
+values and program state modifications are indicative of it.  This effort is
+comparable to that which is required to design and construct a new test case to
+be added to an applications test suite.  Similar to a test case,
+this effort can be amortized through repeated use.
+
 %
 %Given that we have a simulation of a given environment, the next step is to make decisions about whether an application
 %is executing correctly in this environment.  The set of interactions (i.e. system calls) necessary to correctly perform
