@@ -1,25 +1,28 @@
 \begin{abstract}
-
-  This work introduces CrashSimulator, a technique and tool that identifies
-  incorrect application behavior caused by unhandled anomalous environmental
-  conditions such as differing API behavior, network performance,
-  or filesystem state.
-  CrashSimulator replays system call traces recorded from the
-  application under test as a means to monitor and control execution. During
-  replay, CrashSimulator modifies system call return values and program states to
+  A major problem when introducing new applications is that not all potential
+  flaws can be identified during development. Unfortunately, the environment
+  into which an application is introduced can negatively impact its
+  execution. But, these flaws remain hidden until the application is
+  deployed—and the resulting consequence can be costly. 
+  CrashSimulator is a technique and tool that identifies incorrect application
+  behavior caused by unhandled anomalous environmental conditions such as
+  differing API behavior, network performance, or filesystem state.
+  The tool replays system call traces recorded from the application under
+  test as a means to monitor and control execution. During replay,
+  CrashSimulator modifies system call return values and program states to
   simulate an anomalous environment. Next, a checker determines whether the
   application is responding to the anomaly appropriately. This process allows
   CrashSimulator to use incorrect behavior identified in one application running
-  in one environment as a test case that determines whether another application
+  in one environment to determine whether another application
   in a different environment is making the same mistake. By testing an
-  application against a series of these test cases, CrashSimulator shows an
-  application's developer how the application would respond were
-  it executed in the environment from which the test cases were
-  generated. CrashSimulator was able to identify 84 bugs resulting from anomalous
-  filesystem and network conditions in 30 popular applications. The damage
-  caused by these bugs ranges from application hangs to data loss and remote
-  denial of service conditions. While one of the bugs we found was independently
-  identified and reported to Python's bug tracker, the rest had not yet been
-  discovered.
+  application against a series of these test cases, CrashSimulator 
+  lets the developer see how the application would respond if executed in
+  a similar environment. When tested, CrashSimulator was
+  able to identify 84 bugs resulting from anomalous filesystem and network
+  conditions in 30 popular applications.  By identifying these bugs before
+  deployment, the tool helped to ward off such potential damaging consequences as hangs,
+  data loss, or remote denial of service conditions
+  All but one of the bugs identified by CrashSimulator were previously unknown.
+  One was independently identified and reported to Python's bug tracker.
 
 \end{abstract}
