@@ -12,9 +12,9 @@
 % acceptable.
 
 
-
-CrashSimulator was evaluated as follows.
-We implemented a prototype in a mix of Python 2 (5060 LOC) and C (2585 
+To be able to evaluate how CrashSimulator performs, a series of tests were
+conducted using a prototype written in a mix of 
+Python 2 (5060 LOC) and C (2585 
 LOC)\footnote{ Line count numbers are according to SLOCCOUNT~\cite{SLOCCOUNT}}.  
 For a test
 environment, we chose a virtual install of Ubuntu Linux 15.04 with a 32 bit 
@@ -22,17 +22,19 @@ kernel on i686 hardware.
 We ran the tests on a 1.7 gHz core i7 system with 8GB of RAM. Our
 implementation used {\tt ptrace} to interpose on the running program and
 interject anomalous behavior into its execution.
-We did not handle threaded programs and disabled ASLR and the kernel's vDSO 
+We did not handle threaded programs and disabled ASLR, as well as the kernel's vDSO 
 to make replay easier.  As far as we are aware, none of these choices 
-influenced the bugs that CrashSimulator can find, however the lack of support
-for threaded programs obviously influences the programs we can test.  The 
-only major impact these design choices had, was that our use of {\tt ptrace} 
-slowed our prototype's performance (which will be discussed later) but made
-constructing CrashSimulator easier.  Given appropriate anomaly information, 
+influenced the types of bugs that CrashSimulator can find. However, the lack of support
+for threaded programs obviously influences the programs we can test.  To our
+knowledge, the 
+only major impact these design choices had was that the use of {\tt ptrace} 
+slowed our prototype's performance (which will be discussed later).  The
+trade-off was it simplified 
+construction of the prototype. Given appropriate information, 
 our implementation of CrashSimulator can
-test for anomalies that exist in other platforms and environments.  
+test for anomalies that exist in other platforms and environments as well.
 
-Using this prototype, we answer the following questions about CrashSimulator:
+With the prototype in hand,  we set out to answer the following questions:
 
 \begin{enumerate}
    \item{[\ref{sec-env-bugs}] Do environmental bugs exist in widely used applications?}
