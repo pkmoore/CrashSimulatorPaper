@@ -100,15 +100,17 @@ With the prototype in hand,  we set out to answer the following questions:
 % Show results
 % Discuss  What should people think about it
 
-Our first question focuses on whether there are any bugs of the sort that
-CrashSimulator can find in popular applications.  After all, if such bugs
-do not exist in practice, then there is no need for CrashSimulator.
-To test whether such bugs exist in real programs, we 
-chose two simple anomalies that could be tested in a large
-array of programs.  We chose one file system anomaly and one network anomaly 
-that used common API calls and thus had the potential to appear in
-many programs.  We ran CrashSimulator on applications from GNU Coreutils and
-on popular projects as is indicated by Debian's Popularity Contest~\cite{DebPopCon}.
+Our first question looks at the broad issue of whether the types of bugs
+identified by 
+CrashSimulator would be found in popular applications.
+After all, if such bugs
+do not exist in practice, then there is no need for a tool like CrashSimulator.
+To test for the existence of these bugs in real programs, we 
+chose two simple anomalies that we could test for in a large
+array of programs.  One is a file system anomaly and the other network anomaly,
+but both use common API calls, and thus had the potential to appear in
+many programs.  Applications selected were either ones deemed ``popular'' by
+Debian's Popularity Contest~\cite{DebPopCon}, or were from GNU Coreutils.
 
 \subsubsection{Unexpected File Types} 
 \label{sec-file-type-bugs}
@@ -132,17 +134,18 @@ often requires that applications
 examine the files in order to ensure they are of an appropriate type.
 
 {\bf Method.}  Identifying these bugs involves changing an application's
-execution trace to emulate the application being provided a file type that is
-unexpected.  For example, the {\tt sed} application, which modifies the contents
+execution trace to induce its response to an unexpected file type. 
+For example, the {\tt sed} application, which modifies the contents
 of a text file according to a provided command string, could be provided
 a symbolic link, a directory, or a character device
 instead.  CrashSimulator accomplishes this by identifying the calls to {\tt
   stat()}, {\tt fstat()}, or {\tt lstat()} that an application makes to examine
-the file and then changes the trace to simulate that the regular file {\tt sed}
-is expecting is actually one of the special file types.  If the application
+the file, and then changing the trace to simulate that the regular file {\tt sed}
+is expected is actually one of the special file types.  If the application
 responds to this injected information then there is the possibility that the
-special file is being handled correctly.  If the application does not alter its
-behavior then the anomalous condition is not being handled correctly.
+special file will be handled correctly.  On the other hand, if there is no
+alteration in the behavior of the application,  
+then the condition is not being handled correctly.
 
 % \cappos{Is this true in all cases?}
 % Its true in the cases we have see so far.  This statement is based on our
@@ -163,19 +166,19 @@ Some of the applications opened multiple files; in these cases each
 anomaly was simulated for each of the file arguments to the application.
 %were used to examine the applications response to each of
 %the listed file types. 
-The columns of Table~\ref{table:unexpectedtypes} 
-are labeled by the values that CrashSimulator inserts into
+Table~\ref{table:unexpectedtypes} 
+shows the values that CrashSimulator inserts into
 the return value of the {\tt stat()}-like call, corresponding to
 different file type anomalies.
 A result of ``Initial Value''
-indicates that this type is the file type the application was provided when the
-execution trace being replayed was recorded -- that is, a file of the type the
+indicates that this is the file type the application was provided when the
+replayed execution trace was recorded -- that is, a file of the type the
 application was expecting.  A result of ``Recognizes'' indicates that the
 application identified that it was being provided with an unexpected file type
-and its execution diverged from the trace being replayed indicating that it was
+and its execution diverged, indicating that it was
 potentially handling the unexpected file type correctly.  A result of ``Fail''
 indicates that the application failed to recognize the presence of the unusual
-file type because its execution did not diverge from the trace being replayed.
+file type because execution never diverged from the trace being replayed.
 We manually examined a subset of the listed application behaviors simulated by
 CrashSimulator and verified they were consistent with the actual behavior on the
 given file type.
@@ -216,24 +219,24 @@ Fail\\
 
 The frequency of failed executions in our results indicate that many
 applications make the assumption that they will only be used to process
-regular files.  When this assumption does not hold the results of the
-application's execution are hard to predict.  In many cases a denial of
-service condition occurs in the form of the application ``hanging'' as it
-attempts to incorrectly process the file.  This may happen harmlessly (such
-as the case where an application blocks forever waiting for a {\tt read()}
-call to retrieve non-existent data from an empty FIFO) or harmfully, as
-happens in the case where an application attempts to read in and process an
-``infinitely large'' file eventually filling available memory or disk
-space~\cite{Cappos_CCS_08}. %\cappos{Please label the bugs w/ the impact.} 
+regular files.  When this assumption does not hold, execution results 
+are hard to predict.  In many cases a denial of
+service condition occurs in the form of the application ``hanging,'' as it
+attempts to incorrectly process the file.  This may happen harmlessly, such
+as if an application blocks forever waiting for a {\tt read()}
+call to retrieve non-existent data from an empty FIFO, or harmfully, as
+happens when an application attempts to read in and process an
+``infinitely large'' file, eventually filling available memory or disk
+space~\cite{Cappos_CCS_08}.
 
 %\cappos{there will need to be more discussion here.  I need more info about
 %the results though, such as which bug does what...}
 
-An interesting behavior we recognized when analyzing these results can be seen
-in the last two applications listed in Table~\ref{table:unexpectedtypes}.  Each of these
-applications correctly recognized when any file type other than its expected
-file type was encountered.  This is because these applications are simply ``dumb'' wrappers
-around the system calls they share a name with.  Essentially, they just hand
+Of particular interest is the behavior we see
+in the last two applications listed in Table~\ref{table:unexpectedtypes}.  Each 
+applications correctly recognized when an unexpected file type 
+was encountered.  This is because these applications are simply ``dumb'' wrappers
+around the system calls with which they share a name. Essentially, they just hand
 the specified file to their corresponding system call and, in the case of an
 error, use {\tt perror()} to print the correct localized error message.  In
 short, these applications pass their error handling responsibilities to the
