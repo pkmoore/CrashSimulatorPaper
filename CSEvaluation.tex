@@ -253,7 +253,7 @@ periods.
 
 % Sentence at the end that says "now that we've seen that these issues are prevalent across major applications...
 
-The second anomaly we examined using CrashSimulator
+The second anomaly we examined
 involves an application's behavior when it attempts to communicate over a network
 with extremely long (on the order of minutes) response times.  At a low level,
 applications retrieve data from a network socket by waiting for data to be
@@ -265,25 +265,25 @@ situation where communication takes too long and should time out.
 %an error code that the application can handle.
 
 {\bf Method.}
-CrashSimulator can detect whether an application is vulnerable by modifying
-the trace to change the time observed by the application to simulate large
+CrashSimulator can detect whether an application is vulnerable to this attack by
+modifying
+the trace so it simulates large
 amounts of time elapsing between network operations.
-In this approach CrashSimulator determines
+In this approach, CrashSimulator determines
 whether or not the application makes any effort to configure its network
 communications with a timeout value. This is done by examining the presence or
 absence of {\tt setsockopt()}, {\tt poll()} and {\tt select()} calls as well as
 the timeout values that may or may not have been passed to them. Applications
 that do not set the timeout are subject to the operating
-system defined protocol timeout value (19 minutes on Linux).
+system-defined protocol timeout value (19 minutes on Linux).
 Note that by properly manipulating the results of all
 time-returning calls, CrashSimulator can simulate an execution where close to
-the maximum timeout value occurred without actually spending any time
+the maximum timeout value occurs without actually spending any time
 waiting.
 
 
 We use CrashSimulator to analyze  network applications and libraries
-that are amongst the most popular based on Debian's popularity contest 
-ratings~\cite{DebPopCon}. 
+that are among the most popular on Debian's ratings~\cite{DebPopCon}. 
 
 %\begin{table*}[t]
 \begin{table}[t]
@@ -320,20 +320,19 @@ ratings~\cite{DebPopCon}.
 even days in some cases.
 What's more, in the vast
 majority of cases, the problem occurs because the application makes no effort to specify a
-timeout value.  This means that the application is effectively falling back on
-the operating system's maximum timeout value as defined for the protocol in
-use.  This value is \emph{19 minutes} for the above applications as defined by
-Linux for TCP sockets, allowing an
-attacker to transmit one byte of data per timeout period to keep the
-application alive.
+timeout value.
+This means an attacker can transmit one byte of data per timeout
+period (per Linux's value of 19 minutes for TCP sockets),
+allowing them to keep the application alive instead of quitting.
+
 
 This attack technique has been effectively exploited in the wild.  The {\tt 
 slowloris} tool
-allowed a single attacking host to successfully deny service to a vulnerable
-web server with minimal bandwidth usage.  This attack worked by introducing
-delays between the time headers were sent to the victim by an attacking HTTP
+allows a single attacking host to successfully deny service to a vulnerable
+web server with minimal bandwidth usage by simply introducing
+delays between the headers sent to the victim by an attacking HTTP
 client.  Because many web servers at the time allowed large timeouts between
-messages from the clients they were communicating with, one web client could
+messages from the clients, one web client could
 effectively tie up the resources of a web server for a long period of
 time.
 %As discussed above, the version of wget we examined is vulnerable to this sort
@@ -366,9 +365,9 @@ compromise~\cite{Cappos_TR_08}.
 The results of the above analysis show that CrashSimulator is readily able to
 identify novel bugs in widely used applications.  This includes
 widely used tools, security-focused applications like {\tt gnu-gpg}, and 
-host of popular network applications.  This is
+a host of popular network applications.  This is
 because CrashSimulator focuses on identifying bugs that result from anomalous
-conditions present in an applications environment.  CrashSimulator provides
+conditions present in an application's environment, and provides
 a mechanism capable of testing a wide array of applications in a
 repeatable, principled manner.
 % For the unexpected file
