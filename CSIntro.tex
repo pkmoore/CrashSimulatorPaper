@@ -3,35 +3,43 @@
 One major hurdle in developing robust applications is getting them to
 run reliably across all of the environments in which they may be
 installed.  In an increasingly diverse software ecosystem it is not
-uncommon for problematic differences to appear between these
-environments.  Whether it happens because of a lack of adherence to
-standards or developer error, the result is the same: software written
-to run in multiple environments falls victim to the differences
-between those environments.  These differences can include API behavior
+surprising then that problematic differences have emerged between these
+environments.  Whether due to a failure to adhere to 
+standards or developer error, the result is the same: the software 
+fails because of unanticipated environmental conditions.
+\preston{Add a VERY BRIEF example here. 1 sentence}
+
+The conditions referred to here, which can include API behavior
 differences, variations in network performance, or peculiarities in
-filesystem state and
+filesystem state, all
 can easily go unnoticed
-during system testing due to the infeasibility of testing software
-across every combination of hardware and system software on which it
+during system testing because it is just not feasible to
+test programs 
+across every possible combination of hardware and software on which it
 is expected to run. Moreover, developers are often unaware
-of particular types of environment anomalies, leaving their
-applications riddled with environment-dependent bugs that are only
+of particular types of environmental anomalies, and their
+applications contain environment-dependent bugs that are only
 detected \emph{after deployment}. A recent survey conducted by
 ClusterHQ~\cite{ClusterHQSurvey} confirmed that application developers
-spend a significant portion of their time debugging errors discovered
+spend a significant portion of their time debugging errors that are only discovered
 in production.  The survey participants cited the inability to
 recreate production environments for testing as the main reason why
-bugs are not discovered earlier in the development process.
-Even specialized environments (such as the Java Runtime Environment) that
-attempt to abstract away these environmental differences are not perfect.
-In many cases they end up increasing the difficulty of debugging and
-increasing development cost.
-What is needed is a way to execute an application in such a way that
-it experiences the environmental anomalies present in a deployment
-environment without having to actually run it there.  This work
+bugs are not discovered earlier.
+Even specialized environments, such as the Java Runtime Environment, that
+attempt to hide these environmental differences are not perfect.
+In many cases, they end up increasing both the difficulty of debugging and
+development costs.
+
+What is needed is a strategy for executing an application in such a way that
+it can experience the anomalies of a deployment
+environment without actually having to run in one.  This work
 introduces an approach to do just that.
 
-An application's environment is the collection of all resources
+\preston{This paragraph is targeted by removal for Lois's feedback.  Its purpose
+  was to address reviewer feedback that we weren't clear enough on the
+  definition of an environment}
+
+\texit{An application's environment is the collection of all resources
 external to the application with which the application communicates.
 These external resources can be thought of as providing implicit
 inputs to the program that affect its flow of execution.
@@ -46,31 +54,53 @@ particular environment.  Specifically, our approach can simulate environmental
 anomalies that are visible in an application's system call interactions as
 opposed to environmental conditions that are visible to the application in
 other ways, such as direct influence on values present in the application's
-memory.
+memory.}
+%
+%For example, in some environments the {\tt select()} system call
+%correctly updates the state of a variable tracking the length of time
+%the call was blocked, while in other environments this variable is not
+%correctly updated.  Consequently, applications that depend on one
+%behavior or another may fail when the call acts
+%differently. Similarly, consider an application that has been
+%developed with the assumption that the socket returned by {\tt
+%  accept()} will inherit the settings configured on the parent socket.
+%This is how {\tt accept()} behaves in the canonical BSD sockets
+%implementation so this is a reasonable assumption.  Unfortunately,
+%this is not the case in Linux where the returned socket does not
+%inherit these options causing subsequent system calls to misbehave if
+%the application does not account for the anomaly. In fact, this
+%anomaly resulted in a portability bug in
+%Python~\cite{Zhuang_NSDI_2014}.  Interactions with file systems are
+%also prone to small differences in environments.  In testing GnuPG we
+%discovered that developers implicitly assumed that a file being
+%provided as input to the key import process was a regular file; when
+%this assumption was violated, the application failed.
+%
 
-For example, in some environments the {\tt select()} system call
-correctly updates the state of a variable tracking the length of time
-the call was blocked, while in other environments this variable is not
-correctly updated.  Consequently, applications that depend on one
-behavior or another may fail when the call acts
-differently. Similarly, consider an application that has been
-developed with the assumption that the socket returned by {\tt
-  accept()} will inherit the settings configured on the parent socket.
-This is how {\tt accept()} behaves in the canonical BSD sockets
-implementation so this is a reasonable assumption.  Unfortunately,
-this is not the case in Linux where the returned socket does not
-inherit these options causing subsequent system calls to misbehave if
-the application does not account for the anomaly. In fact, this
-anomaly resulted in a portability bug in
-Python~\cite{Zhuang_NSDI_2014}.  Interactions with file systems are
-also prone to small differences in environments.  In testing GnuPG we
-discovered that developers implicitly assumed that a file being
-provided as input to the key import process was a regular file; when
-this assumption was violated, the application failed.
+In this paper, we introduce {\em CrashSimulator}, a testing approach that
+follows the theoretical method proposed above, and is based on the
+observation that: {\em Insight gleaned from a fault that is
+  caused by unexpected interactions of {\em one application} with one
+  of its deployment environments, can be leveraged to discover related
+  faults in a {\em wide range} of applications that may run in that
+  environment.}  The approach is loosely inspired by the 
+environments provided by flight simulators, which  will use  the knowledge that
+one model
+of aircraft is prone to behave poorly under certain environmental
+conditions (e.g.\ windy conditions, rain, etc) to
+test many other aircraft models in simulators against relevant
+aspects of the problematic environment. While there are other testing techniques
+that follow a similar approach~\cite{mariani2007compatibility,
+  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
+  DBLP:journals/tosem/MonperrusM13,
+  DBLP:conf/icse/JamrozikSZ16}, we are the first to explore
+its application for finding bugs related to complex environment
+interactions that involve multiple interdependent system calls.
 
-Tool support for automated testing of software against such
-environment anomalies is still limited. Existing work primarily
-focuses on detecting bugs that involve only individual system
+The development of the CrashSimulator tool for automated testing of software
+against an environment is an important step forward.
+Existing tools primarily
+focus on detecting bugs that involve only individual system
 calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}. However,
 a correct response to an anomaly triggered by one
 system call often requires the application to make several other
@@ -84,24 +114,6 @@ capabilities results in applications being deployed
 with a significant number of bugs that are only discovered after the fact
 --- necessitating costly bug triage and application re-deployment.
 
-We introduce {\em CrashSimulator}, a testing approach based on the
-following observation: {\em Insight gleaned from a fault that is
-  caused by unexpected interactions of {\em one application} with one
-  of its deployment environments, can be leveraged to discover related
-  faults in a {\em wide range} of applications that may run in that
-  environment.}  The approach is loosely inspired by simulation
-environments provided by flight simulators. Discovery that one model
-of aircraft is prone to behave poorly under certain environmental
-conditions (e.g.\ windy conditions, rain, etc) leads to
-testing many other aircraft models in simulators that model relevant
-aspects of the problematic environment. While there are other testing techniques
-that follow a similar approach~\cite{mariani2007compatibility,
-  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
-  DBLP:journals/tosem/MonperrusM13,
-  DBLP:conf/icse/JamrozikSZ16}, we are the first to explore
-its application for finding bugs related to complex environment
-interactions that involve multiple interdependent system calls.
-
 % CrashSimulator is concerned with bugs that arise from subtle
 % differences in behavior between executions in one environment versus
 % another, such as the files and network communications visible to the
@@ -112,40 +124,44 @@ interactions that involve multiple interdependent system calls.
 % be fixed, but a huge group of other applications that use similar constructs and that may run in the problematic
 % environment should also be tested to see whether they have the same problems. CrashSimulator facilitates that task.
 
-Since an application's interactions with its environment are mediated
-by system calls, it is possible to represent the difference between
-the environment in which testing is performed (referred to here as the
-{\em test environment}) and the environment under simulation (referred
-to here as the {\em anomalous environment}) as a set of differences in
-system call interaction results. This means a given target
-environment can be simulated, from the application's perspective, by
-influencing the results and side effects of the system calls the
-applications makes such that they appear to be coming from the target
-environment.  CrashSimulator interposes on system calls to allow an
-application to be tested as if it were running in the target
-environment by creating a simulation of the environment using this
-technique and executing the application within it.
+%Since an application's interactions with its environment are mediated
+%by system calls, it is possible to represent the difference between
+%the environment in which testing is performed (referred to here as the
+%{\em test environment}) and the environment under simulation (referred
+%to here as the {\em anomalous environment}) as a set of differences in
+%system call interaction results. This means a given target
+%environment can be simulated, from the application's perspective, by
+%influencing the results and side effects of the system calls the
+%applications makes such that they appear to be coming from the target
+%environment.  CrashSimulator interposes on system calls to allow an
+%application to be tested as if it were running in the target
+%environment by creating a simulation of the environment using this
+%technique and executing the application within it.
 
-The testing process using CrashSimulator is as follows: run a
-traditional test in the application's testing environment, recording a
-trace of its system calls; check some aspects of the trace for
-relevance to the particular test; perturb the trace so that it appears
-as if it were running in the simulated anomalous environment;
+Here is how CrashSimulator works.  A developer will run a
+test in the application's usual testing environment, recording a
+trace of its system calls. After checking some aspects of the trace for
+relevance to the particular test, she will perturb the trace so that it appears
+as if it were running in the simulated anomalous environment, and then
 attempt to replay the modified trace, i.e. allow the application to
 run under the control of CrashSimulator, substituting the system call
 return values (and side-effects) that would occur in the anomalous
-environment; in parallel with the replay, run a checker under the
+environment. In parallel with the replay, a checker will run under the
 control of CrashSimulator that decides whether the resulting behavior
 is indicative of a fault.
 
-Manual effort is needed to describe how traces are to be modified to
+\preston{Lois's feedback targets the below paragraph for removal.  Its purpose
+  was to address feedback from reviewers that we needed to be more explicit about
+  the ``manual effort'' required.  Maybe we need to spread this info in
+  somewhere else if we decide it is important?}
+\textit{Manual effort is needed to describe how traces are to be modified to
 characterize a particular environment and to describe checkers.
 This effort consists of examining the system call trace in order to determine
 which system call are involved in the anomalous condition and what return
 values and program state modifications are indicative of it.  This effort is
 comparable to that which is required to design and construct a new test case to
 be added to an applications test suite.  Similar to a test case,
-this effort can be amortized through repeated use.
+this effort can be amortized through repeated use.}
 
 %
 %Given that we have a simulation of a given environment, the next step is to make decisions about whether an application
@@ -162,9 +178,10 @@ this effort can be amortized through repeated use.
 %they can be thought of as a test suite.  
 A key advantage of this approach is that these %tests and test suites can be
 trace perturbations and corresponding checkers can be
-accumulated from some number of applications that exist in the environment the tests will describe.  Once accumulated,
+accumulated from any number of applications that exist in the environment the tests will describe.  Once accumulated,
 they can be used to test any application as if it were running in that environment.  In this way, prior knowledge
-gathered from past deployment experiences can be used to more thoroughly exercise a new application so that it can be
+gathered from past deployment experiences can be used to more thoroughly work
+out a new application so that it can be
 constructed in such a way that it handles the challenges of the target environment correctly.
 
 %MOVE NEXT FEW PARAGRAPHS TO SUMMARY IN CONCLUSION ???
@@ -197,84 +214,91 @@ constructed in such a way that it handles the challenges of the target environme
 %
 %END -- move to conclusion
 
-To illustrate CrashSimulator's operation, consider applications that
-at some point ``move'' a file from a source filename to a destination
-filename.  Here, the relevant aspect of the environment is the state
-of the filesystem.  In many environments, it is sufficient for the
-application to simply call the {\tt rename()} system call, so having
-tested the application only in such environments, developers might
-erroneously conclude that the application handles the ``move''
-correctly.  However, there are many situations (environments) in which
-this is not sufficient, including environments involving symbolic
-links to files, cross-device moves, and/or special files.  In this
-paper, we will illustrate CrashSimulator's operation on an example in
-which a special file is being moved to a different device.  This
-anomaly is handled incorrectly by several widely used
-applications. Other similar anomalies that CrashSimulator can detect
-are discussed in section~\ref{sec:evaluation}.
+%To illustrate CrashSimulator's operation, consider applications that
+%at some point ``move'' a file from a source filename to a destination
+%filename.  Here, the relevant aspect of the environment is the state
+%of the filesystem.  In many environments, it is sufficient for the
+%application to simply call the {\tt rename()} system call, so having
+%tested the application only in such environments, developers might
+%erroneously conclude that the application handles the ``move''
+%correctly.  However, there are many situations (environments) in which
+%this is not sufficient, including environments involving symbolic
+%links to files, cross-device moves, and/or special files.  In this
+%paper, we will illustrate CrashSimulator's operation on an example in
+%which a special file is being moved to a different device.  This
+%anomaly is handled incorrectly by several widely used
+%applications. Other similar anomalies that CrashSimulator can detect
+%are discussed in section~\ref{sec:evaluation}.
+%
+%After discovering that some application $A$ fails in an environment
+%where it tries to move a special file (such as {\tt /dev/urandom)}
+%across devices, crash simulator can test other applications $A'$ as
+%follows:
+%\begin{enumerate}
+%\item Run the application under test, $T$, in its normal testing environment (e.g. regular file is
+%  moved on the same device), recording a trace of $T$'s system calls,
+%  including their arguments and return values.
+%\item Check that this trace satisfies some of the requirements for
+%  handling the anomalous environment correctly. In this case, the
+%  trace must include a call to {\tt stat()} or a related system call
+%  to check the status of the file being moved. If it does not, the
+%  application almost certainly will not work correctly in the
+%  anomalous environment.
+%\item Execute the application under the control of CrashSimulator,
+%  replaying the trace up to the point of the {\tt stat()} call. Here,
+%  each time the application makes a system call, CrashSimulator
+%  intervenes, supplying return values and causing side effects as the
+%  actual call would, without executing the actual call.
+%\item Modify the structure returned by the {\tt stat()} call so that
+%  it returns values indicating that the file is a special file,
+%  i.e. so it simulates execution in the anomalous environment.
+%\item Continue execution of $T$ under the control of
+%  CrashSimulator. Here the series of system calls made by the
+%  application may diverge from the original trace, as $T$ responds to
+%  the modified return value from the {\tt stat()} call. CrashSimulator
+%  feeds the series of system calls made into a {\em checker},
+%  customized for this particular anomaly, that determines whether the
+%  application is attempting to respond to the anomaly and either
+%  reports a bug (failure to respond to the anomaly) or success (the
+%  application appears to be making an effort to respond to the
+%  anomaly).
+%\end{enumerate}
 
-After discovering that some application $A$ fails in an environment
-where it tries to move a special file (such as {\tt /dev/urandom)}
-across devices, crash simulator can test other applications $A'$ as
-follows:
-\begin{enumerate}
-\item Run the application under test, $T$, in its normal testing environment (e.g. regular file is
-  moved on the same device), recording a trace of $T$'s system calls,
-  including their arguments and return values.
-\item Check that this trace satisfies some of the requirements for
-  handling the anomalous environment correctly. In this case, the
-  trace must include a call to {\tt stat()} or a related system call
-  to check the status of the file being moved. If it does not, the
-  application almost certainly will not work correctly in the
-  anomalous environment.
-\item Execute the application under the control of CrashSimulator,
-  replaying the trace up to the point of the {\tt stat()} call. Here,
-  each time the application makes a system call, CrashSimulator
-  intervenes, supplying return values and causing side effects as the
-  actual call would, without executing the actual call.
-\item Modify the structure returned by the {\tt stat()} call so that
-  it returns values indicating that the file is a special file,
-  i.e. so it simulates execution in the anomalous environment.
-\item Continue execution of $T$ under the control of
-  CrashSimulator. Here the series of system calls made by the
-  application may diverge from the original trace, as $T$ responds to
-  the modified return value from the {\tt stat()} call. CrashSimulator
-  feeds the series of system calls made into a {\em checker},
-  customized for this particular anomaly, that determines whether the
-  application is attempting to respond to the anomaly and either
-  reports a bug (failure to respond to the anomaly) or success (the
-  application appears to be making an effort to respond to the
-  anomaly).
-\end{enumerate}
-
-Overall, each of CrashSimulator's test patterns consists of rules for
+Each of CrashSimulator's test patterns consists of rules for
 mutating traces to give the application the illusion that it is
-executing in an anomalous environment and a checker that attempts to
+executing in an anomalous environment, and a checker that attempts to
 determine whether the application responds appropriately to the
 anomaly.  Once developed, these test patterns can be applied to many
 traces from many applications that may be prone to mishandling the
-environmental anomaly in question.  In the remainder of this paper we
-describe CrashSimulator's operation more generally and in more detail:
-Manipulation and replay of traces is described in
-(section~\ref{sec:approach}), Models for checking behavior in
-simulated environment in (section~\ref{sec:approach}) and Evaluation
-in (section~\ref{sec:evaluation}).  Related work is discussed in
-section~\ref{sec:relatedwork}.
+environmental anomaly in question.
 
-This work makes the following contributions:
+
+This paper makes the following contributions:
 
 \begin{enumerate}
-\item{A new approach that uses targeted manipulation of the
-    interactions between an application and its environment to test
-    how the application will respond in a given environment without
-    having to deploy the application to that environment.}
-\item{An approach for encoding an appropriate flow of interactions
-    between an application and its environment as a model that can be
-    later used to check for correct behavior}
-\item{A tool that implements the discussed approach that is able to
-    successfully find bugs, both known and unknown, in popular
-    applications.}
+\item{It proves the importance of the interaction between an application and
+    its environment in creating potential flaws upon deployment.}
+\item{It proposes the idea that by manipulating these interactions through
+    the use of system calls, the responses of an application to any given
+    environment can be accurately simulated without an actual deployment to
+    that environment.}
+\item{It offers an approach for encoding an appropriate flow of
+    interactions between an application and its environment as a model that
+    can be later used to check for correct behavior.}
+\item{It presents the CrashSimulator tool that can implement the
+    discussed approach to successfully find bugs, both known and unknown,
+    in popular applications.}
 \end{enumerate}
+
+In the remainder of this paper we
+offer additional details on CrashSimulator's operation.
+In section~\ref{sec:approach} we present the rationale for our system call trace
+and replay system and explain how anomalies are identified, extracted,
+converted, and injected while section~\ref{sec:evaluation} analyzes the results
+of testing conducted with the tool and evaluates its effectiveness at checking
+behavior in simulated environments.  Related work is discussed in
+section~\ref{sec:relatedwork} and we offer concluding thoughts and suggestions
+for future work in section~\ref{sec:conclusion}.
 
 
 %%% Local Variables: 
