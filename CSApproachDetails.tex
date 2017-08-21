@@ -113,41 +113,45 @@
 
     \subsection{Converting Anomalies to System Call Sequences}
 
-    Once a new anomaly has been identified, it is distilled into the sequence of
+    Once a new anomaly has been identified, it is distilled into a sequence of
     system calls that respond to the anomaly.  This process
     involves examining the system call traces %containing anomalies 
     in order to
-    identify a series of system calls indicative of appropriate (or inappropriate)
-    response to the anomaly.
-    This analysis should identify two things: 1) what mutations, if any, need to be
-    made to a system call trace to simulate the anomalous environment and 2) a checker that examines the application's response to further trace operations in order to determine whether the application is responding appropriately. These checkers can often be 
+    identify a series of calls indicative of an appropriate (or inappropriate)
+    response to a specified anomaly.
+    This analysis should identify two things: 1) any mutations that may need to be
+    made to the trace to simulate the anomalous environment, and 2) a checker to
+    examine the application's response to further trace operations in order to
+    determine
+    whether it is responding appropriately. These checkers can often be 
     described by finite automata, allowing CrashSimulator to simply check
     whether replay results are accepted by the automaton.
 
-    \preston{Much like the effort involved in constructing a unit test that
-      checks for the presence of correct behavior in a piece of code, this
-      process involves some amount of user skill and effort initially with the
-      idea that this effort will be paid back as its products are used
-      repeatedly in over time.  Consider a Linux application that depends on a
-      particular file being present at a specific location in the filesystem.
-      If this file is usually present, a developer may forget to check the
-      return value of {\tt open ()} on it.  This will result in future calls to
-      {\tt write ()} the file failing returning -1 with {\tt errno} containing {\tt
-        EBADF} --- a result that obscures the initial cause of the failure.  The
-      key pieces of information that CrashSimulator's user must extract from
-      this situation are the true cause of the error (i.e.\ the initial open ()
-      failure) and the system call specific traits of the error (i.e.\ open ()
-      returning -1 rather than a valid file descriptor, and {\tt errno} containing
-      {\tt ENOENT}).  In come cases this step can be automated (consider NetCheck
-      automatically diagnosing some classes of network-related errors) but in
-      other cases manual effort will be required.}
+    Much like the effort involved in constructing a unit test to
+    check for correct behavior in a piece of code, this
+    process involves an initial outlay of user skill and effort that 
+    will be paid back as it is used
+    repeatedly over time.
+    %Consider a Linux application that depends on a
+    %particular file being present at a specific location in the filesystem.
+    %If this file is usually present, a developer may forget to check the
+    %return value of {\tt open ()} on it.  This will result in future calls to
+    %{\tt write ()} the file failing returning -1 with {\tt errno} containing {\tt
+    %EBADF} --- a result that obscures the initial cause of the failure.  The
+    %key pieces of information that CrashSimulator's user must extract from
+    %this situation are the true cause of the error (i.e.\ the initial open ()
+    %failure) and the system call specific traits of the error (i.e.\ open ()
+    %returning -1 rather than a valid file descriptor, and {\tt errno} containing
+    %{\tt ENOENT}).  In come cases this step can be automated (consider NetCheck
+    %automatically diagnosing some classes of network-related errors) but in
+    %other cases manual effort will be required.}
 
-      \preston{With this information in mind, a developer can construct the simple
-      mutation ``make the {\tt open ()} call return -1 with {\tt errno} set to
-      {\tt ENOENT}'' and use CrashSimulator to apply it to any application that
-      makes {\tt open ()} calls.  In this way, the mutation can allow
-      CrashSimulator to perform a universal test for whether or not an
-      application correctly checks {\tt open ()}'s return value.}
+    With this information in mind, a developer can construct the simple
+    mutation ``make the {\tt open ()} call return -1 with {\tt errno} set to
+    {\tt ENOENT}'' and use CrashSimulator to apply it to any application that
+    makes {\tt open ()} calls.  Using these mutated traces can allow
+    CrashSimulator to perform a universal test for whether or not an
+    application correctly checks {\tt open()}'s return value.
 
     %CrashSimulator can use the outputs of this analysis either as mutations to
     %be applied to a system call trace of the application under test or as input
@@ -168,12 +172,12 @@
    In many situations
     CrashSimulator's default checker can be employed to determine
     whether the application has noticed the anomaly and whether it may be making
-    an effort to handle it.  As an example of this situation refer to
-    \S~\ref{sec-file-type-bugs}.  From the other direction,
-    CrashSimulator can employ more specific checkers in a replay execution of an
-    application performing some task in order to determine whether it handled
-    all the edge cases it should have.  We employed this technique in our
-    evaluation of CrashSimulator in finding bugs related to moving files across
+    an effort to handle it (See example in
+    \S~\ref{sec-file-type-bugs}).  From the other direction,
+    the system can employ more specific checkers in a replay execution 
+    to determine whether the application handled
+    all the edge cases.  We employed this technique in our
+    evaluation of CrashSimulator's ability to find bugs related to moving files across
     devices (\S~\ref{sec-complex}).
     
     \subsection{Anomaly Injection}
