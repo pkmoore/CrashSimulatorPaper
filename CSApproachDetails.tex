@@ -346,12 +346,12 @@
 %    file attributes to a destination file can result in the operating system
 %    mishandling trust concers around an untrusted file.
 
-    \subsection{Architecture}
+    \subsection{CrashSimulator Architecture}
         
     At a high level CrashSimulator is organized into two primary modules. The
-    first module is responsible for monitoring a given execution, determining
-    when to inject anomalous behavior, and determining whether or not the
-    application responded correctly to the injected behavior. The second module
+    first is responsible for monitoring a given execution, determining
+    when to inject anomalous behavior, and if the
+    application responded correctly.  The second module
     is responsible for managing the execution of the application under test such
     that it precisely follows a previously recorded system call trace -- a
     process we refer to as ``replaying'' a system call trace.
@@ -364,29 +364,29 @@
     %CrashSimulator's first module operates by using this model to analyzed the system call behavior of the application
     %under test(e.g. order, parameters, side effects, return values).
         
-    CrashSimulator's makes use of the {\tt ptrace} facilities built into modern
-    versions of the Linux kernel. The aforementioned ``replay'' of a system call
-    trace is achieved by intercepting key system calls made by the application,
-    preventing the actual system call from being carried out by the kernel (by
+    Both modules make use of the {\tt ptrace} facilities built into modern
+    versions of the Linux kernel.  A ``replay''
+    is achieved by intercepting key system calls made by the application,
+    preventing the call from being carried out by the kernel (by
     converting it to a call to {\tt getpid()}), identifying the matching system
-    call from the previously recorded trace, and replicating the return value
-    and side effects such that the application believes that the system call it
+    call from a previously recorded trace, and replicating the return value
+    and side effects. In doing so, the application believes that the system call it
     made actually took place. We have found that emulating the post conditions
-    of the system calls an application makes results in faithful replay of a
+    of a system call results in faithful replays of a
     previous execution in most cases.
 
     CrashSimulator is fully self contained and operates without user
-    intervention during its analysis process. At this point, CrashSimulator
-    itself is available as a virtual machine appliance compatible with the
-    \emph{Virtual Box} virtual machine hosting software.  The reasons for
-    distributing CrashSimulator in this manner are threefold.  First, this
+    intervention during its analysis process. At this point, the tool 
+    itself is available as a virtual machine appliance that is compatible with the
+    \emph{Virtual Box} virtual machine hosting software.  The decision to
+    distribute CrashSimulator in this manner is based on three points.  First, this
     distribution method ensures that all of CrashSimulator's dependences are
-    installed and configured appropriately.  Second, this method provides an
+    installed and configured appropriately.  Second, it provides an
     environment for taking system call traces that is known to be complete
-    tool-wise and compatible with CrashSimulator.  Finally, and most importantly,
+    tool-wise and compatible.  Finally, and most importantly,
     this method provides an environment that is known to be compatible with the
     details of CrashSimulator's system call replay techniques.
 
     CrashSimulator's source code is available and, while other environments may
-    be untested, it should function correctly on any platforms that meet the
+    be untested, it should function correctly on any platform that meets the
     criteria described above.
