@@ -398,10 +398,10 @@ repeatable, principled manner.
 
 Having seen that CrashSimulator can detect many bugs with fairly 
 simple anomaly injections and checks,
-we wanted to understand whether CrashSimulator can identify more complex types
+we wanted to understand whether CrashSimulator can identify the more complex types
 of misbehavior that crosses many system calls.
-To do this, we examined the
-way in which applications move a file in terms of the filesystem anomaly discussed in
+To do this, we returned to
+the filesystem anomaly discussed in
 section~\ref{subsec:anomalyexamples}.  This situation adds additional complexity that libraries and applications
 frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
 %To come up with the
@@ -419,7 +419,7 @@ frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
 we examined several libraries and found that {\tt mv} seemed
 to handle cases that other tools failed to consider.  Following this, we 
 used the trace of {\tt mv} as a template and created instructions to modify
-the trace to simulate the anomalies that this program tests for.
+the trace to simulate the anomalies for which this program tests.
 The resulting anomalies that could be detected were as follows:
 %Using these traces in CrashSimulator 
 %\cappos{What is this?  I'm confused by what
@@ -472,14 +472,14 @@ Failing to perform these checks often results in corruption of the file~\cite{Py
 Extended file attributes are used by modern
 operating systems to store descriptive information about a file that cannot be
 held by normal filesystem fields.  For example, an operating system can use
-extended file attributes to store whether or not a file was downloaded from the
-Internet -- important security information that used to warn
+extended file attributes to record whether or not a file was downloaded from the
+Internet -- important security information that warn
 users if they are about to open a potentially unsafe file.  Apple's Gatekeeper
-relies on extended file attributes to prevent applications downloaded from
-untrusted developers from being executed without explicit user action~\cite{AppleCodeSigning}.
+relies on extended file attributes to prevent the execution of applications downloaded from
+untrusted developers without explicit user action~\cite{AppleCodeSigning}.
 When copying a file,
 an application should retrieve extended file attributes from the source
-file and later apply them to the destination file.
+file and, later, apply them to the destination file.
 %{\tt mv} handles
 %preservation of these attributes by making the appropriate system calls to read
 %all of the extended file attributes off of the source file and then applying
@@ -746,7 +746,7 @@ condition.
     allowed on directories.  In such an environment {\tt od}'s use of {\tt
       read ()} would allow  cause execution to continue returning whatever data
     {\tt read ()} can access from a directory rather than bringing the
-    anomalous condition to the attention of user.}
+    anomalous condition to the attention of the user.}
 
 %{\bf False Negatives.}
 %CrashSimulator can encounter false negatives (that is, CrashSimulator accepts an
