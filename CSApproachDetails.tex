@@ -180,13 +180,14 @@
 
     CrashSimulator's replay-based approach makes it easy to inject anomalies
     into an execution.  
-    Because CrashSimulator controls execution so that it faithfully
-    follows the system call behavior described in the system call trace being
-    replayed, modifying this trace manually or programmatically is enough to
-    introduce anomalous behavior.  For example, suppose an anomaly causes a
+    Because its execution faithfully
+    follows the system call behavior described in the trace being
+    replayed, anomalous behavior can be introduced either by modifying
+    this trace manually or programmatically.
+    For example, suppose an anomaly causes a
     call to {\tt read()} fail with return value of -1 and {\tt errno} set to
     {\tt EINVAL}.  Exposing an application to this situation only requires
-    editing the system call trace such that the line describing this read call
+    editing the system call trace, such that the line describing this read call
     reflects the above values.
 
     %Consider the example of an anomaly identified in a web server application.
