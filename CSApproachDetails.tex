@@ -1,14 +1,22 @@
-\section{CrashSimulator Approach }
+\section{CrashSimulator Operations}
 \label{sec:approach}
-    %%% This figure is definitely wrong. Will recreate %%%
     \begin{figure}[t]
         \center{}
         \fbox{\includegraphics[scale=.5]{Architecture}}
         \caption{High level view of CrashSimulator's Architecture.}
         \label{figure:architecture}
     \end{figure}
+
+    \preston{This is draft text from Lois.  She recommends we have a brief
+      introduction on each section}  In this section, we highlight some relevant
+    information behind the operation of CrashSimulator, starting with the
+    rationale behind using system call traces to preserve and replay significant
+    anomalies. Example of where anomalies can be found and what they resemble
+    are also given, as is a description of a few key steps in its operation,
+    such as the method for injecting anomalies and analyzing the execution of
+    CrashSimulator’s replay process.
     
-    \subsection{System Call Traces and Replay}
+    \subsection{Rationale}
 
         \subsubsection{Why System Call Traces?}
 
@@ -22,10 +30,10 @@
 
         Operating at the system call level allows this work to take advantage of
         two key pieces of tooling that already exist in mature form on Linux.
-        The first is {\tt ptrace}. {\tt ptrace} is a process manipulation interface provided
-        by the Linux kernel whose primary use case is debugger development.
+        The first is {\tt ptrace}, a process manipulation interface provided
+        by the Linux kernel primarily for debugger development.
         This work leverages {\tt ptrace} in order to start and stop execution of a
-        process as well as read and write the contents of the processe's
+        process as well as to read and write the contents of the processe's
         registers and memory.  Using these operations allows CrashSimulator to
         pause execution before and after each system call an application makes
         in order to manage execution and inject anomalies where appropriate.
@@ -33,31 +41,31 @@
         CrashSimulator also relies on system call traces recorded using {\tt
           strace}.  The {\tt strace} system call trace format is extensive and
         captures the parameters, return values, and side effects of each system
-        call an application makes.  Such a record provides CrashSimulator with
-        all the information needed to direct execution of the application in
-        such a way that the contents of the system call trace are faithfully
-        replayed.  It is in this way that system call traces act as an interface
-        over an applications execution that used to inject anomalous behavior.
+        call an application makes.  Such a record provides
+        all the information needed to execute an application in
+        such a way that the trace is faithfully
+        replayed.  In doing so, the trace acts as an interface
+        that can inject anomalous behavior into the execution of an application.
 
-        \paragraph{Removal of language dependence}
+        \paragraph{Removing language dependence}
 
         Operating at the system call level frees CrashSimulator from
         dependence on a particular programming language, compiler, or runtime system.  
-	CrashSimulator does not require any complex language parsing and
+	As such, the tool does not require any complex language parsing and
         analysis code, %while still allowing it to posess many of the benefits of
         %systems that perform such work and makes it much easier to use CrashSimulator 
 	so it can be used with applications written in a wide variety of languages.
 	%Testing tools that perform language parsing do
 	%so in order to craft inputs that specifically exercise target execution
 	%paths in an application.  
-	This is because CrashSimulator is concerned with issues that arise
-        at the ``interfaces'' between an application and its environment
+	This is an important advantage as CrashSimulator is concerned with issues that arise
+        at the ``interfaces'' between an application and its environment,
 	and directly manipulates values at these interfaces to simulate
         %Manipulating system calls allows us to skip the process of generating
         %these crafted inputs in favor of directly effecting the
 	anomalous situations of interest.
 
-        \paragraph{Identify Issues that Result from an Application's Environment}
+        \paragraph{Identifying Issues that Result from an Application's Environment}
 
         Most current testing strategies are very application-centric.  For
         example, a black box fuzzer is able to identify faults that arise when
