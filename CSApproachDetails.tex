@@ -16,83 +16,6 @@
     such as the method for injecting anomalies and analyzing the execution of
     CrashSimulator’s replay process.
     
-    \subsection{Rationale}
-
-        \subsubsection{Why System Call Traces?}
-
-        In order to inject anomalies and monitor program behavior as described
-        above, CrashSimulator needs to have detailed interactions with the
-        application under test at some level.  The option of carrying out these
-        interactions at the system call level was chosen for several
-        reasons:
-
-        \paragraph{Tooling}
-
-        Operating at the system call level allows this work to take advantage of
-        two key pieces of tooling that already exist in mature form on Linux.
-        The first is {\tt ptrace}, a process manipulation interface provided
-        by the Linux kernel primarily for debugger development.
-        This work leverages {\tt ptrace} in order to start and stop execution of a
-        process as well as to read and write the contents of the processe's
-        registers and memory.  Using these operations allows CrashSimulator to
-        pause execution before and after each system call an application makes
-        in order to manage execution and inject anomalies where appropriate.
-
-        CrashSimulator also relies on system call traces recorded using {\tt
-          strace}.  The {\tt strace} system call trace format is extensive and
-        captures the parameters, return values, and side effects of each system
-        call an application makes.  Such a record provides
-        all the information needed to execute an application in
-        such a way that the trace is faithfully
-        replayed.  In doing so, the trace acts as an interface
-        that can inject anomalous behavior into the execution of an application.
-
-        \paragraph{Removing language dependence}
-
-        Operating at the system call level frees CrashSimulator from
-        dependence on a particular programming language, compiler, or runtime system.  
-	As such, the tool does not require any complex language parsing and
-        analysis code, %while still allowing it to posess many of the benefits of
-        %systems that perform such work and makes it much easier to use CrashSimulator 
-	so it can be used with applications written in a wide variety of languages.
-	%Testing tools that perform language parsing do
-	%so in order to craft inputs that specifically exercise target execution
-	%paths in an application.  
-	This is an important advantage as CrashSimulator is concerned with issues that arise
-        at the ``interfaces'' between an application and its environment,
-	and directly manipulates values at these interfaces to simulate
-        %Manipulating system calls allows us to skip the process of generating
-        %these crafted inputs in favor of directly effecting the
-	anomalous situations of interest.
-
-        \paragraph{Identifying Issues that Result from an Application's Environment}
-
-        Most current testing strategies are very application-centric.  For
-        example, a black box fuzzer is able to identify faults that arise when
-        an application begins processing data it has received from a network
-        connection. CrashSimulator, on the other hand, is able to identify
-        issues that arise from the network connection itself.
-
-    \subsubsection{Why Replay Executions?}
-
-        Replay is important because it allows CrashSimulator to execute an
-        application free from dependencies on things like file system contents,
-        network configuration, or communication with other applications.  For
-        example, if an application depends on a file being present in a filesystem,
-        CrashSimulator can intercept calls to {\tt read()} from and {\tt write()} to
-        this file, removing the need for this file to actually be present during
-        replay executions. Additionally, replay allows CrashSimulator to reproduce
-        the differences between versions of libraries and other executable
-        dependencies, alleviating the need install them in the test environment.
-
-    %\paragraph{Control Execution}
-
-    %Because it is simulating aspects the application under test's environment, CrashSimulator is able to manipulate the
-    %data the application receives from these aspects in order to control execution.  This is the key feature that allows
-    %CrashSimulator to inject anomalous situations into an execution.  For example, by simulating the communications
-    %between the application under test and another host on a network, CrashSimulator can fragment, modify, or even drop
-    %data ``incoming'' from the simulated remote host in order to determine whether or not the application appropriately
-    %handles the situation. 
 
      
 
@@ -360,6 +283,84 @@
 %    of the copy process.  Further, failing to copy extended
 %    file attributes to a destination file can result in the operating system
 %    mishandling trust concers around an untrusted file.
+    
+\subsection{Rationale}
+
+\subsubsection{Why System Call Traces?}
+
+In order to inject anomalies and monitor program behavior as described
+above, CrashSimulator needs to have detailed interactions with the
+application under test at some level.  The option of carrying out these
+interactions at the system call level was chosen for several
+reasons:
+
+\paragraph{Tooling}
+
+Operating at the system call level allows this work to take advantage of
+two key pieces of tooling that already exist in mature form on Linux.
+The first is {\tt ptrace}, a process manipulation interface provided
+by the Linux kernel primarily for debugger development.
+This work leverages {\tt ptrace} in order to start and stop execution of a
+process as well as to read and write the contents of the processe's
+registers and memory.  Using these operations allows CrashSimulator to
+pause execution before and after each system call an application makes
+in order to manage execution and inject anomalies where appropriate.
+
+CrashSimulator also relies on system call traces recorded using {\tt
+strace}.  The {\tt strace} system call trace format is extensive and
+captures the parameters, return values, and side effects of each system
+call an application makes.  Such a record provides
+all the information needed to execute an application in
+such a way that the trace is faithfully
+replayed.  In doing so, the trace acts as an interface
+that can inject anomalous behavior into the execution of an application.
+
+\paragraph{Removing language dependence}
+
+Operating at the system call level frees CrashSimulator from
+dependence on a particular programming language, compiler, or runtime system.  
+As such, the tool does not require any complex language parsing and
+analysis code, %while still allowing it to posess many of the benefits of
+%systems that perform such work and makes it much easier to use CrashSimulator 
+so it can be used with applications written in a wide variety of languages.
+%Testing tools that perform language parsing do
+%so in order to craft inputs that specifically exercise target execution
+%paths in an application.  
+This is an important advantage as CrashSimulator is concerned with issues that arise
+at the ``interfaces'' between an application and its environment,
+and directly manipulates values at these interfaces to simulate
+%Manipulating system calls allows us to skip the process of generating
+%these crafted inputs in favor of directly effecting the
+anomalous situations of interest.
+
+\paragraph{Identifying Issues that Result from an Application's Environment}
+
+Most current testing strategies are very application-centric.  For
+example, a black box fuzzer is able to identify faults that arise when
+an application begins processing data it has received from a network
+connection. CrashSimulator, on the other hand, is able to identify
+issues that arise from the network connection itself.
+
+\subsubsection{Why Replay Executions?}
+
+Replay is important because it allows CrashSimulator to execute an
+application free from dependencies on things like file system contents,
+network configuration, or communication with other applications.  For
+example, if an application depends on a file being present in a filesystem,
+CrashSimulator can intercept calls to {\tt read()} from and {\tt write()} to
+this file, removing the need for this file to actually be present during
+replay executions. Additionally, replay allows CrashSimulator to reproduce
+the differences between versions of libraries and other executable
+dependencies, alleviating the need install them in the test environment.
+
+%\paragraph{Control Execution}
+
+%Because it is simulating aspects the application under test's environment, CrashSimulator is able to manipulate the
+%data the application receives from these aspects in order to control execution.  This is the key feature that allows
+%CrashSimulator to inject anomalous situations into an execution.  For example, by simulating the communications
+%between the application under test and another host on a network, CrashSimulator can fragment, modify, or even drop
+%data ``incoming'' from the simulated remote host in order to determine whether or not the application appropriately
+%handles the situation. 
 
     \subsection{CrashSimulator Architecture}
         
