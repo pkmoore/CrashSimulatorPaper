@@ -111,9 +111,10 @@
     repeatedly over time.
 
     With this information in mind, a developer can construct the simple
-    mutation ``make the {\tt open ()} call return -1 with {\tt errno} set to
-    {\tt ENOENT}'' and use CrashSimulator to apply it to any application that
-    makes {\tt open ()} calls.  Using these mutated traces can allow
+    mutation, for example:  ``make the {\tt open()} call return -1 with {\tt errno} set to
+    {\tt ENOENT}'', and use CrashSimulator to apply it to any application that
+    makes the specified calls, {\tt open ()} in this case.
+    Using these mutated traces can allow
     CrashSimulator to perform a universal test for whether or not an
     application correctly checks {\tt open()}'s return value.
 
@@ -128,12 +129,14 @@
     %execution this is facilitated by modifying the to-be-replayed system call
     %trace from the application under test.
 
+    Similar analysis is used to derive a checker from a set of system calls
+    involved in an anomaly.
     In some cases, %only one of these pieces is required for CrashSimulator to
    % perform its analysis. 
     the checker is very simple and in others it is more complex.
    % If there is not a definite correct response system
    % call sequence,
-   In many situations
+    In many situations
     CrashSimulator's default checker can be employed to determine
     whether the application has noticed the anomaly and whether it may be making
     an effort to handle it (See example in
