@@ -78,7 +78,7 @@ memory.}
 %
 
 In this paper, we introduce {\em CrashSimulator}, a testing approach that
-follows the theoretical method proposed above, and is based on the
+follows the method proposed above, and is based on the
 observation that: {\em Insight gleaned from a fault that is
   caused by unexpected interactions of {\em one application} with one
   of its deployment environments, can be leveraged to discover related
@@ -150,20 +150,6 @@ environment. In parallel with the replay, a checker will run under the
 control of CrashSimulator that decides whether the resulting behavior
 is indicative of a fault.
 
-\preston{Lois's feedback targets the below paragraph for removal.  Its purpose
-  was to address feedback from reviewers that we needed to be more explicit about
-  the ``manual effort'' required.  Maybe we need to spread this info in
-  somewhere else if we decide it is important?}
-\textit{Manual effort is needed to describe how traces are to be modified to
-characterize a particular environment and to describe checkers.
-This effort consists of examining the system call trace in order to determine
-which system call are involved in the anomalous condition and what return
-values and program state modifications are indicative of it.  This effort is
-comparable to that which is required to design and construct a new test case to
-be added to an applications test suite.  Similar to a test case,
-this effort can be amortized through repeated use.}
-
-%
 %Given that we have a simulation of a given environment, the next step is to make decisions about whether an application
 %is executing correctly in this environment.  The set of interactions (i.e. system calls) necessary to correctly perform
 %a given operation in a given environment can be thought of as a protocol that the application must follow.  With this
