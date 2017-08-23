@@ -5,10 +5,10 @@ unexpected interactions between an application and its environment.
 Although finding and eliminating faults in applications is a key concern for software developers, it is impractical for them to test an application in all of the
 environments in which it will be deployed.
  To address this
-problem, this work presented CrashSimulator, a testing
+problem, we introduced CrashSimulator, a testing
 approach that utilizes mutation, replay, and analysis of system call traces
-in order to test whether applications respond correctly to 
-anomalous environment conditions.
+in order to determine whether an application responds correctly to
+anomalous environmental conditions.
 A significant benefit of CrashSimulator is that failures observed
 in executing one application in an anomalous environment can
 easily be leveraged to test whether {\em other} applications
@@ -27,31 +27,25 @@ the anomalous environment, and invokes a checker to see whether
 subsequent system calls indicate a correct or incorrect response.
 This allows
 CrashSimulator to test an application running in one environment
-as if it were running in another environment. 
-%Additionally,
-%it provides an interface for CrashSimulator to manipulate the execution in order to direct an application down
-%testing-relevant code paths.  
-%Finally, view of execution that can be consumed by computational models that can classify
+as if it were running in another.
 
-%whether or not an application has behaved correctly in some situation.
-
-CrashSimulator evaluates application behavior in the (simulated) anomalous environment
-by analyzing system call traces using
-finite state models characterizing correct (or incorrect) behavior.
+The tool evaluates application behavior in the (simulated) anomalous environment
+by using
+finite state models to characterize correct (or incorrect) behavior.
 This provides a generic ``signature'' for that behavior, which is
 portable across applications. 
-Consequently, a set, of mutations and checkers can be collected from any existing
+Consequently, a set of mutations and checkers can be collected from any existing
 application for use in testing other new or existing applications. 
 In this way, an ever-expanding ``test suite'' can
-be created allowing lessons learned from bugs in some application to benefit many
+be created, allowing lessons learned from bugs in one application to benefit many
 others.
 
-Our evaluation of CrashSimulator has shown it to be both performant and
-effective.  CrashSimulator was able to identify bugs related to unusual file
+Our evaluation of CrashSimulator has shown it to be both effective and
+efficient.  CrashSimulator was able to identify bugs related to unusual file
 types in 15 applications and bugs related to slow network performance in 10
 network applications and libraries.  Additionally CrashSimulator found
 filesystem related bugs in 7 applications and libraries with facilities for
-moving files between areas of a system's filesystem.  The low overhead
+moving files within a system's filesystem.  The low overhead
 introduced by CrashSimulator's technique meant that it was able to
 find these bugs quickly in spite of its unoptimized implementation.
 
