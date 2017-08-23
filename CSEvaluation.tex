@@ -242,6 +242,27 @@ error, use {\tt perror()} to print the correct localized error message.  In
 short, these applications pass their error handling responsibilities to the
 kernel.
 
+\begin{table*}[t]
+    \scriptsize{}
+    \begin{tabular}{l  l  |  l  l  l  l  l  l  l}
+    \toprule{}
+        Application   & IFDIR                     & IFCHR (infinite sized)& IFBLK (finite size)             & FIFO \\
+\hline
+        wc            & Error: Is a Directory     & hangs                 & No output, slowly process file  & Hangs\\
+        install       & Error: Omitting Directory & Fills disk            & No output, copies file          & Hangs\\
+        fmt           & No output                 & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        od            & Error: read error         & hangs, garbage output & No output                       & Hangs\\
+        ptx           & Error: Is a Directory     & hangs, fills disk     & Processes file, garbage output  & Hangs\\
+        comm          & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        pr            & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
+\hline
+    \bottomrule{}
+    \end{tabular}
+    \caption{Responses of a sample of coreutils applications when exposed to anomalous conditions}
+    \label{table:applicationresponses}
+\end{table*}
+
+
 \subsubsection{Slowloris attack} Delaying network applications for extended
 periods.
 
@@ -704,15 +725,6 @@ condition.
       the system call or calls that can implement it}
     \label{table:stepsandcalls}
 \end{table}
-
-
-  \begin{table}
-    \begin{tabular}{l l l}
-      Application      & Detected Misbehavior      &   Result in execution\\
-      od               & Fails to detect directory &   Fails reading from directory with read()\\
-      ...              &  ...                      &  ... \\
-    \end{tabular}
-  \end{table}
 
   \subsection{Application Reactions in the Context of the Environment}
 
