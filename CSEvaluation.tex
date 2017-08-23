@@ -590,24 +590,24 @@ cases.
 %not correctly performing the move operation and diagnose specifically that the
 %``Source Replaced'' race condition was present.
 
-\subsection{What types of bugs cannot be found using CrashSimulator?}
-\label{sec-not-found}
-
-Due to the level at which CrashSimulator works (the system call
-level), it is not possible to find certain types of bugs.
-CrashSimulator is not able to detect bugs that do not result from or
-have a visible effect on the system calls an application makes.  An
-example of this situation is applications mishandling a situation
-around file moves where, due to a strange volume mounting arrangement,
-the source directory is moved into itself.  In order to detect this
-situation the application must make an effort to gather the full path
-of both the source and destination and compare them.  While
-CrashSimulator is able to observe some aspects of the ``gathering''
-process (i.e. the {\tt stat()} or {\tt lstat()} calls) it is not able
-to observe whether the application compares the strings.
-CrashSimulator must see the correct actions via system calls (or
-incorrect actions through the lack of them) to understand application
-behavior.
+%\subsection{What types of bugs cannot be found using CrashSimulator?}
+%\label{sec-not-found}
+%
+%Due to the level at which CrashSimulator works (the system call
+%level), it is not possible to find certain types of bugs.
+%CrashSimulator is not able to detect bugs that do not result from or
+%have a visible effect on the system calls an application makes.  An
+%example of this situation is applications mishandling a situation
+%around file moves where, due to a strange volume mounting arrangement,
+%the source directory is moved into itself.  In order to detect this
+%situation the application must make an effort to gather the full path
+%of both the source and destination and compare them.  While
+%CrashSimulator is able to observe some aspects of the ``gathering''
+%process (i.e. the {\tt stat()} or {\tt lstat()} calls) it is not able
+%to observe whether the application compares the strings.
+%CrashSimulator must see the correct actions via system calls (or
+%incorrect actions through the lack of them) to understand application
+%behavior.
 
 %\emph{CrashSimulator could
 %  detect this issue during a specially crafted execution which replays a trace
