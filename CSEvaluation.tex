@@ -398,8 +398,8 @@ repeatable, principled manner.
 
 Having seen that CrashSimulator can detect many bugs with fairly 
 simple anomaly injections and checks,
-we wanted to understand whether CrashSimulator can identify the more complex types
-of misbehavior that crosses many system calls.
+we wanted to test if CrashSimulator could identify the more complex types
+of flaws that cross many system calls.
 To do this, we returned to
 the filesystem anomaly discussed in
 section~\ref{subsec:anomalyexamples}.  This situation adds additional complexity that libraries and applications
@@ -631,9 +631,11 @@ cases.
 The primary source of false positives %(that is, CrashSimulator reports a failure
 %in a situation where the execution should be accepted) for 
 in CrashSimulator is an
-application using a different sequence of system calls than a checker was
-anticipating to implement a given operation.  CrashSimulator's
-approach allows these situations to be easily corrected once identified.  This
+application using a different sequence of system calls to implement a given
+operation than a checker was
+anticipating. CrashSimulator's
+approach allows these situations to be easily corrected, once identified through
+analysis of the incorrect test results.  This
 is similar to the circumstance where an application's test suite is missing a
 test, necessitating action by the developer to construct the missing test.
 
@@ -646,21 +648,21 @@ test, necessitating action by the developer to construct the missing test.
 
 For example, consider GNOME's {\tt glib} file handling facilities.  When an
 application makes use of these facilities to move a file across storage devices
-the library itself correctly handles the behaviors described above as
-making up a ``correct'' file move operation.  When we used CrashSimulator 
+the library itself correctly handles the behaviors described above 
+for a ``correct'' file move operation.  When we used CrashSimulator 
 with the checkers described above to
 analyze a minimal application that used {\tt glib} for a cross-device move,
 we got reports stating that the application {\em did not} respond
 correctly to the anomaly.
-We found through manual examination of a
-the system call trace that, while {\tt glib} correctly performs
+By manually examining
+a system call trace, we found that, while {\tt glib} correctly performs
 the required behaviors, it does so using alternative system call sequences. 
 Rather than using a sequence of
 {\tt read()} and {\tt write()} calls, 
 as our checker expected,
-Glib creates a pipe and uses the
+{\tt glib} creates a pipe and uses the
 {\tt splice()} system call to copy the contents out of the source file, through
-the pipe, and into the destination file.
+the pipe and into the destination file.
 
 Fortunately, as soon as false positives like this are discovered,
 CrashSimulator's checkers can be modified to deal with alternative
@@ -670,9 +672,9 @@ given operation can be mapped to a manageable subset of system calls.  Given the
 above example around moving files, consider the mapping from high level
 ``operation'' to the set of system calls that can implement it in
 Table~\ref{table:stepsandcalls}.  Each of the steps in the operation map to a small
-number of system calls and, in most cases, only one of the system calls is
+number of system calls and, in most cases, only one of these system calls is
 necessary.  In situations where two system call sequences can correctly
-implement the same operation CrashSimulator simply runs two checkers
+implement the same operation, CrashSimulator simply runs two checkers
 in parallel and accepts the execution if either one ends in an accepting
 condition.
 
@@ -763,7 +765,7 @@ condition.
 %application deciding to cache information in memory when it fails to open a 
 %file.
 
-\subsection{Is CrashSimulator able to execute tests in a performant manner?}
+\subsection{Is CrashSimulator able to execute tests in a timely  manner?}
 \label{sec-perf}
 
 %\cappos{All of the performance numbers should be here.  I recommend having
@@ -771,10 +773,10 @@ condition.
 %y-axis.  It will be a scatter plot.  Each point will be one of the
 %experiments you ran.}
 
-One key attribute of successful testing tools is that they be able to
+One key attribute of successful testing tools is that they are able to
 complete their tests in a timely manner.  If a tool takes too long to
-complete its tests users will be less likely to run it frequently, or at
-all, reducing the tools overall usefulness dramatically. To this end, the
+complete its tasks, users will be less likely to run it
+reducing its usefulness dramatically. To this end, the
 performance of CrashSimulator was evaluated in order to determine whether
 or not it was able to complete its test executions in an acceptable time
 frame.  
@@ -801,67 +803,20 @@ largely due to performance problems in our (unoptimized) prototype,
 primarily our utilization of {\tt ptrace}.  Tracing the program
 with {\tt ptrace} adds up to a factor of 5x in overhead.  (This could
 be removed with more efficient mechanisms like {\tt eBPF} or a loadable 
-kernel module.)  Also the start up time of our prototype is high, due
-to starting up the Python interpreter.
+kernel module.)  In addition, starting up the Python interpreter increases the
+startup time of our prototype.
 
-
-With a more optimized implementation, CrashSimulator could be much more 
-efficient.  In fact, CrashSimulator will be more efficient than actually
+Though the performance of our prototype was slower than desired,
+with a more optimized implementation, CrashSimulator could be much more 
+efficient.
+In fact, CrashSimulator will be more efficient than 
 running the program natively in many cases, since CrashSimulator only
-replays the system calls.  This means that CrashSimulator does not need to
+replays the system calls. This means that CrashSimulator does not need to
 actually perform the calls which avoids the system call overheads, such as 
 I/O.  Note that this already occurs for the {\tt du} program, because 
-CrashSimulator need not actual perform any disk I/O.
+CrashSimulator need not actually perform any disk I/O.
 
 Note also that natively testing the timeout of networked applications (not
-shown) would take an extended period of time (at least as long as the allowed
-timeout value).  CrashSimulator avoids this cost by simulating the fact that
+shown) would take an extended period of time, at least as long as the allowed
+timeout value.  CrashSimulator avoids this cost by simulating the fact that
 time has progressed for future system calls.
-%\cappos{Can we say something about the network timeout apps?}
-
-
-%\cappos{I think the following should all get removed...  I don't understand the
-%purpose}
-%\paragraph{Discussion on network\_speedtest}
-%    \begin{table}[H]
-%        \scriptsize{}
-%        \begin{tabular}{l  l  l  l}
-%            \toprule{}
-%                Execution Description & Native Eecution & Replay Execution\\
-%                network\_speedtest & 0.024 & 2.407 \\
-%                filesystem\_speedtest & 0.038 & 2.604 \\
-%                mv (cross-disk file move) & 0.016 & 2.995 \\
-%            \bottomrule{}
-%        \end{tabular}
-%        \caption{This sum total runtime of 20 runs of the listed application.}
-%    \end{table}
-%
-%
-%Sample application opens a TCP connection to an already running listener (netcat), sends a message, and
-%exits. For simple applications like this, native execution is significantly faster than replay execution...
-%
-%\paragraph{Discussion on filesystem\_speedtest}
-%
-%This sample application create a new file with open(), writes a message to it, closes the file descriptor, and
-%exit()'s. This test is particularly meaningful as it replicates a pattern of system calls that is used for in
-%all sorts of applications in Linux...
-%
-%\paragraph{Discussion on mv}
-%
-%In addition to the newly constructed sample programs, performance values for replay of an execution of {\tt
-%  mv} moving a file between two separate disks were recorded.  Results indicate that CrashSimulator is able to
-%replay this operation in a similar time period to the time in which it is able to replay the dramatically
-%simpler programs.  The fact that {\tt mv} makes an order of magnitude more system calls did not substantially
-%increase replay time.
-%\subsection{What was the response to disclosing bugs found in CrashSimulator?}
-%\label{sec-response}
-%
-%
-%After discovering the bugs in CrashSimulator, we filed bug reports with 
-%different projects.  (To avoid unblinding our work, we do not link to the 
-%bug reports here.)  The maintainers' response to these filings has been 
-%positive.  Several projects have already applied patches to fix the bugs
-%we reported.  For updated information about the number of bugs filed / fixed,
-%we provide a blinded document~\cappos{refer to a webpage or google doc 
-%that we will update}.
-%
