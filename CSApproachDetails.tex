@@ -1,4 +1,4 @@
-\section{CrashSimulator Operations}
+\section{Approach Details}
 \label{sec:approach}
     \begin{figure}[t]
         \center{}
@@ -15,9 +15,7 @@
     are also given, as is a description of a few key steps in its operation,
     such as the method for injecting anomalies and analyzing the execution of
     CrashSimulator’s replay process.
-    
 
-     
 
     \subsection{Anomaly Identification}
     
@@ -88,9 +86,10 @@
 
     \subsection{Converting Anomalies to System Call Sequences}
 
+    %  This paragraph should cover the "describe manual effort" feedback
     Once a new anomaly has been identified, it is distilled into a sequence of
     system calls that respond to the anomaly.  This process
-    involves examining the system call traces %containing anomalies 
+    involves examining the system call traces
     in order to
     identify a series of calls indicative of an appropriate (or inappropriate)
     response to a specified anomaly.
@@ -100,26 +99,16 @@
     determine
     whether it is responding appropriately. These checkers can often be 
     described by finite automata, allowing CrashSimulator to simply check
-    whether replay results are accepted by the automaton.
+    whether replay results are accepted by the automaton.  The set of mutations
+    needed to simulate the anomalous environment consist of modifications
+    to the return values and program state changes that result from the involved
+    system call or calls.
 
     Much like the effort involved in constructing a unit test to
     check for correct behavior in a piece of code, this
     process involves an initial outlay of user skill and effort that 
     will be paid back as it is used
     repeatedly over time.
-    %Consider a Linux application that depends on a
-    %particular file being present at a specific location in the filesystem.
-    %If this file is usually present, a developer may forget to check the
-    %return value of {\tt open ()} on it.  This will result in future calls to
-    %{\tt write ()} the file failing returning -1 with {\tt errno} containing {\tt
-    %EBADF} --- a result that obscures the initial cause of the failure.  The
-    %key pieces of information that CrashSimulator's user must extract from
-    %this situation are the true cause of the error (i.e.\ the initial open ()
-    %failure) and the system call specific traits of the error (i.e.\ open ()
-    %returning -1 rather than a valid file descriptor, and {\tt errno} containing
-    %{\tt ENOENT}).  In come cases this step can be automated (consider NetCheck
-    %automatically diagnosing some classes of network-related errors) but in
-    %other cases manual effort will be required.}
 
     With this information in mind, a developer can construct the simple
     mutation ``make the {\tt open ()} call return -1 with {\tt errno} set to
