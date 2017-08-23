@@ -1,4 +1,7 @@
 \section{Related Work} \label{sec:relatedwork}
+\preston{Draft text from Lois: In building and testing CrashSimulator, we
+  examined a number of previous studies in bug detection, data mining,a nd
+  testing protocols. This section summaries a few earlier initiatives in these areas.
 
 \iffalse
 While there is a vast literature on test
@@ -23,9 +26,9 @@ Crash reproduction by test case mutation~\cite{DBLP:conf/sigsoft/XuanXM15}.
 
 \noindent
 {\bf Static analysis. }
-Tools based on static analysis techniques such as abstract
+Tools based on static analysis techniques, such as abstract
 interpretation, model checking, and symbolic execution have been used
-successfully to detect bugs related to incorrect API usages. Examples
+to successfully detect bugs related to incorrect API usage. Examples
 include SLAM~\cite{Ball_adecade, Ball:2002:SLP:503272.503274} and,
 more recently, CORRAL~\cite{DBLP:conf/sigsoft/LalQ14} for conformance
 checking of Windows device drivers against the Windows kernel API,
@@ -34,14 +37,14 @@ bugs in Java programs, FiSC~\cite{Musuvathi04modelchecking} for
 finding bugs in TCP implementations, and the Explode
 system~\cite{Yang:2006:ELG:1298455.1298469} for detecting crash
 recovery bugs in file system implementations. Unlike CrashSimulator,
-these approaches depend on the availability of source or byte code and
+these approaches depend on the availability of source or byte code, and
 are typically more prone to false alarms. On the other hand, static
 analysis can provide stronger soundness guarantees.  Static analysis
 has also been used to detect portability issues related to changes
-between different versions of external components that a program
-depends on~\cite{silakov2010improving, javacompliance-www}. Like
+between different versions of external components on which a program
+depends~\cite{silakov2010improving, javacompliance-www}. Like
 CrashSimulator, these address the application's interactions with its
-environment, but this work focuses on testing the application's
+environment, but CrashSimulator focuses on testing the application's
 response to anomalies, rather than on proving that the environments
 behave as expected.
 
@@ -63,10 +66,10 @@ missing method calls (see, e.g.,~\cite{mariani2007compatibility,
   DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
   DBLP:journals/tosem/MonperrusM13,
   DBLP:conf/icse/JamrozikSZ16}). These techniques primarily target
-object component interactions rather than system calls to generate
+object component interactions, rather than system calls to generate
 test suites. However, the techniques explored in these works could be
-used to mine system call patterns in source code in order to learn
-checkers that identify incorrect responses to environment
+used to mine system call patterns in source code in order to find 
+checkers that identify incorrect responses to environmental
 anomalies. So far, we have specified these checkers manually for
 CrashSimulator.
 
@@ -86,25 +89,24 @@ using log files to detect anomalies~\cite{pinpoint,
 %reconstructs a plausible global ordering.
 CheckAPI~\cite{rasley2015detecting} and
 NetCheck~\cite{Zhuang_NSDI_2014} use system call traces to diagnose an
-application's violations of cross-platform portability that are
-observed in the field. In contrast to this work, CrashSimulator uses
+application's violations of cross-platform portability. 
+In contrast to this work, CrashSimulator uses
 system call traces for a different purpose: mutating and replaying
-traces to test an applications' responses to known environmental
-anomalies before the application is deployed.
+traces to test responses to known environmental
+anomalies before an application is deployed.
 
 
 \noindent
 {\bf Portability.}
 Wrappers are commonly used to enable cross-platform portability of
 APIs~\cite{bartolomeicompliance}. System call interposition is one
-technique to generate such wrappers
-automatically~\cite{Guo:2011:CUS:2002181.2002202} and has also been
+technique to automatically generate such wrappers~\cite{Guo:2011:CUS:2002181.2002202}
+and has also been
 used to detect and prevent security
 violations~\cite{Hofmeyr:1998:IDU:1298081.1298084,
   Acharya:2000:MUP:1251306.1251307}.  CrashSimulator's goals are
-complementary as it exploits environment anomalies discovered in
-testing or analyzing one application to generate and execute tests for
-another application.
+complementary, as it exploits environmental anomalies discovered in
+testing, or found by analyzing other applications.
 %
 Other works that target complementary classes of portability problems
 include the detection of configuration-related
@@ -120,11 +122,11 @@ applications~\cite{DBLP:conf/icsm/ChoudharyVO10, silakov2010improving,
 {\bf Testing exception handling and conformance.}
 A few researchers have developed testing techniques aimed at checking
 whether programs respond appropriately to anomalous situations.  For
-example, Fu et al. introduce data flow testing techniques that require
+example, Fu et al. introduced data flow testing techniques that require
 tests that cover paths from points at which exceptions are thrown to
-points at which they are handled in Java code, in order to test
-whether programs respond correctly to exceptional situations that the
-programmer has anticipated~\cite{DBLP:journals/tse/FuMRW05}.  Koopman
+points at which they are handled in Java code. The purpose is to discover 
+whether programs respond correctly to exceptional situations anticipated
+by the programmer~\cite{DBLP:journals/tse/FuMRW05}.  Koopman
 and DeVale developed a system to detect bugs in error handling code
 related to calls to POSIX functions~\cite{Koopman00theexception}.
 %
