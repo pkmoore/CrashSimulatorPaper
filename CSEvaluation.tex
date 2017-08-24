@@ -263,6 +263,39 @@ kernel.
 \end{table*}
 
 
+Table~\ref{table:applicationresponses}
+In some cases, an application not detecting an anomalous condition doesn't
+mean the application has failed outright.  That is, sometimes the properties
+of the environment can ``save'' an execution that didn't detect a the
+anomalous condition.  A clear example of this is when an application that
+expects a regular file is handed a symlink instead.  This is the case when
+passing coreutils {\tt od} a symlink to a regular file rather than a regular
+file.  CrashSimulator indicates that {\tt od} does not detect this situation
+but because of the way symlinks work in Linux, {\tt od} is able to
+successfully process the target file anyway.  This approach could be
+problematic in environments where the properties of symlinks are not what
+{\tt od} expects.  Consider a hypothetical environment where the calls that
+{\tt od} uses like {\tt open ()} and {\tt read ()} access the contents of
+the symlink itself rather than the symlinks target.  In this case, the fact
+that {\tt od} does not detect that it has been handed a symlink would be
+problematic.
+
+It is also possible that the properties of an application's environment can
+result in an anomalous condition is missed at the first detection
+opportunity but appears later in the execution.  An example of this is when
+coreutils {\tt od} is passed a directory rather than a regular file.
+CrashSimulator detects that {\tt od} does not recognize this condition when
+the input file is initially being opened and evaluated.  Instead, a future
+call to {\tt read ()} fails with an error code indicating that directories
+cannot be processed with {\tt read ()} in Linux.  Once again, the properties
+of the environment allow this anomalous condition to be detected at a later
+point rather than execution continuing and returning wrong results.
+Consider another hypothetical environment where {\tt read ()} calls are
+allowed on directories.  In such an environment {\tt od}'s use of {\tt
+  read ()} would allow  cause execution to continue returning whatever data
+{\tt read ()} can access from a directory rather than bringing the
+anomalous condition to the attention of the user.
+
 \subsubsection{Slowloris attack} Delaying network applications for extended
 periods.
 
@@ -726,41 +759,6 @@ condition.
     \label{table:stepsandcalls}
 \end{table}
 
-  \subsection{Application Reactions in the Context of the Environment}
-
-  \preston{
-    In some cases, an application not detecting an anomalous condition doesn't
-    mean the application has failed outright.  That is, sometimes the properties
-    of the environment can ``save'' an execution that didn't detect a the
-    anomalous condition.  A clear example of this is when an application that
-    expects a regular file is handed a symlink instead.  This is the case when
-    passing coreutils {\tt od} a symlink to a regular file rather than a regular
-    file.  CrashSimulator indicates that {\tt od} does not detect this situation
-    but because of the way symlinks work in Linux, {\tt od} is able to
-    successfully process the target file anyway.  This approach could be
-    problematic in environments where the properties of symlinks are not what
-    {\tt od} expects.  Consider a hypothetical environment where the calls that
-    {\tt od} uses like {\tt open ()} and {\tt read ()} access the contents of
-    the symlink itself rather than the symlinks target.  In this case, the fact
-    that {\tt od} does not detect that it has been handed a symlink would be
-    problematic.}
-
-  \preston{
-    It is also possible that the properties of an application's environment can
-    result in an anomalous condition is missed at the first detection
-    opportunity but appears later in the execution.  An example of this is when
-    coreutils {\tt od} is passed a directory rather than a regular file.
-    CrashSimulator detects that {\tt od} does not recognize this condition when
-    the input file is initially being opened and evaluated.  Instead, a future
-    call to {\tt read ()} fails with an error code indicating that directories
-    cannot be processed with {\tt read ()} in Linux.  Once again, the properties
-    of the environment allow this anomalous condition to be detected at a later
-    point rather than execution continuing and returning wrong results.
-    Consider another hypothetical environment where {\tt read ()} calls are
-    allowed on directories.  In such an environment {\tt od}'s use of {\tt
-      read ()} would allow  cause execution to continue returning whatever data
-    {\tt read ()} can access from a directory rather than bringing the
-    anomalous condition to the attention of the user.}
 
 %{\bf False Negatives.}
 %CrashSimulator can encounter false negatives (that is, CrashSimulator accepts an
