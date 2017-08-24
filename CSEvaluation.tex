@@ -263,38 +263,41 @@ kernel.
 \end{table*}
 
 
-Table~\ref{table:applicationresponses}
-In some cases, an application not detecting an anomalous condition doesn't
-mean the application has failed outright.  That is, sometimes the properties
-of the environment can ``save'' an execution that didn't detect a the
-anomalous condition.  A clear example of this is when an application that
-expects a regular file is handed a symlink instead.  This is the case when
-passing coreutils {\tt od} a symlink to a regular file rather than a regular
-file.  CrashSimulator indicates that {\tt od} does not detect this situation
-but because of the way symlinks work in Linux, {\tt od} is able to
-successfully process the target file anyway.  This approach could be
-problematic in environments where the properties of symlinks are not what
-{\tt od} expects.  Consider a hypothetical environment where the calls that
-{\tt od} uses like {\tt open ()} and {\tt read ()} access the contents of
-the symlink itself rather than the symlinks target.  In this case, the fact
-that {\tt od} does not detect that it has been handed a symlink would be
-problematic.
+In order to confirm the accuracy of CrashSimulator's assessment we manually
+exposed a subset of the Coreutils applications we tested to the unusual file
+types to get an idea of how they would respond.
+Table~\ref{table:applicationresponses} contains the results of this assessment.
+CrashSimulator's evaluation of an application and the results of its real world
+behavior can be paired up in a few different ways.
+The first possibility is that CrashSimulator
+asserts that the application will fail and the application fails in practice.
+this is the case of the install and a character device result above.  CrashSimulator
+predicted failure and the application ended up filling the disk of the machine
+it was run on.  A second possibility is that CrashSimulator detects the
+may have made an effort to respond and the application responds correctly in
+practice.  This is the case of wc when tested with a directory.
 
-It is also possible that the properties of an application's environment can
-result in an anomalous condition is missed at the first detection
-opportunity but appears later in the execution.  An example of this is when
-coreutils {\tt od} is passed a directory rather than a regular file.
-CrashSimulator detects that {\tt od} does not recognize this condition when
-the input file is initially being opened and evaluated.  Instead, a future
-call to {\tt read ()} fails with an error code indicating that directories
-cannot be processed with {\tt read ()} in Linux.  Once again, the properties
-of the environment allow this anomalous condition to be detected at a later
-point rather than execution continuing and returning wrong results.
-Consider another hypothetical environment where {\tt read ()} calls are
-allowed on directories.  In such an environment {\tt od}'s use of {\tt
-  read ()} would allow  cause execution to continue returning whatever data
-{\tt read ()} can access from a directory rather than bringing the
-anomalous condition to the attention of the user.
+The other two cases occur when there is disagreement. The first is where
+CrashSimulator asserts that the application has made an effort to respond but in
+reality the application fails in some way.  This is the case of ptx.
+CrashSimulator reported that it had made an effort to respond to the presence of
+a character device but its response is actually incorrect and leads to the disk
+being filled.  In this situation, the checker CrashSimulator used to make its
+assessment needs to be expanded --- a similar situation to an insufficiently
+rigorous unit test.
+
+\preston{I am not sure about this paragraph's argument}
+The opposite case is CrashSimulator reporting a failure when the application
+appears to be correct.  An example of this case is the case of pr above.
+CrashSimulator reported that the application was not responding correctly but,
+in reality, the application prints an error message and quits.  This case
+requires some investigation.  As it turns out, pr's error message occurs when a
+the target file is being read from rather than when it was initially examined
+with {\tt stat()}.  Delaying detecting this anomalous conditions obscures its
+initial appearence which hinders debugging.  Additionally the application may
+fail more dramatically in environments where {\tt read()} doesn't respond in
+this fashion.
+
 
 \subsubsection{Slowloris attack} Delaying network applications for extended
 periods.
