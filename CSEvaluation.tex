@@ -420,25 +420,23 @@ repeatable, principled manner.
 Having seen that CrashSimulator can detect many bugs with fairly 
 simple anomaly injections and checks,
 we wanted to test if CrashSimulator could identify the more complex types
-of flaws that cross many system calls. To perform this evaluation we configured
-CrashSimulator to test whether an application properly performs the steps
-required to move a file from location to another while preserving important
-metadata. In Linux, the standard approach for moving a file, the {\tt rename()}
-system
-call, will work if the source and
-destination are on the same device.  This means that moving a file from a
-directory structure location on one storage device to a directory structure
-location on another device must be handled on a case-by-case basis by any
-application that relies on this operation.  
-This situation adds additional complexity that libraries and applications
+of flaws that cross many system calls.
+To do this, we returned to
+the filesystem anomaly discussed in
+section~\ref{subsec:anomalyidentification}.  This situation adds additional complexity that libraries and applications
 frequently get wrong~\cite{PHPRenameBug,PythonShutilBug,NodejsCopyBug}.
 %To come up with the
 %instructions for how to simulate the anomaly, we examined the system 
 %calls made by the {\tt mv} command and compared the behavior of other 
 %tools.  We found that other tools made many errors when trying to move files.
 
+%In Linux, the rename() system call will only move a file if the source and
+%destination are on the same device.  This means that moving a file from a
+%directory structure location on one storage device to a directory structure
+%location on another device must be handled on a case-by-case basis by any
+%application that relies on this operation.  
 
-{\bf Method.}  To identify the steps required to correctly move a file, 
+{\bf Method.}  To identify the correct steps for moving a file, 
 we examined several libraries and found that {\tt mv} seemed
 to handle cases that other tools failed to consider.  Following this, we 
 used the trace of {\tt mv} as a template and created instructions to modify
