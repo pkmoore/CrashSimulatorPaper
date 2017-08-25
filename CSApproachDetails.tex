@@ -7,18 +7,15 @@
         \label{figure:architecture}
     \end{figure}
 
-    \preston{This is draft text from Lois.  She recommends we have a brief
-      introduction on each section}  In this section, we highlight some relevant
-    information behind the operation of CrashSimulator, starting with the
-    rationale behind using system call traces to preserve and replay significant
-    anomalies. Example of where anomalies can be found and what they resemble
-    are also given, as is a description of a few key steps in its operation,
-    such as the method for injecting anomalies and analyzing the execution of
-    CrashSimulator’s replay process.
-
+    In order to understand CrashSimulator's operation it is necessary to have a
+    more detailed understanding of how its components fit together and what
+    steps are required to use it in testing an application.
+    Figure~\ref{figure:architecture} illustrates the steps required to gather
+    the anomaly information CrashSimulator requires, how that information is to
+    be transformed into mutated traces and what output CrashSimulator yields
+    once its replay and analysis process completes.
 
     \subsection{Anomaly Identification} \label{subsec:anomalyidentification}
-
 
     %Section II.A, first paragraph, the tenses are messed up here. In the first
     %sentence, "we identified" is entirely out-of-place.  This part should be
