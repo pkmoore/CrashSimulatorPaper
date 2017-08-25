@@ -107,7 +107,7 @@ After all, if such bugs
 do not exist in practice, then there is no need for a tool like CrashSimulator.
 To test for the existence of these bugs in real programs, we 
 chose two simple anomalies that we could test for in a large
-array of programs.  One is a file system anomaly and the other network anomaly,
+array of programs.  One is a file system anomaly and the other a network anomaly,
 but both use common API calls, and thus had the potential to appear in
 many programs.  Applications selected were either ones deemed ``popular'' by
 Debian's Popularity Contest~\cite{DebPopCon}, or were from GNU Coreutils.
@@ -273,8 +273,9 @@ The first possibility is that CrashSimulator
 asserts that the application will fail and the application fails in practice.
 this is the case of the install and a character device result above.  CrashSimulator
 predicted failure and the application ended up filling the disk of the machine
-it was run on.  A second possibility is that CrashSimulator detects the
-may have made an effort to respond and the application responds correctly in
+it was run on.  A second possibility is that CrashSimulator detects
+that the application
+may respond correctly in
 practice.  This is the case of wc when tested with a directory.
 
 The other two cases occur when there is disagreement. The first is where
