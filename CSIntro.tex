@@ -142,7 +142,8 @@ with a significant number of bugs that are only discovered after the fact
 Here is how CrashSimulator works.  A developer will run a
 test in the application's usual testing environment, recording a
 trace of its system calls. After checking some aspects of the trace for
-relevance to the particular test, she will perturb the trace so that it appears
+relevance to the particular test, she will construct a mutator to perturb
+the trace so that it appears
 as if it were running in the simulated anomalous environment, and then
 attempt to replay the modified trace, i.e. allow the application to
 run under the control of CrashSimulator, substituting the system call
