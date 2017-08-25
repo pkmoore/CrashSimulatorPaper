@@ -71,8 +71,9 @@ environment without actually having to run in one.
 %this assumption was violated, the application failed.
 %
 
-In this paper, we introduce {\em CrashSimulator}, a testing approach that
-does this, and is based on the
+In this paper, we introduce {\em CrashSimulator}, a testing approach
+and tool that
+realizes such a strategy. CrashSimulator is based on the
 observation that: {\em Insight gleaned from a fault that is
   caused by unexpected interactions of {\em one application} with one
   of its deployment environments, can be leveraged to discover related
@@ -86,34 +87,38 @@ test many other aircraft models in simulators against relevant
 aspects of the problematic environment.  In the case of CrashSimulator,
 we are concerned with the implicit inputs, implementation details, and resource
 constraints an application's environment supplies.  Rather than stormy
-weather and foggy landings, applications experience conditions such as varying
+weather and foggy landings, applications experience anomalous conditions such as varying
 kernel versions with slightly different implementations details,
 unusual filesystem configurations, and unexpected network conditions that
-affect performance.
-While there are other testing techniques
-that follow a similar approach~\cite{mariani2007compatibility,
-  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
-  DBLP:journals/tosem/MonperrusM13,
-  DBLP:conf/icse/JamrozikSZ16}, we are the first to explore
-its application for finding bugs related to complex environment
-interactions that involve multiple interdependent system calls.
+affect performance. Our approach tests an application against such anomalous
+conditions by modifying the responses to the
+application's system calls, thereby simulating potential deployment environments.
 
-The development of the CrashSimulator tool for automated testing of software
-against an environment is an important step forward.
-Existing tools primarily
-focus on detecting bugs that involve only individual system
-calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}. However,
-a correct response to an anomaly triggered by one
-system call often requires the application to make several other
-system calls, each of which may trigger further anomalies. Tools such
-as NetCheck~\cite{Zhuang_NSDI_2014} and
+
+The development of the CrashSimulator tool for automated testing of
+software against an environment is an important step forward.  There
+are other testing techniques that follow a similar
+approach~\cite{mariani2007compatibility,
+  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
+  DBLP:journals/tosem/MonperrusM13, DBLP:conf/icse/JamrozikSZ16},
+including techniques that detect bugs involving individual system
+calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}.
+However, a correct response to an anomaly triggered by one system call
+often requires the application to make several other system calls,
+each of which may trigger further anomalies. Tools such as
+NetCheck~\cite{Zhuang_NSDI_2014} and
 CheckAPI~\cite{rasley2015detecting} can analyze complex response
 patterns while the anomaly is observed in the deployment
 environment. However, they do not support systematic testing of
 applications before deployment.  As a result, relying only on these
-capabilities results in applications being deployed
-with a significant number of bugs that are only discovered after the fact
---- necessitating costly bug triage and application re-deployment.
+capabilities results in applications being deployed with a significant
+number of bugs that are only discovered after the fact ---
+necessitating costly bug triage and application re-deployment.
+We are the first to
+explore techniques for finding bugs related to complex
+environment interactions that involve multiple interdependent system
+calls, before the application is deployed. 
+
 
 % CrashSimulator is concerned with bugs that arise from subtle
 % differences in behavior between executions in one environment versus
@@ -139,20 +144,21 @@ with a significant number of bugs that are only discovered after the fact
 %environment by creating a simulation of the environment using this
 %technique and executing the application within it.
 
-Here is how CrashSimulator works. Suppose an application $A'$ has failed due to
-a newly discovered environmental anomaly.  A developer using CrashSimulator can
-then test whether other applications $A_1'$, $A_2'$,... suffer from the same
-problem.  The first step is to run these other applications in their development
-environment in order to gather traces.  Next, she writes a simple script to
-evaluate whether traces are relevant to this anomaly and to mutate traces to
-give the appearance that they were generated in the anomalous environment.
-Finally, she
-attempts to replay the modified trace, i.e. allow the application to
-run under the control of CrashSimulator, substituting the system call
-return values (and side-effects) that would occur in the anomalous
-environment. In parallel with the replay, a checker will run under the
-control of CrashSimulator that decides whether the application's behavior
-is indicative of a fault.
+Here is how CrashSimulator works in detail. Suppose an application
+$A$ has failed due to a newly discovered environmental anomaly.  A
+developer using CrashSimulator can then test whether other
+applications $A_1$, $A_2,\dots$ suffer from the same problem.  The
+first step is to run these other applications in their development
+environment in order to gather traces.  Next, she writes a simple
+script to evaluate whether traces are relevant to this anomaly and to
+mutate traces to give the appearance that they were generated in the
+anomalous environment.  Finally, she attempts to replay the modified
+trace, i.e. allow the application to run under the control of
+CrashSimulator, substituting the system call return values (and
+side-effects) that would occur in the anomalous environment. In
+parallel with the replay, a checker will run under the control of
+CrashSimulator that decides whether the application's behavior is
+indicative of a fault.
 
 %Given that we have a simulation of a given environment, the next step is to make decisions about whether an application
 %is executing correctly in this environment.  The set of interactions (i.e. system calls) necessary to correctly perform
