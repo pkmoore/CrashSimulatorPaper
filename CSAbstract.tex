@@ -1,9 +1,8 @@
 \begin{abstract}
-  A major problem when introducing new applications is that not all potential
-  flaws can be identified during development. Unfortunately, the environment
-  into which an application is introduced can negatively impact its
-  execution. But, these flaws remain hidden until the application is
-  deployed—and the resulting consequence can be costly. 
+  A major problem when introducing new applications is that
+  the environment
+  into which an application is introduced can be a source of flaws that remain
+  hidden until after a costly deployment.
   CrashSimulator is a technique and tool that identifies incorrect application
   behavior caused by unhandled anomalous environmental conditions such as
   differing API behavior, network performance, or filesystem state.
@@ -13,16 +12,17 @@
   simulate an anomalous environment. Next, a checker determines whether the
   application is responding to the anomaly appropriately. This process allows
   CrashSimulator to use incorrect behavior identified in one application running
-  in one environment to determine whether another application
-  in a different environment is making the same mistake. By testing an
+  in one environment to determine whether other applications
+  would make the same mistake in that environment. By testing an
   application against a series of these test cases, CrashSimulator 
   lets the developer see how the application would respond if executed in
-  a similar environment. When tested, CrashSimulator was
-  able to identify 84 bugs resulting from anomalous filesystem and network
-  conditions in 30 popular applications.  By identifying these bugs before
-  deployment, the tool helped to ward off such potential damaging consequences as hangs,
-  data loss, or remote denial of service conditions
-  All but one of the bugs identified by CrashSimulator were previously unknown.
-  One was independently identified and reported to Python's bug tracker.
+  a similar environment.
+  We evaluated CrashSimulator by using it to test popular applications such as
+  vim, nano, aspell, and others selected from the Coreutils project and the
+  Debian popularity contest. The result of this evaluation was 84 bugs 
+  identified in 30 applications with consequences ranging from hangs and
+  crashes to data loss and remote denial of service conditions.
+  %All but one of the bugs identified by CrashSimulator were previously unknown.
+  %One was independently identified and reported to Python's bug tracker.
 
 \end{abstract}
