@@ -190,26 +190,24 @@ given file type.
     \toprule{}
         Application & Condition Tested           & IFREG        & IFDIR        & IFCHR     & IFBLK    & FIFO      & IFLNK    & IFSOCK\\
 \hline
-        Aspell      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        Aspell      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        gnu-gpg     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
-        vim         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
-        nano        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
-        sed         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        df          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
-        wc          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        du          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        install     & File being installed       & Initial Value  &
-Recognizes     & Fail       & Fail      & Fail       & Recognizes &
-Fail\\
-        fmt         & File being formatted       & Initial Value  & Fail          & Recognizes  & Fail      & Fail       & Fail      & Fail\\
-        od          & File being dumped          & Initial Value  & Fail          & Recognizes  & Fail      & Fail       & Fail      & Fail\\
-        ptx         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
-        comm        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
-        pr          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+        {\tt Aspell}      & Dictionary File            & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        {\tt Aspell}      & File being checked         & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        {\tt gnu-gpg}     & secring.gpg                & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
+        {\tt vim}         & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes* & Recognizes & Fail\\
+        {\tt nano}        & File being opened          & Initial Value  & Recognizes     & Recognizes  & Recognizes & Fail        & Fail       & Fail\\
+        {\tt sed}         & File being edited          & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        {\tt df}          & /proc                      & Fail           & Initial Value  & Fail        & Fail       & Fail        & Fail       & Fail\\
+        {\tt wc}          & File being checked         & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        {\tt du}          & Directory being checked    & Recognizes     & Initial Value  & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        {\tt install}     & File being installed       & Initial Value  & Recognizes     & Fail       & Fail      & Fail       & Recognizes & Fail\\
+        {\tt fmt}         & File being formatted       & Initial Value  & Fail          & Recognizes  & Fail      & Fail       & Fail      & Fail\\
+        {\tt od}          & File being dumped          & Initial Value  & Fail          & Recognizes  & Fail      & Fail       & Fail      & Fail\\
+        {\tt ptx}         & File being read            & Initial Value  & Recognizes     & Recognizes  & Recognizes & Recognizes  & Recognizes & Recognizes\\
+        {\tt comm}        & Second file being compared & Initial Value  & Fail           & Recognizes  & Fail       & Fail        & Fail       & Fail\\
+        {\tt pr}          & File being read            & Initial Value  & Fail           & Fail        & Fail       & Fail        & Fail       & Fail\\
 \hline
-        readlink    & Link being evaluated       & \textbf{No file checks performed} & & & & & & \\
-        unlink      & File being unlinked        & \textbf{No file checks performed} & & & & & & \\
+        {\tt readlink}    & Link being evaluated       & \textbf{No file checks performed} & & & & & & \\
+        {\tt unlink}      & File being unlinked        & \textbf{No file checks performed} & & & & & & \\
     \bottomrule{}
     \end{tabular}
     \caption{Applications tested for their handling of unexpected file types.}
@@ -245,17 +243,17 @@ kernel.
 
 \begin{table*}[t]
     \scriptsize{}
-    \begin{tabular}{l  l  |  l  l  l  l  l  l  l}
+    \begin{tabular}{l  l  l  l  l  l  l  l  l}
     \toprule{}
         Application   & IFDIR                     & IFCHR (infinite sized)& IFBLK (finite size)             & FIFO \\
 \hline
-        wc            & Error: Is a Directory     & hangs                 & No output, slowly process file  & Hangs\\
-        install       & Error: Omitting Directory & Fills disk            & No output, copies file          & Hangs\\
-        fmt           & No output                 & hangs, garbage output & Processes file, garbage output  & Hangs\\
-        od            & Error: read error         & hangs, garbage output & No output                       & Hangs\\
-        ptx           & Error: Is a Directory     & hangs, fills disk     & Processes file, garbage output  & Hangs\\
-        comm          & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
-        pr            & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        {\tt wc}            & Error: Is a Directory     & hangs                 & No output, slowly process file  & Hangs\\
+        {\tt install}       & Error: Omitting Directory & Fills disk            & No output, copies file          & Hangs\\
+        {\tt fmt}           & No output                 & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        {\tt od}            & Error: read error         & hangs, garbage output & No output                       & Hangs\\
+        {\tt ptx}           & Error: Is a Directory     & hangs, fills disk     & Processes file, garbage output  & Hangs\\
+        {\tt comm}          & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        {\tt pr}            & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
 \hline
     \bottomrule{}
     \end{tabular}
@@ -281,7 +279,7 @@ practice.  This is the case of wc when tested with a directory.
 
 The other two cases occur when there is disagreement. The first is where
 CrashSimulator asserts that the application has made an effort to respond but in
-reality the application fails in some way.  This is the case of ptx.
+reality the application fails in some way.  This is the case of {\tt ptx}.
 CrashSimulator reported that it had made an effort to respond to the presence of
 a character device but its response is actually incorrect and leads to the disk
 being filled.  In this situation, the checker CrashSimulator used to make its
@@ -290,10 +288,10 @@ rigorous unit test.
 
 \preston{I am not sure about this paragraph's argument}
 The opposite case is CrashSimulator reporting a failure when the application
-appears to be correct.  An example of this case is the case of pr above.
+appears to be correct.  An example of this case is the case of {\tt pr} above.
 CrashSimulator reported that the application was not responding correctly but,
 in reality, the application prints an error message and quits.  This case
-requires some investigation.  As it turns out, pr's error message occurs when a
+requires some investigation.  As it turns out, {\tt pr}'s error message occurs when a
 the target file is being read from rather than when it was initially examined
 with {\tt stat()}.  Delaying detecting this anomalous conditions obscures its
 initial appearence which hinders debugging.  Additionally the application may
@@ -351,16 +349,16 @@ that are among the most popular on Debian's ratings~\cite{DebPopCon}.
   \begin{tabular}{l | l}
     \toprule{}
 	  {\bf Application}              & {\bf Analysis Result}\\
-    wget                     & Overly long timeout supplied to {\tt select()}, vulnerable\\
-    ftp                      & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    telnet                   & {\tt select()} specifies no timeout, vulnerable\\
-    urllib http              & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    urllib ftp               & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    ftplib                   & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    httplib                  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    requests                 & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    urllib3                  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
-    python-websocket-client  & No {\tt poll()} or {\tt select()}, no timeout set, vulnerable\\
+    {\tt wget}                     & Overly long timeout supplied to {\tt select()} \\
+    {\tt ftp}                      & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt telnet}                   & {\tt select()} specifies no timeout \\
+    {\tt urllib http}              & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt urllib ftp}               & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt ftplib}                   & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt httplib}                  & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt requests}                 & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt urllib3}                  & No {\tt poll()} or {\tt select()}, no timeout set \\
+    {\tt python-websocket-client}  & No {\tt poll()} or {\tt select()}, no timeout set \\
     \bottomrule{}
   \end{tabular}
   \caption{Applications tested for their handling of extremely slow response
