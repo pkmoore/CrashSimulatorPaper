@@ -18,7 +18,7 @@ resulting from an application's interactions with its environment.
 %Performing its analysis on a replayed execution of an application allows
 %CrashSimulator to remove the filesystem and network dependancies of the application under test.  
 To test whether an application responds appropriately to a particular
-anomaly (such as an unexpected file type, an unexpected device, an unexpected
+anomaly (such as an unexpected file type, an unexpected device, unexpected
 network conditions, etc.)
 CrashSimulator records system call traces from the application under test,
 mutates return values and/or program state to simulate execution in 
@@ -43,7 +43,7 @@ Our evaluation of CrashSimulator has shown it to be both effective and
 efficient.  CrashSimulator was able to identify bugs related to unusual file
 types in 15 applications and bugs related to slow network performance in 10
 network applications and libraries.  Additionally CrashSimulator found
-filesystem related bugs in 7 applications and libraries with facilities for
+filesystem related bugs in 6 applications and libraries with facilities for
 moving files within a system's filesystem.  The low overhead
 introduced by CrashSimulator's technique meant that it was able to
 find these bugs quickly in spite of its unoptimized implementation.
