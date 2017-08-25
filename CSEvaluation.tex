@@ -27,9 +27,9 @@ to make replay easier.  As far as we are aware, none of these choices
 influenced the types of bugs that CrashSimulator can find. However, the lack of support
 for threaded programs obviously influences the programs we can test.  To our
 knowledge, the 
-only major impact these design choices had was that the use of {\tt ptrace} 
-slowed our prototype's performance (which will be discussed later).  The
-trade-off was it simplified 
+only major negative impact these design choices had was that the use of {\tt ptrace} 
+slowed our prototype's performance (which will be discussed later).
+On the positive side, it simplified 
 construction of the prototype. Given appropriate information, 
 our implementation of CrashSimulator can
 test for anomalies that exist in other platforms and environments as well.
@@ -37,12 +37,13 @@ test for anomalies that exist in other platforms and environments as well.
 With the prototype in hand,  we set out to answer the following questions:
 
 \begin{enumerate}
-   \item{[\ref{sec-env-bugs}] Do environmental bugs exist in widely used applications?}
-   \item{[\ref{sec-complex}] Can CrashSimulator identify anomalies that require
-       complex checkers?}
+   \item{Do environmental bugs exist in widely used
+       applications? (Subsection~\ref{sec-env-bugs})}
+   \item{Can CrashSimulator identify anomalies that require
+       complex checkers? (Subsection~\ref{sec-complex})}
    %\item{[\ref{sec-not-found}] What types of bugs could not be found using CrashSimulator?}
-   \item{[\ref{sec-sorts-errors}] What sorts of errors does CrashSimulator make?}
-   \item{[\ref{sec-perf}] Is CrashSimulator able to execute tests in a performant manner?}
+   \item{What sorts of errors does CrashSimulator make? (Subsection~\ref{sec-sorts-errors})}
+   \item{Is CrashSimulator able to execute tests in a performant manner? (Subsection~\ref{sec-perf})}
 %   \item{[\ref{sec-response}] What was the response to disclosing bugs found in CrashSimulator?}
 \end{enumerate}
 
