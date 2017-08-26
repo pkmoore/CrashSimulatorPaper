@@ -776,10 +776,6 @@ condition.
 \subsection{Is CrashSimulator able to execute tests in a timely  manner?}
 \label{sec-perf}
 
-%\cappos{All of the performance numbers should be here.  I recommend having
-%a graph with the normal run time on the x-axis and the replay speed on the
-%y-axis.  It will be a scatter plot.  Each point will be one of the
-%experiments you ran.}
 
 One key attribute of successful testing tools is that they are able to
 complete their tests in a timely manner.  If a tool takes too long to
@@ -798,8 +794,9 @@ native and replay execution modes.
         \center{}
         \includegraphics[scale=.5]{performance.png}
         \caption{\emph{This shows the run time difference between the
-native program and CrashSimulator. The dashed line indicates equal
+native program and CrashSimulator in seconds. The dashed line indicates equal
 performance. }}
+         \label{figure:performance}
 
     \end{figure}
 
@@ -828,3 +825,11 @@ Note also that natively testing the timeout of networked applications (not
 shown) would take an extended period of time, at least as long as the allowed
 timeout value.  CrashSimulator avoids this cost by simulating the fact that
 time has progressed for future system calls.
+
+Overall, these results indicate that CrashSimulator is able to replay executions
+in a performant manner.  Figure~\ref{figure:performance} shows that the majority
+of the above executions ran in less than
+one second.  When replaying longer-running executions the initial
+CrashSimulator's start up time will be less of a concern and the slowdown
+compared to a native execution will depend on how many I/O operations the replay
+execution is able to avoid. 
