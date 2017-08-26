@@ -242,25 +242,27 @@ error, use {\tt perror()} to print the correct localized error message.  In
 short, these applications pass their error handling responsibilities to the
 kernel.
 
-\begin{table*}[t]
+\begin{table}[t]
     \scriptsize{}
     \begin{tabular}{l  l  l  l  l  l  l  l  l}
     \toprule{}
-        Application   & IFDIR                     & IFCHR (infinite sized)& IFBLK (finite size)             & FIFO \\
+        Application         & IFDIR                     & IFCHR       & IFBLK                & FIFO \\
 \hline
-        {\tt wc}            & Error: Is a Directory     & hangs                 & No output, slowly process file  & Hangs\\
-        {\tt install}       & Error: Omitting Directory & Fills disk            & No output, copies file          & Hangs\\
-        {\tt fmt}           & No output                 & hangs, garbage output & Processes file, garbage output  & Hangs\\
-        {\tt od}            & Error: read error         & hangs, garbage output & No output                       & Hangs\\
-        {\tt ptx}           & Error: Is a Directory     & hangs, fills disk     & Processes file, garbage output  & Hangs\\
-        {\tt comm}          & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
-        {\tt pr}            & Error: Is a Directory     & hangs, garbage output & Processes file, garbage output  & Hangs\\
+        {\tt wc}            & Error: Is a Directory     & hangs       & slowly process file  & Hangs\\
+        {\tt install}       & Error: Omitting Directory & Fills disk  & slowly copies file   & Hangs\\
+        {\tt fmt}           & No output                 & hangs       & garbage output       & Hangs\\
+        {\tt od}            & Error: read error         & hangs       & No output            & Hangs\\
+        {\tt ptx}           & Error: Is a Directory     & fills disk  & garbage output       & Hangs\\
+        {\tt comm}          & Error: Is a Directory     & hangs       & garbage output       & Hangs\\
+        {\tt pr}            & Error: Is a Directory     & hangs       & garbage output       & Hangs\\
 \hline
     \bottomrule{}
     \end{tabular}
-    \caption{Responses of a sample of coreutils applications when exposed to anomalous conditions}
+    \caption{Responses of a sample of coreutils applications when exposed to
+      anomalous conditions.  The IFCHR file used was the infinite-length {\tt
+        /dev/urandom}.}
     \label{table:applicationresponses}
-\end{table*}
+\end{table}
 
 
 In order to confirm the accuracy of CrashSimulator's assessment we manually
@@ -269,34 +271,25 @@ types to get an idea of how they would respond.
 Table~\ref{table:applicationresponses} contains the results of this assessment.
 CrashSimulator's evaluation of an application and the results of its real world
 behavior can be paired up in a few different ways.
-The first possibility is that CrashSimulator
+One possibility is that CrashSimulator
 asserts that the application will fail and the application fails in practice.
-this is the case of the install and a character device result above.  CrashSimulator
+This is the case when we evaluated the response of  {\tt install} when it was
+provided a character device rather than a regular file. CrashSimulator
 predicted failure and the application ended up filling the disk of the machine
-it was run on.  A second possibility is that CrashSimulator detects
-that the application
-may respond correctly in
-practice.  This is the case of wc when tested with a directory.
+it was run on.  The opposite can also occur.  That is, CrashSimulator reports
+that the application detected the anomalous condition and the application manages
+to do so in practice.  This occurred when we evaluated {\tt wc}'s response to being
+run on a directory.
 
-The other two cases occur when there is disagreement. The first is where
-CrashSimulator asserts that the application has made an effort to respond but in
-reality the application fails in some way.  This is the case of {\tt ptx}.
-CrashSimulator reported that it had made an effort to respond to the presence of
-a character device but its response is actually incorrect and leads to the disk
-being filled.  In this situation, the checker CrashSimulator used to make its
-assessment needs to be expanded --- a similar situation to an insufficiently
-rigorous unit test.
-
-The opposite case is CrashSimulator reporting a failure when the application
-appears to be correct.  An example of this case is the case of {\tt pr} above.
-CrashSimulator reported that the application was not responding correctly but,
-in reality, the application prints an error message and quits.  This case
-requires some investigation.  As it turns out, {\tt pr}'s error message occurs when a
-the target file is being read from rather than when it was initially examined
-with {\tt stat()}.  Delaying detecting this anomalous conditions obscures its
-initial appearence which hinders debugging.  Additionally the application may
-fail more dramatically in environments where {\tt read()} doesn't respond in
-this fashion.
+Sometimes CrashSimulator and the application's response disagree.  This happened
+when we evaluated {\tt ptx}'s response to being run against an infinite-sized
+character device.  CrashSimulator reported that {\tt ptx} had correctly responded to 
+the anomaly but in reality, {\tt ptx} filled the disk of the the test machine.
+As will be discussed later, correcting this error is easily accomplished by
+improving the checker used in this assessment -- an effort similar to updating
+a unit test when it is shown to be incomplete.  Overall, the results of this 
+``real world'' analysis support the claim that CrashSimulator can identify real
+bugs with damaging consequences.
 
 
 \subsubsection{Slowloris attack} Delaying network applications for extended
