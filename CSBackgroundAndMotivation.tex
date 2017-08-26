@@ -1,10 +1,56 @@
-%\section{Background and Motivation}
-%
-%CrashSimulator operates in a unique niche in relation to other testing tools and techniques. As a result, it is better
-%suited to identify and report on certain types of errors that relate to the environment in which an application is
-%running.
-%
-%
-%    \subsection{An Example from CrashSimulator}
-%
-%
+\section{What Is An Environment?}
+
+Before looking at how environments differ, it is important to clearly
+define what an environment is.  An environment \cappos{fill in}
+
+There are many examples of ways in which environments differ, even in
+situations where they implement a `standard interface', such as Java or
+POSIX. 
+
+\begin{itemize}
+
+\item {\bf Operating Systems.}  A commonly observed difference is that many
+applications behave in different ways due to the varying ways in which the
+operating systems implement system calls.  For example, on Linux it is 
+possible to remove an open file while this is 
+not allowed on Windows systems.... \cappos{extend / cite...}
+
+
+\item {\bf File Systems.}  The exact file system used will also have a
+substantial impact on the behavior of a system, independent of the
+operating system.  The popular XYZ file system on Linux is case 
+sensitive, so that `a' and `A' are different files, while Linux's ABC file 
+system is case insensitive so those file names would refer to the same
+file.  Different file systems have varying limits or behaviors for other 
+items, including file name length (popularized due to the 8.3 limitations
+of the FAT file system), maximum file length, number of directory entries, 
+depth of directories supported, which leads to errors when programs are not
+written to take these issues into account \cappos{cites / extend}. 
+
+\item {\bf Network.}  Aspects of the network environment also have a 
+substantial impact on the behavior of application.  This can be either
+local things or remote network behaviors.  For example, POSIX operating
+systems support the notion of limiting the kernel buffer set aside for a
+socket.  However, popular POSIX operating systems (Windows, Linux, and Mac) 
+implement this quite differently.  On ... \cappos{This example is in one of
+the papers, likely CheckAPI.  It deals with when datagrams are discarded
+and how the buffer size is reported back to the application.}
+
+\item {\bf Processor.}  The processor can also make a substantial
+difference in the behavior of an application.  This is very frequently
+evidenced through the variety of different floating point behaviors on
+different processors \cappos{cites}.  However, this is not the only
+difference.  Bugs in processors are fairly common and cause variance.
+There are also intended differences that occur from varying interpretations
+of how to execute complex instructions.  \cappos{cite if true, remove if
+not.}
+
+
+\end{itemize}
+
+In this work, we focus on operating system, file system, and network
+environmental issues.  We leave processor-based environmental differences
+for future work because the mitigations are prohibitively expensive and
+their occurrance is much less.  We focus on operating system, file system, 
+and network issues, which are the bulk of enviornmental issues that
+applications struggle with today.
