@@ -48,7 +48,7 @@
 
     In selecting anomalies for use it is important to understand that they
     can be as subtle as a single configuration flag being set
-    differently under specific circumstances.  In BSD and OS X sockets returned
+    differently under specific circumstances.  For example, in BSD and OS X sockets returned
     by the {\tt accept()} system call inherit the values of the {\tt
       O\_NONBLOCK} and {\tt O\_ASYNC} flags from their parent socket.  In Linux,
     these values are not inherited.  As a result, the correct behavior is to
@@ -112,7 +112,7 @@
     check for correct behavior in a piece of code, this
     process involves an initial outlay of user skill and effort that 
     will be paid back as it is used
-    repeatedly over time.
+    repeatedly over time to test many different applications.
 
     With this information in mind, a developer can construct the simple
     mutation, for example:  ``make the {\tt open()} call return -1 with {\tt errno} set to
@@ -164,7 +164,7 @@
     follows the described system call behavior, the application is exposed to
     the anomalous conditions that were injected.
     For example, suppose an anomaly causes a
-    call to {\tt read()} fail with return value of -1 and {\tt errno} set to
+    call to {\tt read()} to fail with return value of -1 and {\tt errno} set to
     {\tt EINVAL}.  Exposing an application to this situation only requires
     editing the system call trace, such that the line describing this read call
     reflects the above values.

@@ -38,7 +38,7 @@ With the prototype in hand,  we set out to answer the following questions:
 
 \begin{enumerate}
    \item{Do environmental bugs exist in widely used
-       applications? (Subsection~\ref{sec-env-bugs})}
+       applications and can CrashSimulator find them? (Subsection~\ref{sec-env-bugs})}
    \item{Can CrashSimulator identify anomalies that require
        complex checkers? (Subsection~\ref{sec-complex})}
    %\item{[\ref{sec-not-found}] What types of bugs could not be found using CrashSimulator?}
@@ -93,7 +93,8 @@ With the prototype in hand,  we set out to answer the following questions:
 %support this level of detail.
 
 
-\subsection{Do environmental bugs  exist in widely used applications?}
+\subsection{Do environmental bugs  exist in widely used applications and can
+  CrashSimulator find them?}
 \label{sec-env-bugs}
 
 % Describe bug. Why is this attack badddk
@@ -286,7 +287,6 @@ being filled.  In this situation, the checker CrashSimulator used to make its
 assessment needs to be expanded --- a similar situation to an insufficiently
 rigorous unit test.
 
-\preston{I am not sure about this paragraph's argument}
 The opposite case is CrashSimulator reporting a failure when the application
 appears to be correct.  An example of this case is the case of {\tt pr} above.
 CrashSimulator reported that the application was not responding correctly but,
