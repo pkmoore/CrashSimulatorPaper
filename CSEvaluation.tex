@@ -826,3 +826,36 @@ one second.  When replaying longer-running executions the initial
 CrashSimulator's start up time will be less of a concern and the slowdown
 compared to a native execution will depend on how many I/O operations the replay
 execution is able to avoid. 
+
+\subsection{How does CrashSimulator's Performance Relate to a Test Suite}
+\label{sec-perf-unit-comparison}
+
+\preston{Another concern with CrashSimulator is how its performance relates to that of a
+more standard test suite.....}
+
+\preston{Method.  In order to address this concern, we compared the time
+CrashSimulator took to evaluate an application for the presence of one of the
+above file system based bugs to the time an application's unit test suite took
+to test the areas code responsible for the same system calls.  For this
+evaluation we constructed XXXX modified traces that inject the unusual file type
+bug for every file gnupg reads during the course of an execution where a new key
+is being imported.  This set of traces took XXXTIMEXXX to be replayed by
+CrashSimulator.  As a point of comparison, we identified the unit tests from
+gnupg's test suite that tested the code responsible for the these same system
+calls.  We configured gnupg's test harness to execute only these tests and
+recorded the time required to execute them.  These tests took XXXXTIMEXXXX to
+complete.}
+
+\preston{Findings. [Assumption follows]  Though CrashSimulator was slower by XXXX,  we
+found XXXX instances where gnupg opened and read from a file without checking
+for unusual file types.  These are bugs that gnupg's test suite cannot test for
+because they are caused by the absence of checking code.}
+
+\preston{As was the case in the previous performance evaluation,  a more performant
+implementation of CrashSimulator's technique would bring its replay time down to
+something much closer to that of gnupg's test suite.}
+
+\preston{Table INSERTTABLE maps each of the file usages we tested using
+CrashSimulator to the test from gnupg's test suite that covers the code
+responsible for the file usage.  Additionally, we note whether or not the code
+correctly identified the unusual condition we injected.}
