@@ -1,5 +1,23 @@
 \section{Introduction}
 
+\cappos{perhaps include this quote}
+“No Battle Plan Survives Contact With the Enemy” Helmuth von Moltke
+
+No matter how well an application is tested before being released, new 
+bugs always seem to be found after deployment.  \cappos{quotes about this.
+1/2 of MS employees are testers, formally verified systems failing in practice,
+etc.}
+
+A large reason for the challenges discovered during deployment is that the 
+application is running in a diverse set of different \emph{environments}.  
+Changing the operating system can cause new bugs to occur (cites), file
+systems have quite different behavior from each other (cites), and differences
+in network behavior can be substantial, even in situations where the network
+type or even the adaptor are identical (cites).  Of course, many applications
+seek to work across different operating systems, network types, etc., and this
+all greatly exaserbates the problems in ensuring the application functions
+correctly.
+system
 One major hurdle in developing robust applications is getting them to
 run reliably across all of the environments in which they may be
 installed.  In an increasingly diverse software ecosystem it is not
@@ -24,14 +42,14 @@ spend a significant portion of their time debugging errors that are only discove
 in production.  The survey participants cited the inability to
 recreate production environments for testing as the main reason why
 bugs are not discovered earlier.
-Even specialized environments, such as the Java Runtime Environment, that
-attempt to hide these environmental differences are not perfect.
-In many cases, they end up increasing both the difficulty of debugging and
-development costs.
+Even specialized ``Write-Once, Run Anywhere'' environments, such as the Java 
+Runtime Environment, that attempt to hide these environmental differences are 
+not perfect, leading them to be rechristened ``Write-Once, Debug 
+Everywhere'' \cappos{cite}.
 
-What is needed is a strategy for executing an application in such a way that
-it can experience the anomalies of a deployment
-environment without actually having to run in one.
+%What is needed is a strategy for executing an application in such a way that
+%it can experience the anomalies of a deployment
+%environment without actually having to run in one.
 
 %
 %For example, in some environments the {\tt select()} system call
@@ -55,37 +73,57 @@ environment without actually having to run in one.
 %this assumption was violated, the application failed.
 %
 
-In this paper, we introduce {\em CrashSimulator}, a testing approach
-and tool that
-realizes such a strategy. CrashSimulator is based on the
-observation that: {\em Insight gleaned from a fault that is
-  caused by unexpected interactions of {\em one application} with one
-  of its deployment environments, can be leveraged to discover related
-  faults in a {\em wide range} of applications that may run in that
-  environment.}  The approach is loosely inspired by the 
-environments provided by flight simulators, which  will use the knowledge that
-one model
-of aircraft is prone to behave poorly under certain environmental
-conditions (e.g.\ windy conditions, rain, etc) to
-test many other aircraft models in simulators against relevant
-aspects of the problematic environment.  In the case of CrashSimulator,
-we are concerned with the implicit inputs, implementation details, and resource
-constraints an application's environment supplies.  Rather than stormy
-weather and foggy landings, applications experience anomalous conditions such as varying
-kernel versions with slightly different implementations details,
-unusual filesystem configurations, and unexpected network conditions that
-affect performance. Our approach tests an application against such anomalous
-conditions by modifying the responses to the
-application's system calls, thereby simulating potential deployment environments.
+In this paper, we introduce {\em CrashSimulator}\footnote{
+Our approach is loosely inspired by flight simulators, which test pilot
+aptitude under a variety of rare, adverse scenarios (water landings, 
+engine failures, etc.) before the pilots are certified to work in practice.}, 
+a testing approach
+and tool that can test an application as though it is running in a large number
+of diverse environments likely to cause crashes.  Of course, it is not 
+feasible to test all possible environments, so an important consideration
+is how to choose which environments to test.  This comes from examining 
+situations that caused environmental bugs in other applications and then
+testing for them in other applications.
+
+As a result, an environmental bug that is detected in one application can be 
+detected by CrashSimulator in other applications.  This merely requires the 
+environmental bug to be added to CrashSimulator and then any application can
+be run in CrashSimulator and tested for the bug with no added effort.  Thus,
+CrashSimulator can be applied to an application and can detect the full 
+suite of environmental bugs it is aware of.  This is somewhat analagous to
+CrashSimulator automatically creating unit tests for all environments the 
+application could run in.
 
 
-The development of the CrashSimulator tool for automated testing of
-software against an environment is an important step forward.  There
-are other testing techniques that follow a similar
+%CrashSimulator is based on the
+%observation that: {\em Insight gleaned from a fault that is
+%  caused by unexpected interactions of {\em one application} with one
+%  of its deployment environments, can be leveraged to discover related
+%  faults in a {\em wide range} of applications that may run in that
+%  environment.}  
+% of the problematic environment.  In the case of CrashSimulator,
+%we are concerned with the implicit inputs, implementation details, and resource
+%constraints an application's environment supplies.  Rather than stormy
+%weather and foggy landings, applications experience anomalous conditions such as varying
+%kernel versions with slightly different implementations details,
+%unusual filesystem configurations, and unexpected network conditions that
+%affect performance. Our approach tests an application against such anomalous
+%conditions by modifying the responses to the
+%application's system calls, thereby simulating potential deployment environments.
+
+
+%The development of the CrashSimulator tool for automated testing of
+%software against an environment is an important step forward.  
+\cappos{Please check}
+There
+are other testing techniques that can provide environmental bugs for later
+analysis with CrashSimulator.  This includes
+\cappos{remove or move later?  This shouldn't be 'related work', but should
+mention tools we leverage to get our anomalies...
 approach~\cite{mariani2007compatibility,
   DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
-  DBLP:journals/tosem/MonperrusM13, DBLP:conf/icse/JamrozikSZ16},
-including techniques that detect bugs involving individual system
+  DBLP:journals/tosem/MonperrusM13, DBLP:conf/icse/JamrozikSZ16}, }
+techniques that detect bugs involving individual system
 calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}.
 However, a correct response to an anomaly triggered by one system call
 often requires the application to make several other system calls,
@@ -128,6 +166,7 @@ calls, before the application is deployed.
 %environment by creating a simulation of the environment using this
 %technique and executing the application within it.
 
+\cappos{I would cut this.}
 Here is how CrashSimulator works in detail. Suppose an application
 $A$ has failed due to a newly discovered environmental anomaly.  A
 developer using CrashSimulator can then test whether other

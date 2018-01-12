@@ -1,11 +1,23 @@
 \begin{abstract}
-  A major problem when introducing new applications is that
-  the environment
-  into which an application is introduced can be a source of flaws that remain
-  hidden until after a costly deployment.
-  CrashSimulator is a technique and tool that identifies incorrect application
-  behavior caused by unhandled anomalous environmental conditions such as
-  differing API behavior, network performance, or filesystem state.
+  It is common that an application that is tested extensively, still has a 
+  large numbers of bugs manifest when deployed in production.  This is because
+  it is not feasible to test all of an application's potential 
+  \emph{environments}.  These environmental differences, such as slightly 
+  different behavior due to different OS versions, file systems, network
+  middleboxes, etc. often manifest themselves as failures or crashes of the
+  application. 
+%  will be used 
+%  A major problem when introducing new applications is that
+%  the environment
+%  into which an application is introduced can be a source of flaws that remain
+%  hidden until after a costly deployment.
+
+  CrashSimulator is a technique and tool that uses information about how 
+  different environments differ to identify incorrect application behavior 
+  caused by unhandled anomalous environmental conditions before the 
+  application is deployed.  
+%such as
+%  differing API behavior, network performance, or filesystem state.
   The tool replays system call traces recorded from the application under
   test as a means to monitor and control execution. During replay,
   CrashSimulator modifies system call return values and program states to
@@ -17,11 +29,12 @@
   application against a series of these test cases, CrashSimulator 
   lets the developer see how the application would respond if executed in
   a similar environment.
-  We evaluated CrashSimulator by using it to test popular applications such as
-  vim, nano, aspell, and others selected from the Coreutils project and the
-  Debian popularity contest. The result of this evaluation was 84 bugs 
-  identified in 31 applications with consequences ranging from hangs and
-  crashes to data loss and remote denial of service conditions.
+  We evaluated CrashSimulator by using it to test a set of the most popular 
+  Linux applications, including vim, nano, aspell, and others selected from 
+  the Coreutils project and the Debian popularity contest. The result of this 
+  evaluation was 84 bugs identified in 31 applications with consequences 
+  ranging from hangs and crashes to data loss and remote denial of service 
+  conditions.
   %All but one of the bugs identified by CrashSimulator were previously unknown.
   %One was independently identified and reported to Python's bug tracker.
 
