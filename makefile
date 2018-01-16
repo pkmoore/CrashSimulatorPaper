@@ -7,6 +7,7 @@ CrashSimulator.pdf: CrashSimulator.tex
 
 clean:
 	latexmk -CA
+	- rm CrashSimulator.bbl
 
 view: CrashSimulator.pdf
 	open CrashSimulator.pdf
