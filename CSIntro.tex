@@ -35,19 +35,8 @@ seek to work across different operating systems, network types, etc., and this
 all greatly exaserbates the problems in ensuring the application functions
 correctly.
 system
-One major hurdle in developing robust applications is getting them to
-run reliably across all of the environments in which they may be
-installed.  In an increasingly diverse software ecosystem it is not
-surprising then that problematic differences have emerged between these
-environments.  Whether due to a failure to adhere to 
-standards or developer error, the result is the same: the software 
-fails because of unanticipated environmental conditions.
 
-%What is needed is a strategy for executing an application in such a way that
-%it can experience the anomalies of a deployment
-%environment without actually having to run in one.
 
-%
 %For example, in some environments the {\tt select()} system call
 %correctly updates the state of a variable tracking the length of time
 %the call was blocked, while in other environments this variable is not
@@ -77,18 +66,27 @@ a testing approach
 and tool that can test an application as though it is running in a large number
 of diverse environments likely to cause crashes.  Of course, it is not 
 feasible to test all possible environments, so an important consideration
-is how to choose which environments to test.  This comes from examining 
+is how to choose which environments to test.  This comes from identifying 
 situations that caused environmental bugs in other applications and then
 testing for them in other applications.
-
-As a result, an environmental bug that is detected in one application can be 
+This approach means that an environmental bug that is detected in one application can be 
 detected by CrashSimulator in other applications.  This merely requires the 
 environmental bug to be added to CrashSimulator. Once this is done, any application can
 be tested for the bug using CrashSimulator with no added effort.  Thus,
 CrashSimulator can be applied to an application and can detect the full 
 suite of environmental bugs it is aware of.  This is somewhat analagous to
 CrashSimulator automatically creating unit tests for all environments the 
-application could run in.
+in which the application could run.
+Each of these ``tests'' consists of rules for
+mutating system call behavior to give the application the illusion that it is
+executing in an anomalous environment and rules for determining whether or not
+the application responds appropriately.
+Because these rules can be applied to many
+applications that may be prone to mishandling the
+anomalous environment in question, prior knowledge
+gathered from past deployment experiences can be used to more thoroughly work
+out a new application so that it can
+handle the challenges of its target environments correctly.
 
 
 %CrashSimulator is based on the
@@ -187,17 +185,7 @@ calls, before the application is deployed.
 %appliation successfully completed the protocol and, as a result, performed the operation correctly in terms of the
 %simulated environment.
 %
-%
-%Individual pieces of the above process can be thought of as a pair consisting of an environmental anomaly and a model
-%that determines whether or not the application handled it correctly.  Each of these pairs is a test and collectively
-%they can be thought of as a test suite.  
-A key advantage of this approach is that these %tests and test suites can be
-trace perturbations and corresponding checkers can be
-accumulated from any number of applications that exist in the environment the tests will describe.  Once accumulated,
-they can be used to test any application as if it were running in that environment.  In this way, prior knowledge
-gathered from past deployment experiences can be used to more thoroughly work
-out a new application so that it can be
-constructed in such a way that it handles the challenges of the target environment correctly.
+
 
 %MOVE NEXT FEW PARAGRAPHS TO SUMMARY IN CONCLUSION ???
 %
@@ -279,13 +267,6 @@ constructed in such a way that it handles the challenges of the target environme
 %  anomaly).
 %\end{enumerate}
 
-Each of CrashSimulator's test patterns consists of rules for
-mutating traces to give the application the illusion that it is
-executing in an anomalous environment, and a checker that attempts to
-determine whether the application responds appropriately to the
-anomaly.  Once developed, these test patterns can be applied to many
-traces from many applications that may be prone to mishandling the
-environmental anomaly in question.
 
 
 This paper makes the following contributions:
