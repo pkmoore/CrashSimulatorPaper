@@ -114,6 +114,7 @@
     will be paid back as it is used
     repeatedly over time to test many different applications.
 
+    \preston{Maybe cut this paragraph in favor of the following example}
     With this information in mind, a developer can construct the simple
     mutation, for example:  ``make the {\tt open()} call return -1 with {\tt errno} set to
     {\tt ENOENT}'', and use CrashSimulator to apply it to any application that
@@ -121,6 +122,31 @@
     Using these mutated traces can allow
     CrashSimulator to perform a universal test for whether or not an
     application correctly checks {\tt open()}'s return value.
+
+    \preston{Concrete example from one of the anomalies}
+    For a more concrete example of the above, consider an anomaly
+    involving unusual file types we will later address in our evaluation of
+    CrashSimulator.  This anomaly appears when a call to {\tt stat()} or a similar system
+    call returns a structure with a {\tt st\_mode} member containing an unexpected
+    value. Consider the line of {\tt strace} output representing a call to {\tt
+      fstat()}:
+    \begin{quote}
+      {\tt 8936  fstat64(3, \{st\_dev=makedev(0, 40), st\_ino=54993216, st\_mode=S\_IFREG ...\}) = 0}
+    \end{quote}
+    The third member of the returned structure indicates that the file is a
+    regular file by showing that {\tt st\_mode} flag is set in the {\tt st\_mode}
+    member.  CrashSimulator can mutate this  line to the following:
+
+    \begin{quote}
+      {\tt 8936  fstat64(3, \{st\_dev=makedev(0, 40), st\_ino=54993216, st\_mode=S\_IFCHR ...\}) = 0}
+    \end{quote}
+    
+    The trace containing this modified line can then be replayed in order to
+    test how
+    the application responds when a file
+    that is expected to be regular is actually a character device. In our
+    evaluation we further explore the behavior of applications as they encounter
+    other possible valid values of {\tt st\_mode} in the course of testing.
 
     %CrashSimulator can use the outputs of this analysis either as mutations to
     %be applied to a system call trace of the application under test or as input
