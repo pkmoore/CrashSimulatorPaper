@@ -2,39 +2,38 @@
 
 \textit{No Battle Plan Survives Contact With the Enemy --- Helmuth von Moltke}
 
-No matter how well an application is tested before being released, new 
-bugs always seem to be found after deployment.
-A recent survey conducted by
-ClusterHQ~\cite{ClusterHQSurvey} confirmed that application developers
-spend a significant portion of their time debugging errors that are only discovered
-in production.  The survey participants cited the inability to
-recreate production environments for testing as the main reason why
-bugs are not discovered earlier.
-Putting forward enormous developer effort
-may be insufficient to uncover
-these bugs before deployment.
-Microsoft employs thousands of engineers with nearly a 1:1 ratio of testers to
-developers\cite{Page2009}.
-In spite of this enormous emphasis on testing a recent Windows Update released
-in response to the Spectre Intel CPU vulnerability resulted in machines with
-certain hardware configurations being rendered unbootable~\cite{kb4056892}.
-Even specialized ``Write-Once, Run Anywhere'' environments, such as the Java
-Runtime Environment, that attempt to hide these environmental differences are
-not perfect, leading them to be rechristened ``Write-Once, Debug
-Everywhere''~\cite{WODE}.
-Clearly, bugs are
-being missed in testing only to be found in deployment.
+No matter how well an application is tested before being released, new
+bugs always seem to be found after deployment. An important reason
+explaining this observation is that applications are running in a
+diverse set of different deployment \emph{environments}. Many
+applications seek to work across different operating systems, network
+types, etc.  Changing the operating system can cause new bugs to
+occur~\cite{LinuxGlibcChanges}, file systems exhibit subtle but
+critical differences among each other~\cite{EXT4Layout, AppleHFS}, and differences
+in network behavior can be substantial, even in situations where the
+network type or even the adapter are identical~\cite{vbox}. These
+environmental differences greatly exacerbates the problems in ensuring
+that an application functions correctly before it is deployed.
 
-A large reason for the challenges discovered during deployment is that the 
-application is running in a diverse set of different \emph{environments}.  
-Changing the operating system can cause new bugs to occur~\cite{LinuxGlibcChanges}, file
-systems have quite different behavior from each other~\cite{EXT4Layout}\cite{AppleHFS}, and differences
-in network behavior can be substantial, even in situations where the network
-type or even the adaptor are identical~\cite{vbox}.  Of course, many applications
-seek to work across different operating systems, network types, etc., and this
-all greatly exaserbates the problems in ensuring the application functions
-correctly.
-system
+A recent survey conducted by ClusterHQ~\cite{ClusterHQSurvey}
+confirmed that application developers spend a significant portion of
+their time debugging errors that are only discovered in production.
+The survey participants cited the inability to recreate production
+environments for testing as the main reason why bugs are not
+discovered earlier.  Putting forward enormous developer effort may be
+insufficient to uncover these bugs before deployment.  Microsoft
+employs thousands of engineers with nearly a 1:1 ratio of testers to
+developers~\cite{Page2009}.  In spite of this enormous emphasis on
+testing a recent Windows Update released in response to the Spectre
+Intel CPU vulnerability resulted in machines with certain hardware
+configurations being rendered unbootable~\cite{kb4056892}.  Even
+specialized ``Write-Once, Run Anywhere'' environments that attempt to
+hide these environmental differences, such as the Java Runtime
+Environment, are not perfect, leading them to be rechristened
+``Write-Once, Debug Everywhere''~\cite{WODE}.  Clearly, bugs due to
+differences between development and production environments are being
+missed in testing only to be found in deployment.
+
 
 
 %For example, in some environments the {\tt select()} system call
@@ -58,24 +57,31 @@ system
 %this assumption was violated, the application failed.
 %
 
+\thomas{I think the following paragraph should give a short high-level
+  overview of CrashSimulator's approach, specifically, the idea of
+  system call replay, mutation, and checking. The summary of the
+  contributions refers to some of these ideas but we never actually
+  explain any of them in the intro.}
 In this paper, we introduce {\em CrashSimulator}\footnote{
 Our approach is loosely inspired by flight simulators, which test pilot
 aptitude under a variety of rare, adverse scenarios (water landings, 
 engine failures, etc.) before the pilots are certified to work in practice.}, 
 a testing approach
 and tool that can test an application as though it is running in a large number
-of diverse environments likely to cause crashes.  Of course, it is not 
+of diverse environments likely to cause crashes.  It is not 
 feasible to test all possible environments, so an important consideration
 is how to choose which environments to test.  This comes from identifying 
 situations that caused environmental bugs in other applications and then
-testing for them in other applications.
+testing for them systematically.
 This approach means that an environmental bug that is detected in one application can be 
-detected by CrashSimulator in other applications.  This merely requires the 
-environmental bug to be added to CrashSimulator. Once this is done, any application can
+detected by CrashSimulator in other applications.  \thomas{What does
+  'This' refer to?} This merely requires the 
+environmental bug to be added to CrashSimulator \thomas{What does it
+  mean for an environmental bug to be added to CrashSimulator?}. Once this is done, any application can
 be tested for the bug using CrashSimulator with no added effort.  Thus,
 CrashSimulator can be applied to an application and can detect the full 
 suite of environmental bugs it is aware of.  This is somewhat analagous to
-CrashSimulator automatically creating unit tests for all environments the 
+CrashSimulator automatically creating unit tests for all environments
 in which the application could run.
 Each of these ``tests'' consists of rules for
 mutating system call behavior to give the application the illusion that it is
@@ -126,7 +132,7 @@ NetCheck~\cite{Zhuang_NSDI_2014} and
 CheckAPI~\cite{rasley2015detecting} can analyze complex response
 patterns while the anomaly is observed in the deployment
 environment. However, they do not support systematic testing of
-applications before deployment.  As a result, relying only on these
+applications before deployment.  Consequently, relying only on these
 capabilities results in applications being deployed with a significant
 number of bugs that are only discovered after the fact ---
 necessitating costly bug triage and application re-deployment.
@@ -281,12 +287,24 @@ This paper makes the following contributions:
 \item{It offers an approach for encoding an appropriate flow of
     interactions between an application and its environment as a model that
     can be later used to check for correct behavior.}
-\item{It presents an implementation of CrashSimulator that can implement the
-    discussed approach to successfully find bugs, both known and unknown. 
-    Using this prototype on popular applications, such as {\tt wc}, {\tt ftp}, 
+\item \thomas{The summary of the evaluation should be expanded and
+    beefed up (it should be at least as detailed as in the
+    abstract). Also, perhaps move this bullet point into a separate
+    paragraph after the enumeration for emphasis.}{It presents an implementation of
+    CrashSimulator that can implement the discussed approach to
+    successfully find bugs, both known and unknown.  Using this
+    prototype on popular applications, such as {\tt wc}, {\tt ftp},
     {\tt vim}, and {\tt nano}, we found 84 bugs.}
 \end{enumerate}
 
+\thomas{I don't think that the introduction should end with an overview of the
+  paper. I prefer to
+  end the intro with a strong argument for why the paper should be accepted. In our
+  case, this is the summary of the evaluation and what is novel about
+  CrashSimulator. This way of organizing the intro also makes it
+  easier for the reviewer. The overview rarely adds anything meaningful. We
+  could even drop it altogether. Alternatively, move it to the
+  beginning of the next section.}
 In the remainder of this paper we
 offer additional details on CrashSimulator's operation.
 In section~\ref{sec:approach} we present the rationale for our system call trace
