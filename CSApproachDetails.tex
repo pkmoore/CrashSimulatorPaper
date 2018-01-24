@@ -98,16 +98,12 @@
     identify a series of calls indicative of an appropriate (or inappropriate)
     response to a specified anomaly.
     This analysis should identify two things: 1) any mutations that may need to be
-    made to the trace to simulate the anomalous environment, and 2) a checker to
+    made to the trace to simulate the anomalous environment (i.e. what
+    modifications
+    must be made to system call return values and program state during replay), and 2) a checker to
     examine the application's response to further trace operations in order to
     determine
-    whether it is responding appropriately. These checkers can often be 
-    described by finite automata, allowing CrashSimulator to simply check
-    whether replay results are accepted by the automaton.  The set of mutations
-    needed to simulate the anomalous environment consist of modifications
-    to the return values and program state changes that result from the involved
-    system call or calls.
-
+    whether it is responding appropriately.
     Much like the effort involved in constructing a unit test to
     check for correct behavior in a piece of code, this
     process involves an initial outlay of user skill and effort that 
