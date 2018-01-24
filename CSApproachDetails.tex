@@ -190,13 +190,15 @@
     editing the system call trace, such that the line describing this read call
     reflects the above values.
 
-    \preston{Our implementation of CrashSimulator uses {\tt strace} to accomplish the
+    Our implementation of CrashSimulator uses {\tt strace} to accomplish the
     above.  {\tt Strace} is a good fit for this purpose because it provides a
     ready-build way to record an application's system call activity as well as a
     user-friendly representation of the inputs, outputs, and side effects of
     each system call an application makes.  This means CrashSimulator's user can
-    easily modify an {\tt strace} recording in order to express an anomaly in
-    terms of system call results and side effects.}
+    easily modify an {\tt strace} recording using a text editor in order to
+    express an anomaly in terms of system call results and side effects.  These
+    modifications can typically be automated (and were for the anomalies used in
+    our evaluation).
 
 
     %Consider the example of an anomaly identified in a web server application.
