@@ -299,29 +299,26 @@
     not an application has performed a required operation.  These checkers
     monitor a replay execution for a specific system call sequence (with the
     correct parameters, return values, and state modifications) that indicates
-    the application has carried out the operation in question.  \preston{To
+    the application has carried out the operation in question.  To
     facilitate the creation of these more specific checkers our current
     implementation of CrashSimulator provides an object-based Python interface
     over the system calls made during a replay execution.
     Whenever a system call is handled in the course of a replay
     execution, a callback passes the associated inputs, outputs, and side effects to the user's
     chosen checker.  The checkers we implemented in order to evaluate
-    CrashSimulator}
-    use a model (e.g. a deterministic finite
-    automaton, a push down automaton, etc.) that accepts particular system
+    CrashSimulator
+    use a model that accepts particular system
     call sequences indicative of correct (or incorrect) response
     to the anomaly.  Whether CrashSimulator
     ultimately accepts a given replay execution is determined by the ending
     states of the checkers monitoring the execution.
-
-    \preston{We chose to implement checkers using enhanced finite automata because it seemed
-    a good fit for analyzing a stream of system calls as they occurred.  In reality,
+    In reality,
     users are unrestricted in terms of what strategy they use to implement a
     checker.  CrashSimulator simply presents the stream of system calls as described
     above for consumtion by a checker.  Once a user has a idea of the system call
     sequence they need to check for, the actual construction of a checker is
     simple.  The effort and amount of code involved is similar to that of a small
-    unit test. }
+    unit test.
     
 
 
