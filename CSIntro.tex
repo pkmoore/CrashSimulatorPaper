@@ -56,12 +56,6 @@ missed in testing only to be found in deployment.
 %provided as input to the key import process was a regular file; when
 %this assumption was violated, the application failed.
 %
-
-\thomas{I think the following paragraph should give a short high-level
-  overview of CrashSimulator's approach, specifically, the idea of
-  system call replay, mutation, and checking. The summary of the
-  contributions refers to some of these ideas but we never actually
-  explain any of them in the intro.}
 In this paper, we introduce {\em CrashSimulator}\footnote{
 Our approach is loosely inspired by flight simulators, which test pilot
 aptitude under a variety of rare, adverse scenarios (water landings, 
@@ -96,6 +90,15 @@ gathered from past deployment experiences can be used to more thoroughly work
 out a new application so that it can
 handle the challenges of its target environments correctly.
 
+CrashSimulator's technique for performing this testing procedure is based on the
+insight that environmental anomalies can be represented as anomalies in results
+and side effects of the system calls an application makes.  CrashSimulator tests
+an application by exposing it to these anomalous conditions during the course of
+execution and evaluating the application's response to them.  This details of
+this exposure are configured by taking a system call trace of the application
+under normal conditions and modifying it such that the anomalous conditions are
+represented.  CrashSimulator uses these modified system call traces to control a
+replay execution of the application in which these conditions will be encountered.
 
 %CrashSimulator is based on the
 %observation that: {\em Insight gleaned from a fault that is
