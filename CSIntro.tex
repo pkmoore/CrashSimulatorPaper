@@ -70,19 +70,21 @@ a testing approach
 and tool that can test an application as though it is running in a large number
 of diverse environments likely to cause crashes.  It is not 
 feasible to test all possible environments, so an important consideration
-is how to choose which environments to test.  This comes from identifying 
+is how to choose which environments to test.  These environments can be chosen
+by  identifying 
 situations that caused environmental bugs in other applications and then
 testing for them systematically.
-This approach means that an environmental bug that is detected in one application can be 
-detected by CrashSimulator in other applications.  \thomas{What does
-  'This' refer to?} This merely requires the 
-environmental bug to be added to CrashSimulator \thomas{What does it
-  mean for an environmental bug to be added to CrashSimulator?}. Once this is done, any application can
-be tested for the bug using CrashSimulator with no added effort.  Thus,
-CrashSimulator can be applied to an application and can detect the full 
-suite of environmental bugs it is aware of.  This is somewhat analagous to
+Selecting situations in this way means that an environmental bug that is detected in one application can be 
+detected by CrashSimulator in other applications. 
+This merely requires CrashSimulator be configured to identify the environmental
+bug in question.
+Once this is done, any application can
+be tested for the bug using CrashSimulator with no added effort.  CrashSimulator
+can be configured to test a suite of bugs accumulated from a set of applications
+running in a variety of environments.
+This is somewhat analagous to
 CrashSimulator automatically creating unit tests for all environments
-in which the application could run.
+in which an application could run.
 Each of these ``tests'' consists of rules for
 mutating system call behavior to give the application the illusion that it is
 executing in an anomalous environment and rules for determining whether or not
