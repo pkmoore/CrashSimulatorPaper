@@ -117,34 +117,32 @@ replay execution of the application in which these conditions will be encountere
 %application's system calls, thereby simulating potential deployment environments.
 
 
-%The development of the CrashSimulator tool for automated testing of
-%software against an environment is an important step forward.  
-\cappos{Please check}
-There
-are other testing techniques that can provide environmental bugs for later
-analysis with CrashSimulator.  This includes
-\cappos{remove or move later?  This shouldn't be 'related work', but should
-mention tools we leverage to get our anomalies...
-approach~\cite{mariani2007compatibility,
-  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
-  DBLP:journals/tosem/MonperrusM13, DBLP:conf/icse/JamrozikSZ16}, }
-techniques that detect bugs involving individual system
-calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}.
-However, a correct response to an anomaly triggered by one system call
-often requires the application to make several other system calls,
-each of which may trigger further anomalies. Tools such as
-NetCheck~\cite{Zhuang_NSDI_2014} and
-CheckAPI~\cite{rasley2015detecting} can analyze complex response
-patterns while the anomaly is observed in the deployment
-environment. However, they do not support systematic testing of
-applications before deployment.  Consequently, relying only on these
-capabilities results in applications being deployed with a significant
-number of bugs that are only discovered after the fact ---
-necessitating costly bug triage and application re-deployment.
-We are the first to
-explore techniques for finding bugs related to complex
-environment interactions that involve multiple interdependent system
-calls, before the application is deployed. 
+%\cappos{Please check}
+%There
+%are other testing techniques that can provide environmental bugs for later
+%analysis with CrashSimulator.  This includes
+%\cappos{remove or move later?  This shouldn't be 'related work', but should
+%mention tools we leverage to get our anomalies...
+%approach~\cite{mariani2007compatibility,
+%  DBLP:journals/ase/WasylkowskiZ11, DBLP:conf/icse/PradelJAG12,
+%  DBLP:journals/tosem/MonperrusM13, DBLP:conf/icse/JamrozikSZ16}, }
+%techniques that detect bugs involving individual system
+%calls~\cite{Koopman00theexception,Dadeau:2008:CSM:1433121.1433137,Farchi02}.
+%However, a correct response to an anomaly triggered by one system call
+%often requires the application to make several other system calls,
+%each of which may trigger further anomalies. Tools such as
+%NetCheck~\cite{Zhuang_NSDI_2014} and
+%CheckAPI~\cite{rasley2015detecting} can analyze complex response
+%patterns while the anomaly is observed in the deployment
+%environment. However, they do not support systematic testing of
+%applications before deployment.  Consequently, relying only on these
+%capabilities results in applications being deployed with a significant
+%number of bugs that are only discovered after the fact ---
+%necessitating costly bug triage and application re-deployment.
+%We are the first to
+%explore techniques for finding bugs related to complex
+%environment interactions that involve multiple interdependent system
+%calls, before the application is deployed. 
 
 
 % CrashSimulator is concerned with bugs that arise from subtle
@@ -280,6 +278,8 @@ calls, before the application is deployed.
 
 
 
+\preston{Do we need a paragraph just before this to tie the previous discussion
+  to these contributions?}
 This paper makes the following contributions:
 
 \begin{enumerate}
