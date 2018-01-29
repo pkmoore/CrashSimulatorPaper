@@ -94,7 +94,7 @@ CrashSimulator's technique for performing this testing procedure is based on the
 insight that environmental anomalies can be represented as anomalies in results
 and side effects of the system calls an application makes.  CrashSimulator tests
 an application by exposing it to these anomalous conditions during the course of
-execution and evaluating the application's response to them.  This details of
+execution and evaluating the application's response to them.  The details of
 this exposure are configured by taking a system call trace of the application
 under normal conditions and modifying it such that the anomalous conditions are
 represented.  CrashSimulator uses these modified system call traces to control a
@@ -301,23 +301,6 @@ When the applications in question were actually exposed to these conditions a
 variety of failures including hangs, crashes, and filesystem damage occurred.  In
 total, 84 bugs were identified.
 
-%\thomas{I don't think that the introduction should end with an overview of the
-%  paper. I prefer to
-%  end the intro with a strong argument for why the paper should be accepted. In our
-%  case, this is the summary of the evaluation and what is novel about
-%  CrashSimulator. This way of organizing the intro also makes it
-%  easier for the reviewer. The overview rarely adds anything meaningful. We
-%  could even drop it altogether. Alternatively, move it to the
-%  beginning of the next section.}
-%In the remainder of this paper we
-%offer additional details on CrashSimulator's operation.
-%In section~\ref{sec:approach} we present the rationale for our system call trace
-%and replay system and explain how anomalies are identified, extracted,
-%converted, and injected while section~\ref{sec:evaluation} analyzes the results
-%of testing conducted with the tool and evaluates its effectiveness at checking
-%behavior in simulated environments.  Related work is discussed in
-%section~\ref{sec:relatedwork} and we offer concluding thoughts and suggestions
-%for future work in section~\ref{sec:conclusion}.
 
 
 %%% Local Variables: 

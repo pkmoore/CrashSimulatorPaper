@@ -1,4 +1,26 @@
 \section{Approach Details}
+
+%\thomas{I don't think that the introduction should end with an overview of the
+%  paper. I prefer to
+%  end the intro with a strong argument for why the paper should be accepted. In our
+%  case, this is the summary of the evaluation and what is novel about
+%  CrashSimulator. This way of organizing the intro also makes it
+%  easier for the reviewer. The overview rarely adds anything meaningful. We
+%  could even drop it altogether. Alternatively, move it to the
+%  beginning of the next section.}
+
+\textit{In the remainder of this paper we
+offer additional details on CrashSimulator's operation.
+In section~\ref{sec:approach} we present the rationale for our system call trace
+and replay system and explain how anomalies are identified, extracted,
+converted, and injected while section~\ref{sec:evaluation} analyzes the results
+of testing conducted with the tool and evaluates its effectiveness at checking
+behavior in simulated environments.  Related work is discussed in
+section~\ref{sec:relatedwork} and we offer concluding thoughts and suggestions
+for future work in section~\ref{sec:conclusion}.}
+
+\bigskip
+
 \label{sec:approach}
     \begin{figure}[t]
         \center{}
@@ -296,7 +318,7 @@
     monitor a replay execution for a specific system call sequence (with the
     correct parameters, return values, and state modifications) that indicates
     the application has carried out the operation in question.  To
-    facilitate the creation of these more specific checkers our current
+    facilitate the creation of these more specific checkers our
     implementation of CrashSimulator provides an object-based Python interface
     over the system calls made during a replay execution.
     Whenever a system call is handled in the course of a replay
@@ -308,8 +330,7 @@
     to the anomaly.  Whether CrashSimulator
     ultimately accepts a given replay execution is determined by the ending
     states of the checkers monitoring the execution.
-    In reality,
-    users are unrestricted in terms of what strategy they use to implement a
+    Users are unrestricted in terms of what strategy they use to implement a
     checker.  CrashSimulator simply presents the stream of system calls as described
     above for consumtion by a checker.  Once a user has a idea of the system call
     sequence they need to check for, the actual construction of a checker is
